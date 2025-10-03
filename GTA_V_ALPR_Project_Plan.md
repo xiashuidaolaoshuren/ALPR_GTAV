@@ -117,3 +117,47 @@ A tracking algorithm will be implemented to maintain the identity of a license p
   - **Mitigation:** Extensive pre-processing of the cropped license plate image. If issues persist, fine-tuning the OCR model on a synthetic dataset of GTA V-style license plates may be necessary.
 - **Risk:** Real-time performance is not achieved.
   - **Mitigation:** Use a smaller, faster YOLO model (e.g., YOLOv8n). Optimize the pipeline by only running OCR when a new plate is detected or after a certain number of frames.
+
+## 8. Datasets
+
+The performance of the ALPR system is highly dependent on the quality and diversity of the data used for training and evaluation. We will require three main types of datasets:
+
+### 8.1. Raw In-Game Footage
+This dataset will consist of video clips recorded directly from GTA V gameplay. It is crucial to capture a wide variety of scenarios to ensure the final model is robust.
+
+- **Content:** Gameplay recordings of vehicles from different angles, distances, and speeds.
+- **Conditions to Capture:**
+    - **Time of Day:** Day, night, dawn, and dusk.
+    - **Weather:** Clear, rainy, foggy, and overcast.
+    - **Lighting:** Direct sunlight, shadows, and artificial light from street lamps or headlights.
+    - **Occlusion:** Partially obscured license plates (e.g., by other cars, objects, or dirt on the plate).
+- **Source:** Manual gameplay recording or automated data collection using scripts (e.g., ScriptHookV).
+
+### 8.2. License Plate Detection Dataset (for YOLOv8)
+This dataset will be used to fine-tune the YOLOv8 model for detecting license plates. It will be created by annotating frames extracted from the raw in-game footage.
+
+- **Format:** Each image will have a corresponding label file containing the bounding box coordinates of the license plate(s). The format will be compatible with YOLO, where each line in the label file represents one object: `<class_id> <x_center> <y_center> <width> <height>`.
+- **Annotation Tools:** We will use an annotation tool like **CVAT** or **Roboflow** to label the license plates.
+- **Structure:** The dataset will be split into `train`, `validation`, and `test` sets. A `data.yaml` file will be created to define the dataset paths and class names, as required by YOLOv8.
+    ```yaml
+    train: ../datasets/lpr/train/images
+    val: ../datasets/lpr/valid/images
+    
+    # Number of classes
+    nc: 1
+    
+    # Class names
+    names: ['license_plate']
+    ```
+
+### 8.3. License Plate Recognition Dataset (for OCR)
+This dataset is for training or evaluating the PaddleOCR model. It will consist of cropped images of license plates.
+
+- **Content:** Tightly cropped images of license plates, extracted from the detection dataset.
+- **Preprocessing:** These images may be pre-processed (e.g., de-skewed, converted to grayscale, resized) to improve OCR performance.
+- **Labeling:** A simple text file mapping image filenames to the corresponding license plate text will be created. For example:
+    ```
+    image_001.png	SA8821A
+    image_002.png	46EEK827
+    ```
+This format is compatible with PaddleOCR's training pipeline if fine-tuning becomes necessary.
