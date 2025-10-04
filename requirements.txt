@@ -1,0 +1,30 @@
+# Core Dependencies for GTA V ALPR Project
+# Deep Learning Frameworks
+ultralytics>=8.0.0
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Computer Vision
+opencv-python>=4.8.0
+
+# OCR - PaddlePaddle
+paddlepaddle-gpu>=2.5.0  # Use paddlepaddle for CPU-only systems
+paddleocr>=2.7.0
+
+# Data Augmentation
+albumentations>=1.3.0
+
+# Configuration Management
+pyyaml>=6.0
+
+# Testing
+pytest>=7.0.0
+
+# Utilities
+tqdm>=4.65.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+Pillow>=9.5.0
+
+# Annotation Tool (for Week 2)
+label-studio>=1.8.0

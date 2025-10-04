@@ -1,0 +1,135 @@
+# GTA V ALPR Pipeline Configuration
+# This file contains all configuration parameters for the ALPR pipeline modules
+
+# Detection Module Configuration (YOLOv8)
+detection:
+  # Path to YOLOv8 model weights
+  # Default: Pre-trained license plate detection model
+  model_path: models/detection/yolov8n.pt
+  
+  # Confidence threshold for detections (0.0 - 1.0)
+  # Lower values detect more plates but increase false positives
+  confidence_threshold: 0.25
+  
+  # Intersection over Union (IOU) threshold for NMS (0.0 - 1.0)
+  # Higher values allow more overlapping detections
+  iou_threshold: 0.45
+  
+  # Image size for inference (pixels)
+  # Model will resize input images to this size
+  img_size: 640
+  
+  # Enable GPU acceleration
+  device: cuda  # Options: cuda, cpu
+  
+  # Maximum number of detections per image
+  max_det: 100
+
+# Recognition Module Configuration (PaddleOCR)
+recognition:
+  # Enable GPU acceleration for OCR
+  use_gpu: true
+  
+  # Use angle classification to correct text orientation
+  use_textline_orientation: true
+  
+  # Language model to use
+  lang: en  # Options: en, ch (Chinese), etc.
+  
+  # Recognition confidence threshold (0.0 - 1.0)
+  rec_threshold: 0.5
+  
+  # Show detailed OCR logs
+  show_log: false
+  
+  # Enable recognition algorithm (disable for detection-only mode)
+  use_rec: true
+
+# Tracking Module Configuration
+tracking:
+  # Tracking algorithm type
+  tracker_type: bytetrack  # Options: bytetrack, botsort, iou
+  
+  # Maximum frames to keep lost tracks alive
+  max_age: 30
+  
+  # Minimum number of detections before confirming track
+  min_hits: 3
+  
+  # IOU threshold for matching detections to tracks
+  iou_threshold: 0.3
+  
+  # Frames between OCR calls for same plate (optimization)
+  # Reduces redundant OCR processing
+  ocr_interval: 30
+  
+  # Confidence threshold for accepting OCR results
+  ocr_confidence_threshold: 0.7
+
+# Preprocessing Module Configuration
+preprocessing:
+  # Enable image enhancement
+  enable_enhancement: false
+  
+  # Minimum width for plate crops (pixels)
+  # Smaller crops will be upscaled
+  min_width: 200
+  
+  # Use CLAHE (Contrast Limited Adaptive Histogram Equalization)
+  use_clahe: false
+  
+  # CLAHE clip limit (higher = more contrast)
+  clahe_clip_limit: 2.0
+  
+  # CLAHE tile grid size
+  clahe_tile_grid_size: [8, 8]
+  
+  # Gaussian blur for noise reduction
+  use_gaussian_blur: false
+  gaussian_kernel_size: [3, 3]
+  
+  # Sharpening filter
+  use_sharpening: false
+  sharpen_strength: 1.0
+
+# Pipeline Configuration
+pipeline:
+  # Enable complete pipeline (detection + recognition + tracking)
+  enable_full_pipeline: true
+  
+  # Save intermediate results (crops, annotated images)
+  save_intermediate: true
+  
+  # Output directory for results
+  output_dir: outputs
+  
+  # Video processing batch size (frames)
+  batch_size: 32
+  
+  # Enable logging
+  enable_logging: true
+  log_level: INFO  # Options: DEBUG, INFO, WARNING, ERROR
+  log_file: outputs/alpr_pipeline.log
+
+# Data Augmentation (for training)
+augmentation:
+  # Horizontal flip probability
+  horizontal_flip: 0.5
+  
+  # Vertical flip probability
+  vertical_flip: 0.0
+  
+  # Random brightness/contrast adjustment range
+  brightness_contrast_limit: 0.2
+  
+  # Blur probability
+  blur_limit: 3
+  
+  # Random crop probability
+  random_crop: 0.0
+  
+  # Rotation range (degrees)
+  rotation_limit: 10
+  
+  # Enable Mosaic augmentation (YOLO-specific)
+  mosaic: true

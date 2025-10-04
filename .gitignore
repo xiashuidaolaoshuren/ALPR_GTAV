@@ -55,6 +55,7 @@ checkpoints/
 logs/
 wandb/
 .neptune/
+outputs/
 
 # Data files
 *.csv
