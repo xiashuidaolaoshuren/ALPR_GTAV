@@ -62,7 +62,7 @@ A tracking algorithm will be implemented to maintain the identity of a license p
     - Set up a Git repository for version control.
     - Develop a strategy for data acquisition. This could involve:
         - Recording gameplay footage in GTA V under various conditions (day, night, rain).
-        - Writing a script using tools like `ScriptHookV` or `FiveM` to automate data collection (e.g., spawning different vehicles, changing weather).
+        - Writing a script using `ScriptHookV` to automate data collection (e.g., spawning different vehicles, changing weather, and capturing screenshots).
 - **Deliverable:** A configured development environment and a small dataset of initial test images/videos.
 
 ### Week 2: License Plate Detection
@@ -70,7 +70,7 @@ A tracking algorithm will be implemented to maintain the identity of a license p
     - Load the pre-trained YOLOv8 license plate detection model.
     - Write a script to run inference on the collected test images and videos.
     - Evaluate the initial performance of the detector. Identify its strengths and weaknesses (e.g., does it fail at night? At sharp angles?).
-    - If necessary, start annotating a small custom dataset for future fine-tuning using a tool like `Roboflow` or `CVAT`.
+    - If necessary, start annotating a small custom dataset for future fine-tuning using **Label Studio**.
 - **Deliverable:** A Python script that can detect and draw bounding boxes around license plates in images and videos.
 
 ### Week 3: License Plate Recognition (OCR)
@@ -131,13 +131,13 @@ This dataset will consist of video clips recorded directly from GTA V gameplay. 
     - **Weather:** Clear, rainy, foggy, and overcast.
     - **Lighting:** Direct sunlight, shadows, and artificial light from street lamps or headlights.
     - **Occlusion:** Partially obscured license plates (e.g., by other cars, objects, or dirt on the plate).
-- **Source:** Manual gameplay recording or automated data collection using scripts (e.g., ScriptHookV).
+- **Source:** Automated data collection using scripts with **ScriptHookV**.
 
 ### 8.2. License Plate Detection Dataset (for YOLOv8)
 This dataset will be used to fine-tune the YOLOv8 model for detecting license plates. It will be created by annotating frames extracted from the raw in-game footage.
 
 - **Format:** Each image will have a corresponding label file containing the bounding box coordinates of the license plate(s). The format will be compatible with YOLO, where each line in the label file represents one object: `<class_id> <x_center> <y_center> <width> <height>`.
-- **Annotation Tools:** We will use an annotation tool like **CVAT** or **Roboflow** to label the license plates.
+- **Annotation Tools:** We will use **Label Studio** to label the license plates.
 - **Structure:** The dataset will be split into `train`, `validation`, and `test` sets. A `data.yaml` file will be created to define the dataset paths and class names, as required by YOLOv8.
     ```yaml
     train: ../datasets/lpr/train/images
