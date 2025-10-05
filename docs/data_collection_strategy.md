@@ -228,21 +228,37 @@ Capture location: Dedicated SSD
 ### 3.4 Post-Recording Processing
 
 **File Organization:**
+The recommended practice is to organize raw footage into directories based on capture conditions and to use descriptive filenames.
+
 ```
-raw_footage/
+GTA5_Recordings/
 ├── day_clear/
-│   ├── clip_001.mp4
-│   └── clip_002.mp4
-├── night_rain/
-│   └── clip_003.mp4
-└── metadata.csv
+│   ├── day_clear_01.mp4
+│   └── day_clear_02.mp4
+├── night_clear/
+│   └── night_clear_01.mp4
+└── metadata.txt
 ```
 
-**Metadata CSV Format:**
-```csv
-filename,time_of_day,weather,primary_angle,distance,notes
-clip_001.mp4,day,clear,front,medium,highway traffic
-clip_002.mp4,night,clear,rear,close,parking lot
+**File Naming Convention:**
+Files should be renamed to reflect their content, making them easier to manage.
+- **Pattern:** `{condition}_{location}_{number}.mp4`
+- **Example:** `day_clear_airport_01.mp4`
+
+**Metadata Logging:**
+A simple text file (`metadata.txt`) should be maintained to log key details about each recording session.
+
+**`metadata.txt` Example:**
+```
+day_clear_01.mp4
+- Location: Airport parking lot
+- Vehicles: 15-20 sedans, 5 trucks
+- Quality: Good, clear lighting
+
+night_clear_01.mp4
+- Location: Downtown street
+- Vehicles: 10 sedans
+- Quality: Good, street lamps
 ```
 
 ---
@@ -359,12 +375,14 @@ For each captured clip, verify:
 
 **Naming Convention:**
 ```
-{location}_{condition}_{vehicle_type}_{frame_number}.jpg
+{video_filename_base}_{frame_number}.jpg
 
 Examples:
-airport_day_clear_sedan_00123.jpg
-freeway_night_rain_truck_00456.jpg
+day_clear_01_00123.jpg
+night_rain_03_00456.jpg
 ```
+
+This convention uses the base name of the source video file, ensuring that frames are easily traceable to their original clip.
 
 ### 5.2 Automated Extraction Script
 
@@ -378,6 +396,7 @@ def extract_frames(video_path, output_dir, fps=5, quality=95):
     source_fps = video.get(cv2.CAP_PROP_FPS)
     frame_interval = int(source_fps / fps)
     
+    video_filename_base = os.path.splitext(os.path.basename(video_path))[0]
     frame_count = 0
     extracted_count = 0
     
@@ -388,8 +407,8 @@ def extract_frames(video_path, output_dir, fps=5, quality=95):
         
         # Extract every Nth frame
         if frame_count % frame_interval == 0:
-            # Generate filename with metadata
-            filename = generate_filename(video_path, extracted_count)
+            # Generate filename from video name and frame number
+            filename = f"{video_filename_base}_{extracted_count:05d}.jpg"
             filepath = os.path.join(output_dir, filename)
             
             # Save frame
@@ -400,17 +419,11 @@ def extract_frames(video_path, output_dir, fps=5, quality=95):
     
     video.release()
     return extracted_count
-
-def generate_filename(video_path, frame_num):
-    # Parse video filename for metadata
-    # Format: {location}_{condition}_{vehicle}_{frame}.jpg
-    metadata = parse_video_metadata(video_path)
-    return f"{metadata['location']}_{metadata['condition']}_{frame_num:05d}.jpg"
 ```
 
 **Usage:**
 ```bash
-python scripts/extract_frames.py --input raw_footage/day_clear/clip_001.mp4 \
+python scripts/extract_frames.py --input raw_footage/day_clear/day_clear_01.mp4 \
                                   --output datasets/lpr/train/images/ \
                                   --fps 5 \
                                   --quality 95
