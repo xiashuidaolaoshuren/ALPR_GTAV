@@ -12,6 +12,7 @@
 
 ## Development Guidelines
 - **Coding Standards:** Follow PEP 8. Use meaningful variable names and modular functions.
+- **Reuse existing Code:** Check whether existing scripts can be adapted before writing new ones.
 - **MCP Uses:** Use the following MCP servers when developing:
   - `context7`: get the latest information and avoid deprecated methods
   - `sequential-thinking` & `shrimp-task-manager`: for structured problem solving
