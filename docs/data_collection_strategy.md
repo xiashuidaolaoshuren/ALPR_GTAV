@@ -131,17 +131,18 @@ This document outlines the comprehensive strategy for collecting high-quality li
 
 ### 2.7 Target Scenario Distribution
 
-**Minimum Initial Dataset (Week 1): 100-200 images**
+**Initial Test Dataset (Task 5): 50-100 images**
 
 | Scenario | Target Count | Notes |
 |----------|--------------|-------|
-| Day + Clear + Front | 30 | Core training data |
-| Day + Clear + Rear | 20 | Rear plate training |
-| Night + Clear + Front | 20 | Low-light training |
-| Rain + Any Angle | 15 | Weather variation |
-| Various Angles (45°, 90°) | 15 | Angle robustness |
+| Day + Clear | 10-15 | Core test data |
+| Night + Clear | 10-15 | Low-light test data |
+| Day + Rain | 5-10 | Weather variation |
+| Night + Rain | 5-10 | Challenging conditions |
+| Various Angles | 10-20 | Angle robustness (Front 30%, Rear 30%, Side 40%) |
 
-**Expanded Dataset (Week 3+): 1000+ images**
+**Expanded Training Dataset (Week 3+): 1000+ images**
+- This phase will focus on building a comprehensive training set following the initial testing.
 
 ---
 
@@ -228,37 +229,29 @@ Capture location: Dedicated SSD
 ### 3.4 Post-Recording Processing
 
 **File Organization:**
-The recommended practice is to organize raw footage into directories based on capture conditions and to use descriptive filenames.
+The recommended practice is to organize raw footage into directories based on capture conditions. An alternative is to use publicly available footage, for which attribution must be documented.
 
 ```
-GTA5_Recordings/
-├── day_clear/
-│   ├── day_clear_01.mp4
-│   └── day_clear_02.mp4
-├── night_clear/
-│   └── night_clear_01.mp4
-└── metadata.txt
+outputs/
+├── raw_footage/
+│   ├── day_clear/
+│   │   └── day_clear_01.mp4
+│   ├── night_clear/
+│   │   └── night_clear_01.mp4
+│   └── sources.txt  (for public footage attribution)
+└── test_images/
+    ├── day_clear_01_00001.jpg
+    └── metadata.txt
 ```
-
-**File Naming Convention:**
-Files should be renamed to reflect their content, making them easier to manage.
-- **Pattern:** `{condition}_{location}_{number}.mp4`
-- **Example:** `day_clear_airport_01.mp4`
 
 **Metadata Logging:**
-A simple text file (`metadata.txt`) should be maintained to log key details about each recording session.
+A `metadata.txt` file in the output image directory should be maintained to log details for each extracted frame.
 
-**`metadata.txt` Example:**
-```
-day_clear_01.mp4
-- Location: Airport parking lot
-- Vehicles: 15-20 sedans, 5 trucks
-- Quality: Good, clear lighting
-
-night_clear_01.mp4
-- Location: Downtown street
-- Vehicles: 10 sedans
-- Quality: Good, street lamps
+**`metadata.txt` Format:**
+```csv
+filename,condition,time_of_day,weather,angle,notes
+day_clear_01_00042.jpg,day_clear,day,clear,front,good_lighting_close_range_sedan
+night_clear_02_00123.jpg,night_clear,night,clear,front_45,street_lamp_lighting
 ```
 
 ---
@@ -423,8 +416,8 @@ def extract_frames(video_path, output_dir, fps=5, quality=95):
 
 **Usage:**
 ```bash
-python scripts/extract_frames.py --input raw_footage/day_clear/day_clear_01.mp4 \
-                                  --output datasets/lpr/train/images/ \
+python scripts/extract_frames.py --input "outputs/raw_footage/day_clear/day_clear_01.mp4" \
+                                  --output "outputs/test_images/" \
                                   --fps 5 \
                                   --quality 95
 ```
