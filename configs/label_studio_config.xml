@@ -1,0 +1,60 @@
+<!--
+Label Studio Configuration Template for License Plate Detection
+
+This XML configuration defines the labeling interface for annotating
+license plates in GTA V images.
+
+To use:
+1. Copy this entire XML content
+2. In Label Studio project settings, go to "Labeling Interface"
+3. Paste this configuration
+4. Save changes
+
+Features:
+- Rectangle bounding box annotation
+- Single label class: "license_plate"
+- Zoom and pan controls enabled
+- Image metadata display
+-->
+
+<View>
+  <Header value="License Plate Detection Annotation"/>
+  
+  <!-- Image display with controls -->
+  <Image 
+    name="image" 
+    value="$image" 
+    zoom="true" 
+    zoomControl="true" 
+    rotateControl="false"
+    brightnessControl="true"
+    contrastControl="true"
+    grid="true"
+    gridSize="10"
+    gridColor="#E0E0E0"
+  />
+  
+  <!-- Bounding box labels -->
+  <RectangleLabels 
+    name="label" 
+    toName="image"
+    strokeWidth="2"
+    canRotate="false"
+  >
+    <Label value="license_plate" background="#FF6600" hotkey="1"/>
+  </RectangleLabels>
+  
+  <!-- Optional: Display image metadata -->
+  <Header value="Image Info:"/>
+  <Text name="filename" value="$filename"/>
+  
+  <!-- Instructions panel -->
+  <View style="box-shadow: 2px 2px 5px #999; padding: 20px; margin-top: 2em; border-radius: 5px;">
+    <Header value="Quick Instructions"/>
+    <Text value="1. Draw tight bounding boxes around license plates"/>
+    <Text value="2. Include 2-3 pixels padding around plate edges"/>
+    <Text value="3. Ensure all characters are within the box"/>
+    <Text value="4. Annotate all visible plates in the image"/>
+    <Text value="5. Press Ctrl+Enter to submit"/>
+  </View>
+</View>
