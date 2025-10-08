@@ -314,6 +314,7 @@ detection/
 - **MUST** use absolute imports: `from src.detection.model import detect_plates`
 - **DO NOT** use relative imports across modules
 - **MUST** organize imports: stdlib → third-party → local
+- **MUST** let critical imports fail fast—avoid wrapping dependency imports in try/except; allow `ImportError` to propagate so setup issues surface immediately.
 
 ---
 

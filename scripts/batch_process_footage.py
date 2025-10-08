@@ -21,11 +21,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import FrameExtractor from extract_frames.py
-try:
-    from scripts.extract_frames import FrameExtractor
-except ImportError:
-    print("ERROR: Could not import FrameExtractor. Ensure extract_frames.py is in scripts/ directory.")
-    sys.exit(1)
+from scripts.extract_frames import FrameExtractor
 
 # Setup logging
 logging.basicConfig(

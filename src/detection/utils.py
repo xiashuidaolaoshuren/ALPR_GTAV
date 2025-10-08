@@ -8,6 +8,7 @@ and post-processing of detection results.
 import logging
 from typing import List, Tuple, Optional
 import numpy as np
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -50,12 +51,6 @@ def draw_bounding_boxes(
         - For real-time visualization, consider reducing thickness for better performance
         - Coordinates outside image boundaries are clipped automatically by cv2
     """
-    try:
-        import cv2
-    except ImportError:
-        logger.error("OpenCV not installed. Please install with: pip install opencv-python")
-        raise ImportError("OpenCV (cv2) is required for draw_bounding_boxes()")
-    
     # Validate input frame
     if not isinstance(frame, np.ndarray):
         raise ValueError(f"Frame must be a numpy array, got {type(frame)}")

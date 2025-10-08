@@ -9,6 +9,8 @@ import os
 import logging
 from typing import List, Tuple, Optional
 import numpy as np
+from ultralytics import YOLO
+import torch
 
 logger = logging.getLogger(__name__)
 
@@ -43,15 +45,6 @@ def load_detection_model(model_path: str, device: str = 'auto'):
         - First-time usage may download additional dependencies
         - GPU acceleration significantly improves inference speed
     """
-    try:
-        from ultralytics import YOLO
-        import torch
-    except ImportError as e:
-        logger.error(f"Required dependencies not found: {e}")
-        raise ImportError(
-            "Ultralytics YOLO not installed. Please install with: pip install ultralytics torch"
-        )
-    
     # Validate model path
     if not os.path.exists(model_path):
         logger.error(f"Model file not found: {model_path}")

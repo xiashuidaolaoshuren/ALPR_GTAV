@@ -10,52 +10,41 @@ Usage:
 """
 
 import sys
+import importlib
+
+import torch
+import paddle
+
 
 def check_pytorch_gpu():
     """Check PyTorch CUDA availability."""
-    try:
-        import torch
-        cuda_available = torch.cuda.is_available()
-        print(f"PyTorch CUDA available: {cuda_available}")
-        
-        if cuda_available:
-            print(f"  - CUDA device count: {torch.cuda.device_count()}")
-            print(f"  - CUDA device name: {torch.cuda.get_device_name(0)}")
-            print(f"  - CUDA version: {torch.version.cuda}")
-        else:
-            print("  - Running on CPU (GPU not available)")
-        
-        return cuda_available
-    except ImportError:
-        print("PyTorch not installed!")
-        return False
-    except Exception as e:
-        print(f"Error checking PyTorch: {e}")
-        return False
+    cuda_available = torch.cuda.is_available()
+    print(f"PyTorch CUDA available: {cuda_available}")
+    
+    if cuda_available:
+        print(f"  - CUDA device count: {torch.cuda.device_count()}")
+        print(f"  - CUDA device name: {torch.cuda.get_device_name(0)}")
+        print(f"  - CUDA version: {torch.version.cuda}")
+    else:
+        print("  - Running on CPU (GPU not available)")
+    
+    return cuda_available
 
 
 def check_paddle_gpu():
     """Check PaddlePaddle CUDA availability."""
-    try:
-        import paddle
-        cuda_available = paddle.device.is_compiled_with_cuda()
-        print(f"\nPaddlePaddle CUDA available: {cuda_available}")
-        
-        if cuda_available:
-            gpu_count = paddle.device.cuda.device_count()
-            print(f"  - GPU device count: {gpu_count}")
-            if gpu_count > 0:
-                print(f"  - Using GPU: {paddle.device.get_device()}")
-        else:
-            print("  - Running on CPU (GPU not available)")
-        
-        return cuda_available
-    except ImportError:
-        print("\nPaddlePaddle not installed!")
-        return False
-    except Exception as e:
-        print(f"\nError checking PaddlePaddle: {e}")
-        return False
+    cuda_available = paddle.device.is_compiled_with_cuda()
+    print(f"\nPaddlePaddle CUDA available: {cuda_available}")
+    
+    if cuda_available:
+        gpu_count = paddle.device.cuda.device_count()
+        print(f"  - GPU device count: {gpu_count}")
+        if gpu_count > 0:
+            print(f"  - Using GPU: {paddle.device.get_device()}")
+    else:
+        print("  - Running on CPU (GPU not available)")
+    
+    return cuda_available
 
 
 def verify_imports():
@@ -75,12 +64,13 @@ def verify_imports():
     
     all_success = True
     for package_name, display_name in packages.items():
-        try:
-            __import__(package_name)
-            print(f"✓ {display_name} ({package_name})")
-        except ImportError:
+        if importlib.util.find_spec(package_name) is None:
             print(f"✗ {display_name} ({package_name}) - NOT INSTALLED")
             all_success = False
+            continue
+
+        importlib.import_module(package_name)
+        print(f"✓ {display_name} ({package_name})")
     
     return all_success
 
@@ -95,21 +85,17 @@ def get_package_versions():
                 'albumentations', 'yaml', 'pytest']
     
     for package_name in packages:
-        try:
-            if package_name == 'cv2':
-                import cv2
-                print(f"{package_name}: {cv2.__version__}")
-            elif package_name == 'yaml':
-                import yaml
-                print(f"{package_name}: {yaml.__version__}")
-            else:
-                module = __import__(package_name)
-                version = getattr(module, '__version__', 'Unknown')
-                print(f"{package_name}: {version}")
-        except ImportError:
+        if importlib.util.find_spec(package_name) is None:
             print(f"{package_name}: Not installed")
-        except Exception as e:
-            print(f"{package_name}: Error - {e}")
+            continue
+
+        module = importlib.import_module(package_name)
+        if package_name == 'cv2':
+            print(f"{package_name}: {module.__version__}")
+            continue
+
+        version = getattr(module, '__version__', 'Unknown')
+        print(f"{package_name}: {version}")
 
 
 def main():
