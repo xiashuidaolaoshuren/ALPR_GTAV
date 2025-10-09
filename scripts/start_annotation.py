@@ -81,10 +81,10 @@ def check_label_studio_installed() -> bool:
     """
     try:
         result = subprocess.run(
-            ['label-studio', '--version'],
+            ['label-studio', 'version'],
             capture_output=True,
             text=True,
-            timeout=5
+            timeout=30
         )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
