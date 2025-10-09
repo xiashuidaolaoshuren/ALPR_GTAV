@@ -25,6 +25,7 @@ import sys
 import time
 import webbrowser
 from pathlib import Path
+from threading import Thread
 
 # Setup logging
 logging.basicConfig(
@@ -91,6 +92,16 @@ def check_label_studio_installed() -> bool:
         return False
 
 
+def _stream_process_output(stream, level):
+    """Forward subprocess output to logger."""
+    if not stream:
+        return
+    for line in iter(stream.readline, ''):
+        if line:
+            logger.log(level, line.rstrip())
+    stream.close()
+
+
 def start_label_studio(port: int, host: str, data_dir: str = None) -> subprocess.Popen:
     """
     Start Label Studio server.
@@ -115,8 +126,13 @@ def start_label_studio(port: int, host: str, data_dir: str = None) -> subprocess
         cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
+        bufsize=1
     )
+
+    # Stream subprocess output so Label Studio logs remain visible and buffers don't block
+    Thread(target=_stream_process_output, args=(process.stdout, logging.INFO), daemon=True).start()
+    Thread(target=_stream_process_output, args=(process.stderr, logging.ERROR), daemon=True).start()
     
     return process
 
@@ -190,10 +206,10 @@ def main():
         # Check if process is still running
         if process.poll() is not None:
             # Process ended, check for errors
-            stdout, stderr = process.communicate()
             logger.error("Label Studio failed to start!")
-            if stderr:
-                logger.error(f"Error: {stderr}")
+            if process.returncode is not None:
+                logger.error(f"Exit code: {process.returncode}")
+            logger.error("Check logs above for details.")
             return 1
         
         # Open browser if requested
