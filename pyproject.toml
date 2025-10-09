@@ -1,0 +1,42 @@
+[project]
+name = "alpr-gtav"
+version = "0.1.0"
+description = "GTA V automatic license plate recognition pipeline"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "ultralytics>=8.0.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "opencv-python>=4.8.0",
+    "paddlepaddle-gpu>=2.5.0",
+    "paddleocr>=2.7.0",
+    "albumentations>=1.3.0",
+    "pyyaml>=6.0",
+    "pytest>=7.0.0",
+    "tqdm>=4.65.0",
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "Pillow>=9.5.0",
+    "label-studio>=1.8.0"
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu126", marker = "sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "pytorch-cu126", marker = "sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv]
+package = false
