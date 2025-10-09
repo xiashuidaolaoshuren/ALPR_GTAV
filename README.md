@@ -64,7 +64,7 @@ pip install -r requirements.txt
 
 4. **Verify GPU installation:**
 ```bash
-python scripts/verify_gpu.py
+python scripts/diagnostics/verify_gpu.py
 ```
 
 You should see:
@@ -94,8 +94,13 @@ ALPR_GTA5/
 │   └── recognition/       # PaddleOCR model files
 ├── configs/                # Configuration files
 │   └── pipeline_config.yaml  # Main pipeline configuration
-├── scripts/                # Utility scripts
-│   └── verify_gpu.py      # GPU verification script
+├── scripts/                # Componentized CLI tools (no root wrappers)
+│   ├── data_ingestion/    # Frame extraction, metadata, cleaning
+│   ├── annotation/        # Label Studio helpers
+│   ├── inference/         # Image/video inference entrypoints
+│   ├── evaluation/        # Evaluation + reporting utilities
+│   ├── diagnostics/       # Environment + dataset checks
+│   └── README.md          # Overview of script layout
 ├── tests/                  # Test suite
 │   ├── unit/              # Unit tests
 │   ├── integration/       # Integration tests
@@ -107,24 +112,21 @@ ALPR_GTA5/
 
 ## 💻 Usage
 
-### Quick Start (Coming in Week 2)
+### Quick Start
 
-**Single Image Processing:**
-```bash
-# (Script will be available after Week 2 implementation)
-python scripts/detect_single_image.py --image path/to/image.jpg
+**Single Image Detection:**
+```powershell
+python scripts/inference/detect_image.py --image path/to/image.jpg --output outputs/annotated.jpg
 ```
 
-**Video Processing:**
-```bash
-# (Script will be available after Week 2 implementation)
-python scripts/process_video.py --input path/to/video.mp4 --output outputs/annotated.mp4
+**Video Detection:**
+```powershell
+python scripts/inference/detect_video.py --video path/to/video.mp4 --output outputs/annotated.mp4
 ```
 
-**Batch Processing:**
-```bash
-# (Script will be available after Week 2 implementation)
-python scripts/batch_process.py --input_dir path/to/images/ --output_dir outputs/
+**Batch Frame Extraction:**
+```powershell
+python scripts/data_ingestion/batch_process_footage.py --fps 5 --quality 95
 ```
 
 ### Configuration

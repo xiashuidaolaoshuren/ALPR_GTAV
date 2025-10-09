@@ -6,13 +6,13 @@ preparing them for license plate annotation and model training.
 
 Usage:
     Single video:
-        python scripts/extract_frames.py --input video.mp4 --output datasets/lpr/train/images/
+        python scripts/data_ingestion/extract_frames.py --input video.mp4 --output datasets/lpr/train/images/
     
     Batch processing:
-        python scripts/extract_frames.py --batch --input_dir raw_footage/ --output_dir datasets/lpr/train/images/
+        python scripts/data_ingestion/extract_frames.py --batch --input_dir raw_footage/ --output_dir datasets/lpr/train/images/
     
     Custom frame rate:
-        python scripts/extract_frames.py --input video.mp4 --output datasets/lpr/train/images/ --fps 10
+        python scripts/data_ingestion/extract_frames.py --input video.mp4 --output datasets/lpr/train/images/ --fps 10
 
 Author: GTA V ALPR Development Team
 Version: 1.0
@@ -210,16 +210,16 @@ def main():
         epilog="""
 Examples:
   # Extract from single video at 5 FPS
-  python scripts/extract_frames.py --input footage/day_clear_01.mp4 --output datasets/lpr/train/images/
+  python scripts/data_ingestion/extract_frames.py --input footage/day_clear_01.mp4 --output datasets/lpr/train/images/
   
   # Extract from single video at 10 FPS with custom quality
-  python scripts/extract_frames.py --input footage/night.mp4 --output datasets/lpr/valid/images/ --fps 10 --quality 90
+  python scripts/data_ingestion/extract_frames.py --input footage/night.mp4 --output datasets/lpr/valid/images/ --fps 10 --quality 90
   
   # Batch process all videos in directory
-  python scripts/extract_frames.py --batch --input_dir raw_footage/ --output_dir datasets/lpr/train/images/
+  python scripts/data_ingestion/extract_frames.py --batch --input_dir raw_footage/ --output_dir datasets/lpr/train/images/
   
   # Extract as PNG (lossless but larger files)
-  python scripts/extract_frames.py --input video.mp4 --output images/ --format png
+  python scripts/data_ingestion/extract_frames.py --input video.mp4 --output images/ --format png
         """
     )
     

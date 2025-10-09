@@ -32,7 +32,7 @@
    ```
    Or use the startup script:
    ```bash
-   python scripts/start_annotation.py
+   python scripts/annotation/start_annotation.py
    ```
 
 2. **Access the web interface:**
@@ -337,6 +337,6 @@ If you encounter issues not covered in this guide or have suggestions for improv
 
 ---
 
-**Version:** 1.0  
-**Last Updated:** 2025-10-08  
+**Version:** 1.1  
+**Last Updated:** 2025-10-09  
 **Author:** ALPR Project Team

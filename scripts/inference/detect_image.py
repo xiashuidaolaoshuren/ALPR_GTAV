@@ -5,9 +5,9 @@ This script runs license plate detection on a single image and saves the annotat
 It's useful for testing and visualizing detection performance.
 
 Usage:
-    python scripts/detect_image.py --image path/to/image.jpg
-    python scripts/detect_image.py --image outputs/test_images/day_clear_front_00001.jpg --output result.jpg
-    python scripts/detect_image.py --image test.jpg --conf 0.3 --no-save-viz
+    python scripts/inference/detect_image.py --image path/to/image.jpg
+    python scripts/inference/detect_image.py --image outputs/test_images/day_clear_front_00001.jpg --output result.jpg
+    python scripts/inference/detect_image.py --image test.jpg --conf 0.3 --no-save-viz
 
 Author: GTA V ALPR Development Team
 Version: 1.0
@@ -19,8 +19,9 @@ import logging
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 import cv2
 import yaml

@@ -5,17 +5,17 @@ Process video files frame-by-frame, detecting license plates and saving
 an annotated output video with bounding boxes.
 
 Usage:
-    python scripts/detect_video.py --video path/to/video.mp4 [options]
+    python scripts/inference/detect_video.py --video path/to/video.mp4 [options]
 
 Examples:
     # Basic usage
-    python scripts/detect_video.py --video outputs/raw_footage/day_clear/video1.mp4
+    python scripts/inference/detect_video.py --video outputs/raw_footage/day_clear/video1.mp4
     
     # Custom output path and confidence threshold
-    python scripts/detect_video.py --video input.mp4 --output results/output.mp4 --conf 0.5
+    python scripts/inference/detect_video.py --video input.mp4 --output results/output.mp4 --conf 0.5
     
     # Process every 2nd frame for faster processing
-    python scripts/detect_video.py --video input.mp4 --sample_rate 2
+    python scripts/inference/detect_video.py --video input.mp4 --sample_rate 2
 """
 
 import argparse
@@ -23,14 +23,16 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 import cv2
 import yaml
 from tqdm import tqdm
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Ensure project root is on the Python path
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
 from src.detection.model import load_detection_model, detect_plates
 from src.detection.utils import draw_bounding_boxes
@@ -292,7 +294,7 @@ def main():
         iou_threshold = args.iou if args.iou is not None else detection_config['iou_threshold']
         device = args.device if args.device is not None else detection_config.get('device', 'auto')
         
-        logger.info(f"Detection parameters:")
+        logger.info("Detection parameters:")
         logger.info(f"  Confidence threshold: {confidence_threshold}")
         logger.info(f"  IOU threshold: {iou_threshold}")
         logger.info(f"  Device: {device}")

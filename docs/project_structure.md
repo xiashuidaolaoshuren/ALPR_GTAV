@@ -10,7 +10,7 @@ ALPR_GTA5/
 ├── datasets/               # Training and validation data
 ├── models/                 # Model weights storage
 ├── configs/                # Configuration files
-├── scripts/                # Utility and processing scripts
+├── scripts/                # Componentized CLI tools (no wrappers)
 ├── tests/                  # Test suite
 ├── docs/                   # Project documentation
 ├── outputs/                # Processing results and logs
@@ -276,33 +276,22 @@ detection_config = config['detection']
 
 ## Scripts (`scripts/`)
 
-Standalone scripts for various tasks.
+All runnable CLI entrypoints live directly inside their functional subfolders.
+There are no root-level Python shims—call the scripts from their component
+directory paths.
 
-### Expected Scripts:
+```
+scripts/
+├── data_ingestion/      # Frame extraction, metadata generation, cleaning
+├── annotation/          # Label Studio helpers and converters
+├── inference/           # Single-image and video inference utilities
+├── evaluation/          # Evaluation, reporting, visualisation scripts
+└── diagnostics/         # GPU checks, dataset quality analysers
+```
 
-**`verify_gpu.py`** (✓ implemented)
-- Verify GPU availability for PyTorch and PaddlePaddle
-- Check package imports and versions
-
-**`detect_single_image.py`** (Week 2)
-- Process single image with detection only
-- Save annotated output
-
-**`process_video.py`** (Week 2)
-- Process video file with full pipeline
-- Generate annotated video output
-
-**`batch_process.py`** (Week 2)
-- Process multiple images in batch
-- Generate CSV report of results
-
-**`evaluate_model.py`** (Week 2)
-- Evaluate detection performance on test set
-- Calculate metrics (precision, recall, mAP)
-
-**`collect_dataset.py`** (Week 3)
-- Utility for extracting frames from GTA V footage
-- Automated dataset collection helpers
+Each subdirectory ships with its own README describing responsibilities,
+required arguments, and output conventions. Add new tooling inside the
+appropriate folder so the invocation path mirrors the workflow grouping.
 
 ---
 
@@ -415,7 +404,7 @@ Example: highway_day_00123.txt
 ### Scripts:
 ```
 <action>_<target>.py
-Example: detect_single_image.py, train_detection_model.py
+Example: detect_image.py, train_detection_model.py
 ```
 
 ### Modules:
@@ -501,7 +490,8 @@ __all__ = ['LicensePlateDetector', 'visualize_detections', 'apply_nms']
 
 ### Adding a New Script:
 
-1. Create script in `scripts/<script_name>.py`
+1. Create script in the appropriate component folder
+    (e.g. `scripts/data_ingestion/<script_name>.py`)
 2. Add argparse for CLI parameters
 3. Import from src modules (not copy code)
 4. Add logging and error handling
@@ -523,7 +513,7 @@ __all__ = ['LicensePlateDetector', 'visualize_detections', 'apply_nms']
 ### Tracked Files:
 - Source code (`src/`)
 - Configuration templates (`configs/`)
-- Scripts (`scripts/`)
+- Scripts (`scripts/` component subpackages + wrappers)
 - Tests (`tests/`)
 - Documentation (`docs/`)
 - Requirements (`requirements.txt`)
@@ -548,6 +538,6 @@ __all__ = ['LicensePlateDetector', 'visualize_detections', 'apply_nms']
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: Week 1, Task 3 (Project Structure Setup)  
-**Status**: Complete - Ready for Week 2 implementation
+**Document Version**: 1.2  
+**Last Updated**: 2025-10-10 (Wrapper removal + docs refresh)  
+**Status**: Up-to-date with wrapper-free scripts layout

@@ -5,17 +5,17 @@ Convenience script to start Label Studio annotation server and automatically
 open the web interface in the default browser.
 
 Usage:
-    python scripts/start_annotation.py [options]
+    python scripts/annotation/start_annotation.py [options]
 
 Examples:
     # Start with default settings
-    python scripts/start_annotation.py
+    python scripts/annotation/start_annotation.py
     
     # Start on custom port
-    python scripts/start_annotation.py --port 8090
+    python scripts/annotation/start_annotation.py --port 8090
     
     # Start without auto-opening browser
-    python scripts/start_annotation.py --no-browser
+    python scripts/annotation/start_annotation.py --no-browser
 """
 
 import argparse
@@ -24,7 +24,6 @@ import subprocess
 import sys
 import time
 import webbrowser
-from pathlib import Path
 from threading import Thread
 
 # Setup logging
@@ -130,7 +129,6 @@ def start_label_studio(port: int, host: str, data_dir: str = None) -> subprocess
         bufsize=1
     )
 
-    # Stream subprocess output so Label Studio logs remain visible and buffers don't block
     Thread(target=_stream_process_output, args=(process.stdout, logging.INFO), daemon=True).start()
     Thread(target=_stream_process_output, args=(process.stderr, logging.ERROR), daemon=True).start()
     
@@ -185,7 +183,6 @@ def main():
     args = parse_arguments()
     
     try:
-        # Check if Label Studio is installed
         logger.info("Checking Label Studio installation...")
         if not check_label_studio_installed():
             logger.error("Label Studio is not installed!")
@@ -194,32 +191,24 @@ def main():
         
         logger.info("✓ Label Studio is installed")
         
-        # Construct URL
         url = f"http://{args.host}:{args.port}"
         
-        # Start Label Studio
         process = start_label_studio(args.port, args.host, args.data_dir)
         
-        # Wait a moment for server to start
         time.sleep(2)
         
-        # Check if process is still running
         if process.poll() is not None:
-            # Process ended, check for errors
             logger.error("Label Studio failed to start!")
             if process.returncode is not None:
                 logger.error(f"Exit code: {process.returncode}")
             logger.error("Check logs above for details.")
             return 1
         
-        # Open browser if requested
         if not args.no_browser:
             open_browser(url)
         
-        # Print instructions
         print_instructions(url)
         
-        # Wait for process to complete (user will Ctrl+C)
         try:
             process.wait()
         except KeyboardInterrupt:

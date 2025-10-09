@@ -140,7 +140,6 @@
 2. Walk around vehicle slowly
 3. Record 3-5 seconds from each angle:
    - Front (0°)
-   - Front-side (45°)
    - Side (90°)
    - Rear-side (135°)
    - Rear (180°)
@@ -164,6 +163,7 @@ Once you have recorded videos in all 4 condition folders, proceed to "Frame Extr
 
 ---
 
+
 ## Option 2: Use Public GTA V Footage (Alternative)
 
 If you don't have GTA V or can't record right now, you can use publicly available footage.
@@ -174,7 +174,6 @@ If you don't have GTA V or can't record right now, you can use publicly availabl
 - "GTA 5 gameplay license plates"
 - "GTA V traffic police POV"
 - "GTA 5 driving gameplay 4K"
-- "GTA V realistic graphics gameplay"
 
 **Requirements:**
 - ✅ High quality (1080p or better)
@@ -228,19 +227,19 @@ Once you have video files in `outputs/raw_footage/`, extract frames using the pr
 cd "d:\Felix's_stuff\ALPR_GTA5"
 
 # Extract frames from one video (5 FPS = 1 frame every 200ms)
-python scripts/extract_frames.py --input "outputs/raw_footage/day_clear/day_clear_01.mp4" --output "outputs/test_images/" --fps 5 --quality 95
+python scripts/data_ingestion/extract_frames.py --input "outputs/raw_footage/day_clear/day_clear_01.mp4" --output "outputs/test_images/" --fps 5 --quality 95
 ```
 
 ### Method 2: Batch Extract from All Videos
 
 ```powershell
 # Extract from all videos in day_clear folder
-python scripts/extract_frames.py --batch --input_dir "outputs/raw_footage/day_clear/" --output_dir "outputs/test_images/" --fps 5
+python scripts/data_ingestion/extract_frames.py --batch --input_dir "outputs/raw_footage/day_clear/" --output_dir "outputs/test_images/" --fps 5
 
 # Repeat for each condition
-python scripts/extract_frames.py --batch --input_dir "outputs/raw_footage/day_rain/" --output_dir "outputs/test_images/" --fps 5
-python scripts/extract_frames.py --batch --input_dir "outputs/raw_footage/night_clear/" --output_dir "outputs/test_images/" --fps 5
-python scripts/extract_frames.py --batch --input_dir "outputs/raw_footage/night_rain/" --output_dir "outputs/test_images/" --fps 5
+python scripts/data_ingestion/extract_frames.py --batch --input_dir "outputs/raw_footage/day_rain/" --output_dir "outputs/test_images/" --fps 5
+python scripts/data_ingestion/extract_frames.py --batch --input_dir "outputs/raw_footage/night_clear/" --output_dir "outputs/test_images/" --fps 5
+python scripts/data_ingestion/extract_frames.py --batch --input_dir "outputs/raw_footage/night_rain/" --output_dir "outputs/test_images/" --fps 5
 ```
 
 ### Method 3: Use the Helper Script (Easiest)
@@ -406,7 +405,7 @@ After completing this task, you'll:
 ## Need Help?
 
 - Review detailed strategy: `docs/data_collection_strategy.md`
-- Check frame extraction script: `scripts/extract_frames.py`
+- Check frame extraction script: `scripts/data_ingestion/extract_frames.py`
 - Project structure: `docs/project_structure.md`
 
 **Ready to start? Follow the guide above and begin collecting data! Good luck! 🎮📹**

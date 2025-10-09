@@ -5,17 +5,17 @@ This script scans the outputs/test_images/ directory and creates metadata
 template entries for all images, which can then be reviewed and filled in.
 
 Usage:
-    python scripts/generate_metadata.py [--output outputs/test_images/metadata.txt]
+    python scripts/data_ingestion/generate_metadata.py [--output outputs/test_images/metadata.txt]
 
 Author: GTA V ALPR Development Team
 Version: 1.0
 """
 
-import os
 import argparse
 import logging
-from pathlib import Path
+import os
 from datetime import datetime
+from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
@@ -37,8 +37,7 @@ def extract_condition_from_filename(filename):
         tuple: (condition, time_of_day, weather, estimated_angle)
     """
     filename = filename.lower()
-    
-    # Determine time of day
+
     if 'day' in filename or 'daytime' in filename:
         time_of_day = 'day'
     elif 'night' in filename or 'nighttime' in filename:
@@ -49,8 +48,7 @@ def extract_condition_from_filename(filename):
         time_of_day = 'dusk'
     else:
         time_of_day = 'unknown'
-    
-    # Determine weather
+
     if 'rain' in filename or 'rainy' in filename or 'wet' in filename:
         weather = 'rain'
     elif 'fog' in filename or 'foggy' in filename:
@@ -61,8 +59,7 @@ def extract_condition_from_filename(filename):
         weather = 'clear'
     else:
         weather = 'unknown'
-    
-    # Determine angle (if specified in filename)
+
     if 'front' in filename:
         angle = 'front'
     elif 'rear' in filename or 'back' in filename:
@@ -73,13 +70,12 @@ def extract_condition_from_filename(filename):
         angle = 'angled'
     else:
         angle = 'to_be_determined'
-    
-    # Generate combined condition
+
     if time_of_day != 'unknown' and weather != 'unknown':
         condition = f"{time_of_day}_{weather}"
     else:
         condition = 'unknown'
-    
+
     return condition, time_of_day, weather, angle
 
 
@@ -93,27 +89,25 @@ def generate_metadata(images_dir, output_file, overwrite=False):
         overwrite: If True, overwrite existing file. If False, append.
     """
     images_path = Path(images_dir)
-    
+
     if not images_path.exists():
         logger.error(f"Images directory not found: {images_dir}")
         return
-    
-    # Find all image files
+
     image_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
     image_files = []
     for ext in image_extensions:
         image_files.extend(images_path.glob(f'*{ext}'))
         image_files.extend(images_path.glob(f'*{ext.upper()}'))
-    
+
     image_files = sorted(image_files)
-    
+
     if not image_files:
         logger.warning(f"No image files found in {images_dir}")
         return
-    
+
     logger.info(f"Found {len(image_files)} image files")
-    
-    # Read existing entries if not overwriting
+
     existing_files = set()
     if not overwrite and os.path.exists(output_file):
         logger.info("Reading existing metadata entries...")
@@ -125,37 +119,28 @@ def generate_metadata(images_dir, output_file, overwrite=False):
                     if parts:
                         existing_files.add(parts[0])
         logger.info(f"Found {len(existing_files)} existing entries")
-    
-    # Generate new entries
+
     new_entries = []
     skipped = 0
-    
+
     for img_file in image_files:
         filename = img_file.name
-        
-        # Skip if already in metadata
+
         if filename in existing_files:
             skipped += 1
             continue
-        
-        # Extract information from filename
+
         condition, time_of_day, weather, angle = extract_condition_from_filename(filename)
-        
-        # Generate notes template
         notes = "needs_review"
-        
-        # Create entry
         entry = f"{filename},{condition},{time_of_day},{weather},{angle},{notes}"
         new_entries.append(entry)
-    
+
     logger.info(f"Generated {len(new_entries)} new metadata entries")
     logger.info(f"Skipped {skipped} existing entries")
-    
-    # Write to file
+
     mode = 'w' if overwrite else 'a'
     with open(output_file, mode, encoding='utf-8') as f:
         if overwrite:
-            # Write header
             f.write("# GTA V ALPR Test Dataset Metadata\n")
             f.write("# \n")
             f.write("# Format: filename,condition,time_of_day,weather,angle,notes\n")
@@ -163,21 +148,19 @@ def generate_metadata(images_dir, output_file, overwrite=False):
             f.write("# Generated: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
             f.write("# \n")
             f.write("filename,condition,time_of_day,weather,angle,notes\n")
-        
-        # Write entries
+
         for entry in new_entries:
             f.write(entry + "\n")
-    
+
     logger.info(f"Metadata written to: {output_file}")
-    
-    # Summary
+
     if new_entries:
         logger.info("\nSample entries generated:")
         for entry in new_entries[:5]:
             logger.info(f"  {entry}")
         if len(new_entries) > 5:
             logger.info(f"  ... and {len(new_entries) - 5} more")
-    
+
     logger.info("\nNEXT STEPS:")
     logger.info("1. Review metadata.txt and correct any 'unknown' or 'to_be_determined' values")
     logger.info("2. Update 'notes' column with specific observations:")
@@ -192,32 +175,31 @@ def main():
     parser = argparse.ArgumentParser(
         description='Generate metadata template for test images'
     )
-    parser.add_argument('--images_dir', type=str, 
-                       default='outputs/test_images',
-                       help='Directory containing test images')
+    parser.add_argument('--images_dir', type=str,
+                        default='outputs/test_images',
+                        help='Directory containing test images')
     parser.add_argument('--output', type=str,
-                       default='outputs/test_images/metadata.txt',
-                       help='Output metadata file path')
+                        default='outputs/test_images/metadata.txt',
+                        help='Output metadata file path')
     parser.add_argument('--overwrite', action='store_true',
-                       help='Overwrite existing metadata file')
-    
+                        help='Overwrite existing metadata file')
+
     args = parser.parse_args()
-    
-    # Convert to absolute paths
-    project_root = Path(__file__).parent.parent
+
+    project_root = Path(__file__).resolve().parents[2]
     images_dir = project_root / args.images_dir
     output_file = project_root / args.output
-    
-    logger.info("="*60)
+
+    logger.info("=" * 60)
     logger.info("Metadata Generation Tool")
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info(f"Images directory: {images_dir}")
     logger.info(f"Output file: {output_file}")
     logger.info(f"Mode: {'OVERWRITE' if args.overwrite else 'APPEND'}")
-    logger.info("="*60)
-    
+    logger.info("=" * 60)
+
     generate_metadata(str(images_dir), str(output_file), args.overwrite)
-    
+
     return 0
 
 

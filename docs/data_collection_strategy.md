@@ -379,7 +379,7 @@ This convention uses the base name of the source video file, ensuring that frame
 
 ### 5.2 Automated Extraction Script
 
-**Script:** `scripts/extract_frames.py`
+**Script:** `scripts/data_ingestion/extract_frames.py`
 
 **Pseudocode:**
 ```python
@@ -416,10 +416,10 @@ def extract_frames(video_path, output_dir, fps=5, quality=95):
 
 **Usage:**
 ```bash
-python scripts/extract_frames.py --input "outputs/raw_footage/day_clear/day_clear_01.mp4" \
-                                  --output "outputs/test_images/" \
-                                  --fps 5 \
-                                  --quality 95
+python scripts/data_ingestion/extract_frames.py --input "outputs/raw_footage/day_clear/day_clear_01.mp4" \
+                                               --output "outputs/test_images/" \
+                                               --fps 5 \
+                                               --quality 95
 ```
 
 ### 5.3 Manual Frame Selection (Alternative)

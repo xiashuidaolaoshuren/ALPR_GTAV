@@ -6,7 +6,7 @@ This directory contains configuration files and templates for Label Studio annot
 
 ### 1. Start Label Studio
 ```bash
-python scripts/start_annotation.py
+python scripts/annotation/start_annotation.py
 ```
 
 ### 2. Create Project
@@ -143,4 +143,4 @@ For questions or issues:
 
 ---
 
-**Last Updated:** 2025-10-08
+**Last Updated:** 2025-10-09
