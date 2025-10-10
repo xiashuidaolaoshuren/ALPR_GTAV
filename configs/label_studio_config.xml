@@ -15,6 +15,7 @@ Features:
 - Single label class: "license_plate"
 - Zoom and pan controls enabled
 - Image metadata display
+- Readability attribute for each bounding box
 -->
 
 <View>
@@ -36,13 +37,20 @@ Features:
   
   <!-- Bounding box labels -->
   <RectangleLabels 
-    name="label" 
+    name="det_labels" 
     toName="image"
     strokeWidth="2"
     canRotate="false"
   >
-    <Label value="license_plate" background="#FF6600" hotkey="1"/>
+    <Label value="license_plate" background="#1E90FF" hotkey="1"/>
   </RectangleLabels>
+
+  <!-- Per-region attribute to flag OCR suitability -->
+  <Choices name="readability" toName="image" perRegion="true" required="true">
+    <Choice value="clear" hotkey="2"/>
+    <Choice value="blurred" hotkey="3"/>
+    <Choice value="occluded" hotkey="4"/>
+  </Choices>
   
   <!-- Optional: Display image metadata -->
   <Header value="Image Info:"/>
@@ -51,8 +59,11 @@ Features:
   <!-- Instructions panel -->
   <View style="box-shadow: 2px 2px 5px #999; padding: 20px; margin-top: 2em; border-radius: 5px;">
     <Header value="Quick Instructions"/>
-    <Text value="1. Draw tight bounding boxes around license plates"/>
-    <Text value="2. Include 2-3 pixels padding around plate edges"/>
+    <Text value="1. Draw tight bounding boxes around license plates (Hotkey: 1)"/>
+    <Text value="2. For each box, select its readability:"/>
+    <Text value="   - Clear: Plate is sharp and readable (Hotkey: 2)"/>
+    <Text value="   - Blurred: Plate is out of focus or motion-blurred (Hotkey: 3)"/>
+    <Text value="   - Occluded: Part of the plate is blocked (Hotkey: 4)"/>
     <Text value="3. Ensure all characters are within the box"/>
     <Text value="4. Annotate all visible plates in the image"/>
     <Text value="5. Press Ctrl+Enter to submit"/>

@@ -137,7 +137,7 @@ This dataset will consist of video clips recorded directly from GTA V gameplay. 
 This dataset will be used to fine-tune the YOLOv8 model for detecting license plates. It will be created by annotating frames extracted from the raw in-game footage.
 
 - **Format:** Each image will have a corresponding label file containing the bounding box coordinates of the license plate(s). The format will be compatible with YOLO, where each line in the label file represents one object: `<class_id> <x_center> <y_center> <width> <height>`.
-- **Annotation Tools:** We will use **Label Studio** to label the license plates.
+- **Annotation Tools:** We will use **Label Studio** to label the license plates. In addition to the bounding box, each plate will be tagged with a `readability` attribute (`clear`, `blurred`, `occluded`). This allows us to use all annotations for detection training, but only filter for `clear` plates when training the OCR model, improving data quality for recognition.
 - **Structure:** The dataset will be split into `train`, `validation`, and `test` sets. A `data.yaml` file will be created to define the dataset paths and class names, as required by YOLOv8.
     ```yaml
     train: ../datasets/lpr/train/images

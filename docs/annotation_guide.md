@@ -68,10 +68,14 @@
 - Missing characters at the edges
 - Overlapping with other objects unnecessarily
 
-### Label Classes
-- **Single class only:** `license_plate`
-- Do not create additional labels or categories
-- All annotations should use the same class
+### Label Classes and Attributes
+- **Bounding Box:** `license_plate` (single class)
+- **Readability Attribute (per box):**
+  - `clear`: Plate is sharp, in focus, and fully readable.
+  - `blurred`: Plate is out of focus, motion-blurred, or otherwise hard to read.
+  - `occluded`: Part of the plate is blocked by an object.
+
+**Crucially, you must select a readability option for every bounding box you draw.** This is a required step.
 
 ### Special Cases
 
