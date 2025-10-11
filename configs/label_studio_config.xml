@@ -30,9 +30,6 @@ Features:
     rotateControl="false"
     brightnessControl="true"
     contrastControl="true"
-    grid="true"
-    gridSize="10"
-    gridColor="#E0E0E0"
   />
   
   <!-- Bounding box labels -->
