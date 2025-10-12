@@ -48,9 +48,9 @@
 ## Annotation Rules
 
 ### What to Annotate
-- **License plates** visible in GTA V screenshots
-- All characters on the plate must be readable (or partially readable)
-- Both front and rear license plates should be annotated
+- **All visible license plates** in GTA V screenshots, regardless of their readability.
+- If you can identify an object as a license plate, you **must** label it.
+- Both front and rear license plates should be annotated.
 
 ### Bounding Box Requirements
 
@@ -79,25 +79,26 @@
 
 ### Special Cases
 
+The goal is to label **every** visible license plate. The `readability` attribute will handle quality assessment.
+
 #### Multiple Plates in One Image:
-- **Annotate all visible plates** if they meet quality criteria
-- Each plate gets its own bounding box
-- Example: If you can see both front and rear plates, annotate both
+- **Annotate all visible plates**.
+- Each plate gets its own bounding box and its own `readability` tag.
 
 #### Partially Occluded Plates:
-- **Annotate the visible portion only**
-- If less than 50% of the plate is visible, consider skipping
-- Use your judgment: if text is readable, annotate it
+- **Annotate them.**
+- Draw a tight bounding box around the visible portion of the plate.
+- Select the `occluded` readability attribute.
 
 #### Blurry or Low-Quality Plates:
-- **Skip images** where the plate is too blurry to identify characters
-- If at least 50% of characters are distinguishable, annotate it
-- Mark questionable images for review (use comments feature)
+- **Annotate them.**
+- Draw a bounding box around the plate.
+- Select the `blurred` readability attribute. Even if you can't read any characters, if you can identify it as a plate, it must be labeled.
 
 #### Distant/Small Plates:
-- **Annotate if characters are visible** when zoomed in
-- Use Label Studio's zoom feature to verify visibility
-- Skip if plate is too small (< 20 pixels in either dimension)
+- **Annotate them.**
+- Use the zoom feature to draw an accurate box.
+- If the plate is too small to be certain it's a plate, you can skip it. Otherwise, label it and choose `blurred` or `clear` based on its appearance.
 
 ---
 
@@ -126,13 +127,10 @@
 - **Review your work** before submitting a batch
 
 ### When to Skip an Image
-- License plate is completely obscured
-- Image is too dark/bright to see the plate
-- Plate is too blurry (characters not distinguishable)
-- Severe motion blur
-- Plate is too small (< 20 pixels)
+- No license plates are visible at all.
+- The image is so dark, bright, or corrupted that you cannot identify any objects.
 
-**Note:** Mark skipped images with a comment explaining why (e.g., "plate not visible", "too blurry")
+**Do not skip an image just because a license plate is blurry, occluded, or distant.** The purpose of the `readability` attribute is to capture this information. If you can tell it's a plate, you must label it.
 
 ---
 
@@ -152,27 +150,30 @@
 - **Adjust corners** by dragging to fit tightly
 - Ensure 2-3 pixels padding around the plate edges
 
-#### 3. Verify Annotation
-- **Double-check** that all characters are within the box
-- Verify the box is tight (not too loose or too tight)
-- Confirm the correct label class is applied: `license_plate`
-- If multiple plates exist, ensure all are annotated
+#### 3. Select Readability
+- After drawing the box, **you must select one of the readability choices**:
+  - `clear`: The plate is sharp and easy to read.
+  - `blurred`: The plate is out of focus, motion-blurred, or too distant to read clearly.
+  - `occluded`: Part of the plate is blocked by another object.
 
-#### 4. Add Comments (Optional)
-- Click **"Add comment"** for questionable cases
-- Examples:
-  - "Partially occluded - only annotated visible portion"
-  - "Low confidence - characters barely visible"
-  - "Multiple plates - annotated both front and rear"
+#### 4. Verify Annotation
+- **Double-check** that all characters are within the box.
+- Verify the box is tight (not too loose or too tight).
+- Confirm the correct label class (`license_plate`) and a `readability` attribute are applied.
+- If multiple plates exist, ensure all are annotated with their own attributes.
 
-#### 5. Submit Annotation
-- Click **"Submit"** button (or press `Ctrl+Enter`)
-- Annotation is saved and next image loads automatically
+#### 5. Add Comments (Optional)
+- Click **"Add comment"** for highly unusual cases.
+- Example: "Plate is reflected in a window, labeling the reflection."
 
-#### 6. Track Progress
-- Monitor the progress bar at the top
-- Review your annotations periodically for consistency
-- Take breaks to maintain annotation quality
+#### 6. Submit Annotation
+- Click **"Submit"** button (or press `Ctrl+Enter`).
+- Annotation is saved and next image loads automatically.
+
+#### 7. Track Progress
+- Monitor the progress bar at the top.
+- Review your annotations periodically for consistency.
+- Take breaks to maintain annotation quality.
 
 ---
 
