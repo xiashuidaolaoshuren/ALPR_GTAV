@@ -205,13 +205,25 @@ ocr = PaddleOCR(
 **Inference:**
 
 - **MUST** pass preprocessed cropped images to `ocr.ocr(image, cls=True)`
-- **MUST** extract text from nested result structure: `result[0][0][1][0]`
+- **MUST** handle cases where PaddleOCR returns multiple text lines for a single plate.
+- **MUST** implement a filtering mechanism to select the best candidate line.
+
+**Post-processing and Filtering (MUST implement):**
+
+1.  **Filter by Regex:** Discard any recognized text that does not match the license plate format (e.g., `^[A-Z0-9]{6,8}$`).
+2.  **Score Candidates:** For the remaining candidates, calculate a score. A good starting formula is:
+    $score = p \cdot h \cdot \min(\frac{L}{8}, 1)$
+    - `p`: OCR confidence for the text line.
+    - `h`: Height of the text's bounding box, normalized by the height of the cropped plate image.
+    - `L`: Length of the recognized text string.
+3.  **Select Best Candidate:** Choose the candidate with the highest score.
 
 **Rules:**
 
-- **ALWAYS** enable angle classification (`use_angle_cls=True`) for rotated plates
-- **DO NOT** pass full-resolution frames to PaddleOCR
-- **MUST** handle empty results (no text detected) gracefully
+- **ALWAYS** enable angle classification (`use_angle_cls=True`) for rotated plates.
+- **DO NOT** pass full-resolution frames to PaddleOCR.
+- **MUST** handle empty results (no text detected) gracefully.
+- **MUST** load filtering rules (like regex) from `configs/pipeline_config.yaml`.
 
 ---
 

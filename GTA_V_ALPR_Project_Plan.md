@@ -114,7 +114,7 @@ A tracking algorithm will be implemented to maintain the identity of a license p
 - **Risk:** Poor model performance in certain in-game conditions (e.g., heavy rain, low light).
   - **Mitigation:** Collect a diverse dataset that includes these challenging conditions. Use data augmentation to simulate them. Fine-tune the models on this augmented data.
 - **Risk:** The stylized fonts on GTA V license plates are difficult for the OCR model to recognize.
-  - **Mitigation:** Extensive pre-processing of the cropped license plate image. If issues persist, fine-tuning the OCR model on a synthetic dataset of GTA V-style license plates may be necessary.
+  - **Mitigation:** Extensive pre-processing of the cropped license plate image. Implement a rule-based filter to select the most likely text candidate from multiple OCR results based on confidence, size, and format. If issues persist, fine-tuning the OCR model on a synthetic dataset of GTA V-style license plates may be necessary.
 - **Risk:** Real-time performance is not achieved.
   - **Mitigation:** Use a smaller, faster YOLO model (e.g., YOLOv8n). Optimize the pipeline by only running OCR when a new plate is detected or after a certain number of frames.
 

@@ -45,6 +45,21 @@ recognition:
   # Enable recognition algorithm (disable for detection-only mode)
   use_rec: true
 
+  # --- Post-processing and Filtering ---
+  # Regex to validate and filter recognized plate text
+  # Default matches 6-8 uppercase alphanumeric characters
+  regex: '^[A-Z0-9]{6,8}$'
+  
+  # If multiple text lines are detected, prefer the one from the largest bounding box
+  prefer_largest_box: true
+  
+  # Mask a ratio of the top of the cropped plate image to ignore headers/banners
+  # e.g., 0.25 would mask the top 25% of the image
+  mask_top_ratio: 0.0
+  
+  # Minimum confidence for a filtered line to be considered a valid result
+  min_conf: 0.3
+
 # Tracking Module Configuration
 tracking:
   # Tracking algorithm type
