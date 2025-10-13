@@ -14,7 +14,6 @@ Checks performed:
 Usage:
     python scripts/diagnostics/check_dataset_quality.py
 
-Author: GTA V ALPR Development Team
 Version: 1.1
 """
 

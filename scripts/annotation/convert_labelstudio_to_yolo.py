@@ -21,9 +21,10 @@ import argparse
 import json
 import logging
 import random
+import shutil
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 # Setup logging
 logging.basicConfig(
@@ -81,6 +82,15 @@ def parse_arguments():
         type=int,
         default=42,
         help='Random seed for split reproducibility (default: 42)'
+    )
+    
+    parser.add_argument(
+        '--filter-readability',
+        type=str,
+        default=None,
+        help='Comma-separated list of readability values to include (e.g., "clear,blurred"). '
+             'If not specified, all annotations are included. '
+             'Valid values: clear, blurred, occluded'
     )
 
     return parser.parse_args()
@@ -175,8 +185,28 @@ def split_dataset(tasks: List[Dict], train_ratio: float, valid_ratio: float,
     return train_tasks, valid_tasks, test_tasks
 
 
-def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str):
-    """Create YOLO format dataset from tasks."""
+def sanitize_image_filename(filename: str) -> str:
+    """Remove internal ID prefixes from Label Studio filenames."""
+    name = Path(filename).name
+    if '-' in name:
+        prefix, remainder = name.split('-', 1)
+        if remainder:
+            return remainder
+    return name
+
+
+def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
+                        readability_filter: List[str] = None) -> Set[str]:
+    """
+    Create YOLO format dataset from tasks.
+    
+    Args:
+        tasks: List of annotation tasks
+        output_dir: Output directory
+        split_name: Split name (train/valid/test)
+        readability_filter: List of readability values to include (e.g., ['clear', 'blurred'])
+                          If None, all annotations are included
+    """
     images_dir = output_dir / split_name / 'images'
     labels_dir = output_dir / split_name / 'labels'
 
@@ -184,6 +214,10 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str):
     labels_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info(f"Creating {split_name} set...")
+    if readability_filter:
+        logger.info(f"  Filtering readability: {', '.join(readability_filter)}")
+
+    processed_filenames: Set[str] = set()
 
     for task in tasks:
         image_path = task.get('data', {}).get('image')
@@ -192,6 +226,7 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str):
             continue
 
         image_filename = Path(image_path).name
+        sanitized_image_filename = sanitize_image_filename(image_filename)
         annotations = task.get('annotations', [])
         if not annotations:
             logger.warning(f"No annotations for {image_filename}, skipping")
@@ -202,9 +237,30 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str):
         image_height = annotation_data.get('original_height', 1080)
 
         yolo_lines = []
+        filtered_count = 0
         for result in annotation_data.get('result', []):
             if result.get('type') == 'rectanglelabels':
                 value = result['value']
+                
+                # Check readability filter if specified
+                if readability_filter:
+                    # Get readability value from choices
+                    readability = None
+                    for res in annotation_data.get('result', []):
+                        if res.get('type') == 'choices' and res.get('from_name') == 'readability':
+                            choices = res['value'].get('choices', [])
+                            if choices:
+                                readability = choices[0]
+                                break
+                    
+                    # Filter based on readability
+                    if readability and readability not in readability_filter:
+                        filtered_count += 1
+                        continue
+                    elif not readability:
+                        # No readability annotation - include by default for backward compatibility
+                        logger.debug(f"No readability annotation found for {image_filename}, including by default")
+                
                 x_percent = value['x']
                 y_percent = value['y']
                 width_percent = value['width']
@@ -217,20 +273,64 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str):
 
                 yolo_line = f"0 {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}"
                 yolo_lines.append(yolo_line)
+        
+        if filtered_count > 0:
+            logger.debug(f"Filtered out {filtered_count} annotations from {image_filename} based on readability")
 
         if not yolo_lines:
             logger.warning(f"No valid annotations for {image_filename}")
             continue
 
-        label_filename = Path(image_filename).stem + '.txt'
-        label_path = labels_dir / label_filename
+        label_stem = Path(sanitized_image_filename).stem
+        label_path = labels_dir / f"{label_stem}.txt"
 
         with open(label_path, 'w') as f:
             f.write('\n'.join(yolo_lines))
 
         logger.debug(f"Processed {image_filename} -> {len(yolo_lines)} annotations")
+        processed_filenames.add(sanitized_image_filename)
 
     logger.info(f"Created {len(list(labels_dir.glob('*.txt')))} label files in {split_name} set")
+    return processed_filenames
+
+
+def find_source_image(source_dir: Path, filename: str) -> Optional[Path]:
+    """Locate the source image within the outputs/test_images directory."""
+    direct_path = source_dir / filename
+    if direct_path.exists():
+        return direct_path
+
+    matches = list(source_dir.rglob(filename))
+    if matches:
+        return matches[0]
+    return None
+
+
+def copy_images_for_split(filenames: Iterable[str], source_dir: Path, destination_dir: Path):
+    """Copy matching images into the split's images directory."""
+    copied = 0
+    missing = []
+    destination_dir.mkdir(parents=True, exist_ok=True)
+
+    for filename in sorted(set(filenames)):
+        source_path = find_source_image(source_dir, filename)
+        if source_path is None:
+            missing.append(filename)
+            continue
+
+        destination_path = destination_dir / filename
+        try:
+            shutil.copy2(source_path, destination_path)
+            copied += 1
+        except Exception as err:
+            logger.error(f"Failed to copy {source_path} -> {destination_path}: {err}")
+
+    logger.info(f"Copied {copied} images into {destination_dir}")
+    if missing:
+        logger.warning(
+            "Missing source images for %d file(s) in %s: %s",
+            len(missing), destination_dir, ', '.join(missing)
+        )
 
 
 def create_dataset_yaml(output_dir: Path, class_names: List[str]):
@@ -290,10 +390,16 @@ def main():
 
         output_dir = Path(args.output)
         output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Parse readability filter if provided
+        readability_filter = None
+        if args.filter_readability:
+            readability_filter = [r.strip() for r in args.filter_readability.split(',')]
+            logger.info(f"Applying readability filter: {readability_filter}")
 
-        create_yolo_dataset(train_tasks, output_dir, 'train')
-        create_yolo_dataset(valid_tasks, output_dir, 'valid')
-        create_yolo_dataset(test_tasks, output_dir, 'test')
+        train_files = create_yolo_dataset(train_tasks, output_dir, 'train', readability_filter)
+        valid_files = create_yolo_dataset(valid_tasks, output_dir, 'valid', readability_filter)
+        test_files = create_yolo_dataset(test_tasks, output_dir, 'test', readability_filter)
 
         class_names = ['license_plate']
         create_classes_txt(output_dir, class_names)
@@ -316,7 +422,22 @@ def main():
         logger.info(f"  │   └── labels/")
         logger.info(f"  ├── data.yaml")
         logger.info(f"  └── classes.txt")
-        logger.info("\n⚠️  Note: You need to copy the actual image files to the images/ directories")
+        source_images_dir = Path(__file__).resolve().parents[2] / 'outputs' / 'test_images'
+        if source_images_dir.exists():
+            logger.info("\nCopying images from %s into dataset structure...", source_images_dir)
+            copy_images_for_split(train_files, source_images_dir, output_dir / 'train' / 'images')
+            copy_images_for_split(valid_files, source_images_dir, output_dir / 'valid' / 'images')
+            copy_images_for_split(test_files, source_images_dir, output_dir / 'test' / 'images')
+        else:
+            logger.warning(
+                "Source image directory not found at %s; skipping image copy step.",
+                source_images_dir
+            )
+        
+        if args.filter_readability:
+            logger.info(f"\n📊 Readability filter applied: {', '.join(readability_filter)}")
+            logger.info("   Use --filter-readability 'clear' to create a recognition-only dataset")
+            logger.info("   Omit the flag to include all annotations for detection")
 
         return 0
 
