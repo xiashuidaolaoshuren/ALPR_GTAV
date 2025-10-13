@@ -227,59 +227,63 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
 
         image_filename = Path(image_path).name
         sanitized_image_filename = sanitize_image_filename(image_filename)
-        annotations = task.get('annotations', [])
-        if not annotations:
-            logger.warning(f"No annotations for {image_filename}, skipping")
-            continue
+        annotations = task.get('annotations') or []
+        annotation_data = annotations[0] if annotations else None
+        results = annotation_data.get('result', []) if annotation_data else []
 
-        annotation_data = annotations[0]
-        image_width = annotation_data.get('original_width', 1920)
-        image_height = annotation_data.get('original_height', 1080)
+        readability_value = None
+        if readability_filter and annotation_data:
+            for res in results:
+                if res.get('type') == 'choices' and res.get('from_name') == 'readability':
+                    choices = res['value'].get('choices', [])
+                    if choices:
+                        readability_value = choices[0]
+                    break
 
-        yolo_lines = []
+        skip_boxes_for_readability = (
+            readability_filter
+            and readability_value is not None
+            and readability_value not in readability_filter
+        )
+
+        if skip_boxes_for_readability:
+            logger.debug(
+                "Skipping bounding boxes for %s due to readability '%s' not in filter",
+                image_filename,
+                readability_value,
+            )
+
+        yolo_lines: List[str] = []
         filtered_count = 0
-        for result in annotation_data.get('result', []):
-            if result.get('type') == 'rectanglelabels':
-                value = result['value']
-                
-                # Check readability filter if specified
-                if readability_filter:
-                    # Get readability value from choices
-                    readability = None
-                    for res in annotation_data.get('result', []):
-                        if res.get('type') == 'choices' and res.get('from_name') == 'readability':
-                            choices = res['value'].get('choices', [])
-                            if choices:
-                                readability = choices[0]
-                                break
-                    
-                    # Filter based on readability
-                    if readability and readability not in readability_filter:
-                        filtered_count += 1
-                        continue
-                    elif not readability:
-                        # No readability annotation - include by default for backward compatibility
-                        logger.debug(f"No readability annotation found for {image_filename}, including by default")
-                
-                x_percent = value['x']
-                y_percent = value['y']
-                width_percent = value['width']
-                height_percent = value['height']
+        for result in results:
+            if result.get('type') != 'rectanglelabels':
+                continue
 
-                x_center = (x_percent + width_percent / 2) / 100.0
-                y_center = (y_percent + height_percent / 2) / 100.0
-                width = width_percent / 100.0
-                height = height_percent / 100.0
+            if skip_boxes_for_readability:
+                filtered_count += 1
+                continue
 
-                yolo_line = f"0 {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}"
-                yolo_lines.append(yolo_line)
-        
-        if filtered_count > 0:
-            logger.debug(f"Filtered out {filtered_count} annotations from {image_filename} based on readability")
+            value = result['value']
 
-        if not yolo_lines:
-            logger.warning(f"No valid annotations for {image_filename}")
-            continue
+            x_percent = value['x']
+            y_percent = value['y']
+            width_percent = value['width']
+            height_percent = value['height']
+
+            x_center = (x_percent + width_percent / 2) / 100.0
+            y_center = (y_percent + height_percent / 2) / 100.0
+            width = width_percent / 100.0
+            height = height_percent / 100.0
+
+            yolo_line = f"0 {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}"
+            yolo_lines.append(yolo_line)
+
+        if filtered_count > 0 and readability_filter:
+            logger.debug(
+                "Filtered out %d bounding box(es) from %s based on readability",
+                filtered_count,
+                image_filename,
+            )
 
         label_stem = Path(sanitized_image_filename).stem
         label_path = labels_dir / f"{label_stem}.txt"
@@ -287,7 +291,13 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
         with open(label_path, 'w') as f:
             f.write('\n'.join(yolo_lines))
 
-        logger.debug(f"Processed {image_filename} -> {len(yolo_lines)} annotations")
+        if yolo_lines:
+            logger.debug(f"Processed {image_filename} -> {len(yolo_lines)} annotations")
+        else:
+            logger.info(
+                "No bounding boxes for %s (or filtered out); wrote empty label file.",
+                image_filename,
+            )
         processed_filenames.add(sanitized_image_filename)
 
     logger.info(f"Created {len(list(labels_dir.glob('*.txt')))} label files in {split_name} set")
@@ -372,16 +382,26 @@ def main():
         logger.info("Loading Label Studio export...")
         tasks = load_labelstudio_export(args.input)
 
-        annotated_tasks = [t for t in tasks if t.get('annotations')]
-        logger.info(f"Found {len(annotated_tasks)} annotated tasks")
+        image_tasks = [t for t in tasks if t.get('data', {}).get('image')]
+        annotated_count = sum(1 for t in image_tasks if t.get('annotations'))
+        logger.info(
+            "Found %d tasks with image references (%d annotated)",
+            len(image_tasks),
+            annotated_count,
+        )
 
-        if not annotated_tasks:
-            logger.error("No annotated tasks found in export!")
+        if not image_tasks:
+            logger.error("No tasks with image data found in export!")
             return 1
+
+        if annotated_count == 0:
+            logger.warning(
+                "No annotations present; empty label files will be generated for all images."
+            )
 
         logger.info("Splitting dataset...")
         train_tasks, valid_tasks, test_tasks = split_dataset(
-            annotated_tasks,
+            image_tasks,
             args.train_ratio,
             args.valid_ratio,
             args.test_ratio,
