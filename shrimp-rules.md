@@ -210,7 +210,7 @@ ocr = PaddleOCR(
 
 **Post-processing and Filtering (MUST implement):**
 
-1.  **Filter by Regex:** Discard any recognized text that does not match the license plate format (e.g., `^[A-Z0-9]{6,8}$`).
+1.  **Filter by Regex:** Discard any recognized text that does not match the GTA V license plate format: `^\d{2}[A-Z]{3}\d{3}$` (2 digits, 3 uppercase letters, 3 digits, e.g., `12ABC345`).
 2.  **Score Candidates:** For the remaining candidates, calculate a score. A good starting formula is:
     $score = p \cdot h \cdot \min(\frac{L}{8}, 1)$
     - `p`: OCR confidence for the text line.

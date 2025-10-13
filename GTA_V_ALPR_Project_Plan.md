@@ -77,9 +77,10 @@ A tracking algorithm will be implemented to maintain the identity of a license p
 - **Tasks:**
     - Set up the PaddleOCR engine.
     - Write a script that takes a cropped image of a license plate and outputs the recognized text.
+    - Implement post-processing to filter OCR results using the known GTA V license plate format: **2 digits, 3 uppercase letters, 3 digits** (e.g., `12ABC345`). This regex validation (`^\d{2}[A-Z]{3}\d{3}$`) will significantly improve accuracy by rejecting invalid text.
     - Pre-process the cropped images to improve OCR accuracy (e.g., grayscale conversion, resizing, perspective correction).
     - Test the OCR module on manually cropped license plates from the dataset.
-- **Deliverable:** A Python script that can perform OCR on license plate images.
+- **Deliverable:** A Python script that can perform OCR on license plate images with format validation.
 
 ### Week 4: Pipeline Integration and Tracking
 - **Tasks:**
@@ -114,7 +115,7 @@ A tracking algorithm will be implemented to maintain the identity of a license p
 - **Risk:** Poor model performance in certain in-game conditions (e.g., heavy rain, low light).
   - **Mitigation:** Collect a diverse dataset that includes these challenging conditions. Use data augmentation to simulate them. Fine-tune the models on this augmented data.
 - **Risk:** The stylized fonts on GTA V license plates are difficult for the OCR model to recognize.
-  - **Mitigation:** Extensive pre-processing of the cropped license plate image. Implement a rule-based filter to select the most likely text candidate from multiple OCR results based on confidence, size, and format. If issues persist, fine-tuning the OCR model on a synthetic dataset of GTA V-style license plates may be necessary.
+  - **Mitigation:** Extensive pre-processing of the cropped license plate image. Implement a rule-based filter to select the most likely text candidate from multiple OCR results based on confidence, size, and the known GTA V format (2 digits, 3 letters, 3 digits: `^\d{2}[A-Z]{3}\d{3}$`). If issues persist, fine-tuning the OCR model on a synthetic dataset of GTA V-style license plates may be necessary.
 - **Risk:** Real-time performance is not achieved.
   - **Mitigation:** Use a smaller, faster YOLO model (e.g., YOLOv8n). Optimize the pipeline by only running OCR when a new plate is detected or after a certain number of frames.
 
@@ -154,10 +155,12 @@ This dataset will be used to fine-tune the YOLOv8 model for detecting license pl
 This dataset is for training or evaluating the PaddleOCR model. It will consist of cropped images of license plates.
 
 - **Content:** Tightly cropped images of license plates, extracted from the detection dataset.
+- **Format:** GTA V license plates follow a specific format: **2 digits, 3 uppercase letters, 3 digits** (e.g., `12ABC345`, `88FEL123`). This consistent 8-character format makes validation straightforward.
 - **Preprocessing:** These images may be pre-processed (e.g., de-skewed, converted to grayscale, resized) to improve OCR performance.
 - **Labeling:** A simple text file mapping image filenames to the corresponding license plate text will be created. For example:
     ```
-    image_001.png	SA8821A
-    image_002.png	46EEK827
+    image_001.png	12ABC345
+    image_002.png	88FEL123
+    image_003.png	46EEK827
     ```
 This format is compatible with PaddleOCR's training pipeline if fine-tuning becomes necessary.

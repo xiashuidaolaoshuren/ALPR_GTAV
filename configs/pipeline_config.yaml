@@ -47,8 +47,8 @@ recognition:
 
   # --- Post-processing and Filtering ---
   # Regex to validate and filter recognized plate text
-  # Default matches 6-8 uppercase alphanumeric characters
-  regex: '^[A-Z0-9]{6,8}$'
+  # GTA V format: 2 digits, 3 uppercase letters, 3 digits (e.g., 12ABC345)
+  regex: '^\d{2}[A-Z]{3}\d{3}$'
   
   # If multiple text lines are detected, prefer the one from the largest bounding box
   prefer_largest_box: true
