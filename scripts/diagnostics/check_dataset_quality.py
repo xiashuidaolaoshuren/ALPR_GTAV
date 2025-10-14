@@ -14,7 +14,6 @@ Checks performed:
 Usage:
     python scripts/diagnostics/check_dataset_quality.py
 
-Version: 1.1
 """
 
 from __future__ import annotations

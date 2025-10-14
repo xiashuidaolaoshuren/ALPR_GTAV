@@ -14,8 +14,6 @@ Usage:
     Custom frame rate:
         python scripts/data_ingestion/extract_frames.py --input video.mp4 --output datasets/lpr/train/images/ --fps 10
 
-Author: GTA V ALPR Development Team
-Version: 1.0
 """
 
 import os

@@ -7,8 +7,6 @@ template entries for all images, which can then be reviewed and filled in.
 Usage:
     python scripts/data_ingestion/generate_metadata.py [--output outputs/test_images/metadata.txt]
 
-Author: GTA V ALPR Development Team
-Version: 1.0
 """
 
 import argparse

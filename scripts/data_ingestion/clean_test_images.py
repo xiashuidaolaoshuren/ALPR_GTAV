@@ -18,8 +18,6 @@ Controls:
     - q/Q: Quit script
     - ESC: Close current image window
 
-Author: GTA V ALPR Development Team
-Version: 1.0
 """
 
 import argparse

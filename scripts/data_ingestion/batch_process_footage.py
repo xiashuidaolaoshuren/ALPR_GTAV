@@ -7,8 +7,6 @@ outputs/raw_footage/ directory, processing each condition folder separately.
 Usage:
     python scripts/data_ingestion/batch_process_footage.py [--fps 5] [--quality 95]
 
-Author: GTA V ALPR Development Team
-Version: 1.0
 """
 
 import argparse

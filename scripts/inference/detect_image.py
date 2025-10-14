@@ -9,8 +9,6 @@ Usage:
     python scripts/inference/detect_image.py --image outputs/test_images/day_clear_front_00001.jpg --output result.jpg
     python scripts/inference/detect_image.py --image test.jpg --conf 0.3 --no-save-viz
 
-Author: GTA V ALPR Development Team
-Version: 1.0
 """
 
 import sys
