@@ -121,7 +121,7 @@ def recognize_text(
                           Should be output from preprocessing pipeline.
         ocr_model: Loaded PaddleOCR model instance from load_ocr_model().
         config: Configuration dictionary containing recognition parameters. Expected keys:
-               - regex (str): Regex pattern for plate validation (default: '^[A-Z0-9]{6,8}$')
+               - regex (str): Regex pattern for plate validation (default: r'^\\d{2}[A-Z]{3}\\d{3}$')
                - min_conf (float): Minimum confidence threshold (default: 0.3)
                - prefer_largest_box (bool): Prefer text from largest bbox (default: True)
     
@@ -147,8 +147,151 @@ def recognize_text(
     
     Note:
         - OCR may return multiple text lines; post-processing selects best candidate
-        - Filtering uses regex pattern to validate plate format
+        - Filtering uses regex pattern to validate plate format (GTA V: r'^\\d{2}[A-Z]{3}\\d{3}$')
         - Scoring formula: p * h * min(L/8, 1) where p=confidence, h=normalized height, L=length
         - Returns None if no candidates pass regex filter or meet confidence threshold
     """
-    pass
+    from src.recognition.utils import filter_by_regex, score_candidate, select_best_candidate
+    
+    # Validate input image
+    if preprocessed_image is None or not isinstance(preprocessed_image, np.ndarray):
+        raise ValueError("preprocessed_image must be a valid numpy array")
+    if preprocessed_image.size == 0:
+        raise ValueError("preprocessed_image is empty")
+    if len(preprocessed_image.shape) not in [2, 3]:
+        raise ValueError(f"preprocessed_image must be 2D or 3D array, got shape {preprocessed_image.shape}")
+    
+    # Extract configuration parameters with defaults
+    regex_pattern = config.get('regex', r'^\d{2}[A-Z]{3}\d{3}$')  # GTA V format
+    min_conf = config.get('min_conf', 0.3)
+    
+    logger.info(f"Running OCR inference with regex pattern: {regex_pattern}, min_conf: {min_conf}")
+    
+    # Step 1: Run OCR inference
+    try:
+        # Use predict() method (PaddleOCR 3.x)
+        result = ocr_model.predict(preprocessed_image)
+        logger.debug(f"OCR inference completed, result type: {type(result)}")
+    except Exception as e:
+        logger.error(f"OCR inference failed: {e}")
+        raise RuntimeError(f"OCR inference failed: {str(e)}") from e
+    
+    # Step 2: Handle empty results
+    if not result:
+        logger.debug("OCR returned empty result")
+        return None, 0.0
+    
+    # PaddleOCR predict() returns a list of dict results
+    # Each dict contains: 'rec_texts', 'rec_scores', 'rec_polys', etc.
+    # For single image: result = [{'rec_texts': [...], 'rec_scores': [...], 'rec_polys': [...]}]
+    
+    if not isinstance(result, list) or len(result) == 0:
+        logger.debug("OCR returned empty or invalid result")
+        return None, 0.0
+    
+    # Get first image's results
+    ocr_result = result[0]
+    
+    # Check if result is a dict with expected keys
+    if not isinstance(ocr_result, dict):
+        logger.error(f"Unexpected OCR result format: {type(ocr_result)}")
+        return None, 0.0
+    
+    # Extract recognized texts, scores, and polygons
+    rec_texts = ocr_result.get('rec_texts', [])
+    rec_scores = ocr_result.get('rec_scores', [])
+    rec_polys = ocr_result.get('rec_polys', [])
+    
+    if not rec_texts or not rec_scores or not rec_polys:
+        logger.debug("No text detected by OCR")
+        return None, 0.0
+    
+    # Step 3: Extract candidates from all detected text lines
+    candidates = []
+    image_height = preprocessed_image.shape[0]
+    
+    logger.debug(f"Processing {len(rec_texts)} text lines from OCR result")
+    
+    # Iterate over all detected text lines
+    for i, (text, confidence, bbox_points) in enumerate(zip(rec_texts, rec_scores, rec_polys)):
+        try:
+            # Normalize text to uppercase
+            text = str(text).upper().strip()
+            confidence = float(confidence)
+            
+            # Skip empty text or low confidence
+            if not text:
+                logger.debug(f"Skipping empty text in line {i}")
+                continue
+            if confidence < min_conf:
+                logger.debug(f"Skipping low confidence text '{text}' ({confidence:.3f} < {min_conf})")
+                continue
+            
+            # Calculate bounding box height from polygon points
+            bbox_array = np.array(bbox_points)
+            if bbox_array.shape[0] < 2:
+                logger.warning(f"Skipping line {i}: insufficient bbox points")
+                continue
+            
+            # Height = max_y - min_y
+            bbox_height = float(np.max(bbox_array[:, 1]) - np.min(bbox_array[:, 1]))
+            
+            # Store candidate
+            candidates.append({
+                'text': text,
+                'confidence': confidence,
+                'bbox_height': bbox_height,
+                'bbox': bbox_points
+            })
+            
+            logger.debug(f"Extracted candidate {i}: text='{text}', conf={confidence:.3f}, "
+                        f"bbox_height={bbox_height:.1f}")
+        
+        except Exception as e:
+            logger.warning(f"Error parsing line {i}: {e}")
+            continue
+    
+    if not candidates:
+        logger.debug("No valid candidates extracted from OCR results")
+        return None, 0.0
+    
+    logger.info(f"Extracted {len(candidates)} candidates before filtering")
+    
+    # Step 4: Filter candidates by regex pattern
+    valid_candidates = []
+    for candidate in candidates:
+        if filter_by_regex(candidate['text'], regex_pattern):
+            valid_candidates.append(candidate)
+            logger.debug(f"Candidate '{candidate['text']}' passed regex filter")
+        else:
+            logger.debug(f"Candidate '{candidate['text']}' failed regex filter")
+    
+    if not valid_candidates:
+        logger.info(f"No candidates match GTA V plate format: {regex_pattern}")
+        logger.debug(f"Rejected candidates: {[c['text'] for c in candidates]}")
+        return None, 0.0
+    
+    logger.info(f"{len(valid_candidates)} candidates passed regex filter")
+    
+    # Step 5: Score each valid candidate
+    for candidate in valid_candidates:
+        try:
+            candidate['score'] = score_candidate(
+                text=candidate['text'],
+                confidence=candidate['confidence'],
+                bbox_height=candidate['bbox_height'],
+                image_height=image_height
+            )
+        except Exception as e:
+            logger.warning(f"Error scoring candidate '{candidate['text']}': {e}")
+            candidate['score'] = 0.0
+    
+    # Step 6: Select best candidate
+    best_text, best_confidence = select_best_candidate(valid_candidates)
+    
+    if best_text:
+        logger.info(f"Final recognition result: '{best_text}' (confidence: {best_confidence:.3f})")
+    else:
+        logger.info("No valid plate text recognized after filtering and scoring")
+    
+    return best_text, best_confidence

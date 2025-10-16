@@ -15,6 +15,93 @@ import torch
 logger = logging.getLogger(__name__)
 
 
+def calculate_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -> float:
+    """
+    Calculate Intersection over Union (IoU) between two bounding boxes.
+    
+    Args:
+        box1: First box as (x1, y1, x2, y2)
+        box2: Second box as (x1, y1, x2, y2)
+    
+    Returns:
+        IoU score between 0.0 and 1.0
+    """
+    x1_1, y1_1, x2_1, y2_1 = box1
+    x1_2, y1_2, x2_2, y2_2 = box2
+    
+    # Calculate intersection coordinates
+    x1_i = max(x1_1, x1_2)
+    y1_i = max(y1_1, y1_2)
+    x2_i = min(x2_1, x2_2)
+    y2_i = min(y2_1, y2_2)
+    
+    # Calculate intersection area
+    if x2_i < x1_i or y2_i < y1_i:
+        intersection = 0.0
+    else:
+        intersection = (x2_i - x1_i) * (y2_i - y1_i)
+    
+    # Calculate union area
+    area1 = (x2_1 - x1_1) * (y2_1 - y1_1)
+    area2 = (x2_2 - x1_2) * (y2_2 - y1_2)
+    union = area1 + area2 - intersection
+    
+    # Avoid division by zero
+    if union == 0:
+        return 0.0
+    
+    return intersection / union
+
+
+def apply_nms(
+    detections: List[Tuple[int, int, int, int, float]], 
+    iou_threshold: float = 0.3
+) -> List[Tuple[int, int, int, int, float]]:
+    """
+    Apply Non-Maximum Suppression to remove duplicate/overlapping detections.
+    
+    This is an additional NMS pass after YOLOv8's internal NMS to ensure
+    we only keep one detection per unique plate (removes near-duplicates).
+    
+    Args:
+        detections: List of (x1, y1, x2, y2, confidence) tuples
+        iou_threshold: IoU threshold for considering boxes as duplicates.
+                      Lower values are more aggressive (0.3 recommended).
+    
+    Returns:
+        Filtered list of detections with duplicates removed
+    """
+    if not detections:
+        return []
+    
+    # Sort by confidence (descending)
+    sorted_dets = sorted(detections, key=lambda x: x[4], reverse=True)
+    
+    keep = []
+    
+    for current in sorted_dets:
+        # Check if current box overlaps significantly with any kept box
+        should_keep = True
+        
+        for kept in keep:
+            iou = calculate_iou(current[:4], kept[:4])
+            
+            if iou > iou_threshold:
+                # Overlaps too much with an already kept detection
+                should_keep = False
+                logger.debug(f"Filtered duplicate detection (IoU={iou:.3f} > {iou_threshold})")
+                break
+        
+        if should_keep:
+            keep.append(current)
+    
+    if len(keep) < len(sorted_dets):
+        logger.info(f"NMS filtered {len(sorted_dets) - len(keep)} duplicate detections "
+                   f"({len(sorted_dets)} → {len(keep)})")
+    
+    return keep
+
+
 def load_detection_model(model_path: str, device: str = 'auto'):
     """
     Load pre-trained YOLOv8 model for license plate detection.
@@ -92,7 +179,8 @@ def detect_plates(
     frame: np.ndarray,
     model,
     conf_threshold: float = 0.25,
-    iou_threshold: float = 0.45
+    iou_threshold: float = 0.45,
+    min_area: int = 1000
 ) -> List[Tuple[int, int, int, int, float]]:
     """
     Detect license plates in a single frame.
@@ -107,6 +195,8 @@ def detect_plates(
         iou_threshold: IOU (Intersection over Union) threshold for Non-Maximum
                       Suppression (0.0 to 1.0). Controls how much overlap is allowed
                       between detections. Higher values allow more overlapping boxes.
+        min_area: Minimum bounding box area (pixels) to filter tiny false positives.
+                 Default 1000px filters boxes smaller than ~32×32. Set to 0 to disable.
     
     Returns:
         List of detections, where each detection is a tuple:
@@ -185,6 +275,22 @@ def detect_plates(
                     ))
         
         logger.info(f"Detected {len(detections)} plates with conf >= {conf_threshold:.2f}")
+        
+        # Filter by minimum area to remove tiny false positives
+        if min_area > 0:
+            original_count = len(detections)
+            detections = [
+                det for det in detections
+                if (det[2] - det[0]) * (det[3] - det[1]) >= min_area
+            ]
+            if len(detections) < original_count:
+                logger.info(f"Filtered {original_count - len(detections)} small detections "
+                           f"(area < {min_area}px)")
+        
+        # Apply additional NMS to remove near-duplicate detections
+        # (more aggressive than YOLOv8's internal NMS)
+        if len(detections) > 1:
+            detections = apply_nms(detections, iou_threshold=0.3)
         
         # Log detection details in debug mode
         if detections:
