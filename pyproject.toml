@@ -32,10 +32,18 @@ torch = [
 torchvision = [
     { index = "pytorch-cu126", marker = "sys_platform == 'win32'" },
 ]
+paddlepaddle-gpu = [
+    { index = "paddlepaddle-gpu-cu126", marker = "sys_platform == 'win32'" },
+]
 
 [[tool.uv.index]]
 name = "pytorch-cu126"
 url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "paddlepaddle-gpu-cu126"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu126/"
 explicit = true
 
 [tool.uv]
