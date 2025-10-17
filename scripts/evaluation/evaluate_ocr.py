@@ -488,7 +488,7 @@ def evaluate_ocr(
                 failure_img = image.copy()
                 
                 # Add annotation
-                text_display = f"GT: {gt_text} | Pred: {predicted_text or 'NONE'}"
+                text_display = f"GT: {gt_text} | Pred: {best_pred or 'NONE'}"
                 cv2.putText(failure_img, text_display, (10, 30),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 
