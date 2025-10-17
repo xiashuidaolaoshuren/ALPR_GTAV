@@ -21,7 +21,7 @@ import logging
 import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Iterable, List, Tuple, Union
 
 import cv2
 import yaml
@@ -146,6 +146,48 @@ def parse_filename(filename: str) -> Dict[str, str]:
     }
 
 
+# Type aliases for clarity
+DetectionTuple = Tuple[float, float, float, float, float]
+DetectionDict = Dict[str, Union[List[float], float]]
+
+
+def _normalize_detections(detections: Iterable[Union[DetectionTuple, DetectionDict]]) -> List[DetectionDict]:
+    """Convert raw detector outputs to a consistent dictionary format."""
+    normalized: List[DetectionDict] = []
+    for det in detections:
+        if isinstance(det, dict):
+            bbox = det.get('bbox') or det.get('box')
+            conf = det.get('confidence') or det.get('conf')
+            if bbox is None or conf is None:
+                logger.debug(f"Skipping malformed detection dict: {det}")
+                continue
+            normalized.append({
+                'bbox': [float(b) for b in bbox],
+                'confidence': float(conf)
+            })
+        else:
+            # Expect tuple/list in format (x1, y1, x2, y2, confidence)
+            if len(det) < 5:
+                logger.debug(f"Skipping malformed detection tuple: {det}")
+                continue
+            x1, y1, x2, y2, conf = det[:5]
+            normalized.append({
+                'bbox': [float(x1), float(y1), float(x2), float(y2)],
+                'confidence': float(conf)
+            })
+    return normalized
+
+
+def _detections_to_tuples(detections: Iterable[DetectionDict]) -> List[DetectionTuple]:
+    """Convert normalized detection dictionaries to tuples for visualization."""
+    tuples: List[DetectionTuple] = []
+    for det in detections:
+        bbox = det['bbox']
+        conf = det['confidence']
+        tuples.append((bbox[0], bbox[1], bbox[2], bbox[3], conf))
+    return tuples
+
+
 def evaluate_detection(
     test_dir: str,
     model,
@@ -181,9 +223,11 @@ def evaluate_detection(
             confidence_threshold,
             iou_threshold
         )
-        
-        num_detections = len(detections)
-        confidences = [d['confidence'] for d in detections]
+
+        normalized_detections = _normalize_detections(detections)
+
+        num_detections = len(normalized_detections)
+        confidences = [d['confidence'] for d in normalized_detections]
         max_confidence = max(confidences, default=0.0)
         avg_confidence = sum(confidences) / num_detections if num_detections else 0.0
         
@@ -192,13 +236,7 @@ def evaluate_detection(
             'num_detections': num_detections,
             'max_confidence': float(max_confidence),
             'avg_confidence': float(avg_confidence),
-            'detections': [
-                {
-                    'bbox': d['bbox'],
-                    'confidence': float(d['confidence'])
-                }
-                for d in detections
-            ],
+            'detections': normalized_detections,
             'metadata': metadata
         }
         
@@ -280,7 +318,9 @@ def save_examples(
         frame = cv2.imread(str(image_path))
         if frame is None:
             continue
-        annotated = draw_bounding_boxes(frame, result['detections'])
+
+        detection_tuples = _detections_to_tuples(result['detections'])
+        annotated = draw_bounding_boxes(frame, detection_tuples)
         cv2.imwrite(str(best_dir / result['filename']), annotated)
     
     for result in with_detections[-num_examples:]:
@@ -288,7 +328,9 @@ def save_examples(
         frame = cv2.imread(str(image_path))
         if frame is None:
             continue
-        annotated = draw_bounding_boxes(frame, result['detections'])
+
+        detection_tuples = _detections_to_tuples(result['detections'])
+        annotated = draw_bounding_boxes(frame, detection_tuples)
         cv2.imwrite(str(worst_dir / result['filename']), annotated)
     
     for result in without_detections[:num_examples]:
