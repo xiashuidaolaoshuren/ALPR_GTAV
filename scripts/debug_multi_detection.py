@@ -16,7 +16,9 @@ def main():
     # Images with multiple detections
     test_images = [
         'outputs/test_images/day_clear_angle_00024.jpg',
-        'outputs/test_images/day_clear_angle_00033.jpg'
+        'outputs/test_images/day_clear_angle_00033.jpg',
+        'outputs/test_images/day_clear_rear_00111.jpg',
+        'outputs/test_images/day_clear_angle_00072.jpg'
     ]
     
     # Load model
@@ -35,7 +37,7 @@ def main():
             continue
         
         # Detect plates
-        detections = detect_plates(image, model, conf_threshold=0.25, iou_threshold=0.45)
+        detections = detect_plates(image, model, conf_threshold=0.1, iou_threshold=0.1)
         
         print(f"\nFound {len(detections)} detection(s):")
         for i, (x1, y1, x2, y2, conf) in enumerate(detections, 1):
