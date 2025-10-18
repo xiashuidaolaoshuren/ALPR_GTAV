@@ -43,6 +43,8 @@ def load_ocr_model(config: dict) -> Any:
         - Angle classification essential for rotated license plates
         - Falls back to CPU gracefully if GPU unavailable
     """
+    # Pre-import torch to avoid PaddleOCR DLL load issues on Windows environments.
+    import torch  # type: ignore
     from paddleocr import PaddleOCR
     
     # Extract configuration parameters with defaults
