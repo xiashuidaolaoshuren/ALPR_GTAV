@@ -19,10 +19,11 @@ def draw_bounding_boxes(
     color: Tuple[int, int, int] = (0, 255, 0),
     thickness: int = 2,
     show_confidence: bool = True,
-    font_scale: float = 0.5
+    font_scale: float = 0.5,
+    text_labels: Optional[List[str]] = None
 ) -> np.ndarray:
     """
-    Draw bounding boxes on frame with optional confidence labels.
+    Draw bounding boxes on frame with optional confidence and text labels.
     
     Args:
         frame: Input image in BGR format (numpy array).
@@ -32,24 +33,31 @@ def draw_bounding_boxes(
         thickness: Line thickness in pixels. Default is 2.
         show_confidence: If True, display confidence score above each box.
         font_scale: Font size for confidence labels. Default is 0.5.
+        text_labels: Optional list of text labels (e.g., recognized plate text) to display
+                    below each bounding box. Length must match number of detections.
+                    Added in Task 19 for pipeline integration.
     
     Returns:
         Annotated frame with bounding boxes drawn. Returns a copy of the input frame.
     
     Raises:
-        ValueError: If frame is not a valid numpy array or detections format is incorrect.
+        ValueError: If frame is not a valid numpy array, detections format is incorrect,
+                   or text_labels length doesn't match detections length.
     
     Example:
         >>> import cv2
         >>> frame = cv2.imread('image.jpg')
         >>> detections = [(100, 100, 200, 150, 0.95), (300, 200, 400, 250, 0.87)]
-        >>> annotated = draw_bounding_boxes(frame, detections, color=(0, 255, 0))
+        >>> # With text labels for recognized plates
+        >>> text_labels = ['ABC123', 'XYZ789']
+        >>> annotated = draw_bounding_boxes(frame, detections, text_labels=text_labels)
         >>> cv2.imwrite('annotated.jpg', annotated)
     
     Note:
         - This function does not modify the input frame (creates a copy)
         - For real-time visualization, consider reducing thickness for better performance
         - Coordinates outside image boundaries are clipped automatically by cv2
+        - text_labels parameter added for Task 19 pipeline integration
     """
     # Validate input frame
     if not isinstance(frame, np.ndarray):
@@ -58,11 +66,18 @@ def draw_bounding_boxes(
     if frame.ndim != 3:
         raise ValueError(f"Frame must have 3 dimensions, got {frame.ndim}")
     
+    # Validate text_labels if provided
+    if text_labels is not None and len(text_labels) != len(detections):
+        raise ValueError(
+            f"text_labels length ({len(text_labels)}) must match "
+            f"detections length ({len(detections)})"
+        )
+    
     # Create a copy to avoid modifying the original
     annotated = frame.copy()
     
     # Draw each detection
-    for detection in detections:
+    for i, detection in enumerate(detections):
         if len(detection) != 5:
             logger.warning(f"Invalid detection format (expected 5 elements, got {len(detection)}): {detection}")
             continue
@@ -108,6 +123,46 @@ def draw_bounding_boxes(
                 cv2.FONT_HERSHEY_SIMPLEX,
                 font_scale,
                 (0, 0, 0),  # Black text for contrast
+                thickness=1,
+                lineType=cv2.LINE_AA
+            )
+        
+        # Add text label below box if provided (Task 19 integration)
+        if text_labels is not None and text_labels[i]:
+            text = text_labels[i]
+            
+            # Calculate text size for background
+            text_size, baseline = cv2.getTextSize(
+                text,
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                thickness
+            )
+            
+            # Position text below the box (with some padding)
+            text_y = y2 + text_size[1] + 15
+            
+            # Ensure text stays within frame bounds
+            if text_y + baseline > frame.shape[0]:
+                text_y = y1 - 15  # Draw above box if no space below
+            
+            # Draw background rectangle for better readability
+            cv2.rectangle(
+                annotated,
+                (x1, text_y - text_size[1] - baseline),
+                (x1 + text_size[0], text_y + baseline),
+                (0, 0, 0),  # Black background
+                -1  # Filled rectangle
+            )
+            
+            # Draw text
+            cv2.putText(
+                annotated,
+                text,
+                (x1, text_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                (255, 255, 255),  # White text for contrast
                 thickness=1,
                 lineType=cv2.LINE_AA
             )
