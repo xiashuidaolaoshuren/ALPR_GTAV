@@ -8,6 +8,7 @@ Provides OCR model loading and text inference capabilities.
 import logging
 from typing import Tuple, Optional, Any
 import numpy as np
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -169,11 +170,21 @@ def recognize_text(
     
     logger.info(f"Running OCR inference with regex pattern: {regex_pattern}, min_conf: {min_conf}")
     
+    # Step 0: Convert grayscale to BGR if needed (PaddleOCR 3.x requires 3-channel images)
+    if len(preprocessed_image.shape) == 2:
+        logger.debug("Converting grayscale to BGR for PaddleOCR compatibility")
+        preprocessed_image = cv2.cvtColor(preprocessed_image, cv2.COLOR_GRAY2BGR)
+    
     # Step 1: Run OCR inference
     try:
         # Use predict() method (PaddleOCR 3.x)
         result = ocr_model.predict(preprocessed_image)
         logger.debug(f"OCR inference completed, result type: {type(result)}")
+    except IndexError as e:
+        # PaddleOCR sometimes throws IndexError (e.g., "tuple index out of range") 
+        # for certain image characteristics - handle gracefully
+        logger.warning(f"OCR inference failed with IndexError (likely PaddleOCR internal issue): {e}")
+        return None, 0.0
     except Exception as e:
         logger.error(f"OCR inference failed: {e}")
         raise RuntimeError(f"OCR inference failed: {str(e)}") from e
