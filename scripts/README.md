@@ -10,7 +10,8 @@ scripts/
 ├── data_ingestion/  # Frame extraction, dataset curation
 ├── diagnostics/     # Environment and health checks
 ├── evaluation/      # Metrics, reporting, visualization
-└── inference/       # Image and video inference pipelines
+├── inference/       # Image and video inference pipelines
+└── profiling/       # Pipeline performance profiling and optimization
 ```
 
 ### How to Run Scripts

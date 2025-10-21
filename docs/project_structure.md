@@ -286,7 +286,8 @@ scripts/
 ├── annotation/          # Label Studio helpers and converters
 ├── inference/           # Single-image and video inference utilities
 ├── evaluation/          # Evaluation, reporting, visualisation scripts
-└── diagnostics/         # GPU checks, dataset quality analysers
+├── diagnostics/         # GPU checks, dataset quality analysers
+└── profiling/           # Pipeline performance profiling and optimization tools
 ```
 
 Each subdirectory ships with its own README describing responsibilities,

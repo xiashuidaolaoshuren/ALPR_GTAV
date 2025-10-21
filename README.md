@@ -100,6 +100,7 @@ ALPR_GTA5/
 │   ├── inference/         # Image/video inference entrypoints
 │   ├── evaluation/        # Evaluation + reporting utilities
 │   ├── diagnostics/       # Environment + dataset checks
+│   ├── profiling/         # Pipeline performance profiling and optimization
 │   └── README.md          # Overview of script layout
 ├── tests/                  # Test suite
 │   ├── unit/              # Unit tests
