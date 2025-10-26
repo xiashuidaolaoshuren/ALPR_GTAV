@@ -3,6 +3,9 @@ Integration tests for the complete ALPR pipeline.
 
 Tests the end-to-end workflow including detection, tracking, preprocessing,
 and recognition components working together.
+
+Note: Track lifetime tests use consecutive video frames instead of sampled images
+to ensure ByteTrack properly maintains state and track age increments correctly.
 """
 
 import unittest
@@ -115,8 +118,18 @@ class TestSingleFrameProcessing(unittest.TestCase):
         self.assertEqual(self.pipeline.frame_count, 1)
 
 
-class TestMultiFrameTracking(unittest.TestCase):
-    """Test tracking persistence across multiple frames."""
+
+
+class TestVideoFrameTracking(unittest.TestCase):
+    """
+    Test tracking behavior using consecutive video frames.
+    
+    NOTE: This class uses video frames instead of sampled images because:
+    - ByteTrack requires consecutive frames to maintain internal state
+    - Track age only increments when ByteTrack successfully matches detections
+    - Sampled images (with time gaps) cause ByteTrack to lose track state
+    - Video frames ensure proper testing of track lifetime and persistence
+    """
     
     @classmethod
     def setUpClass(cls):
@@ -124,99 +137,341 @@ class TestMultiFrameTracking(unittest.TestCase):
         # Get project root directory
         cls.project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         cls.config_path = os.path.join(cls.project_root, 'configs', 'pipeline_config.yaml')
-        # Use sequential frames from same video
-        cls.test_frames = [
-            os.path.join(cls.project_root, 'outputs', 'test_images', 'day_clear_front_00000.jpg'),
-            os.path.join(cls.project_root, 'outputs', 'test_images', 'day_clear_front_00001.jpg'),
-            os.path.join(cls.project_root, 'outputs', 'test_images', 'day_clear_front_00002.jpg'),
-        ]
+        
+        # Use test video with consecutive frames
+        cls.test_video_path = os.path.join(cls.project_root, 'outputs', 'unit_test_video.mp4')
+        
+        # Verify video exists
+        if not os.path.exists(cls.test_video_path):
+            raise FileNotFoundError(
+                f"Test video not found: {cls.test_video_path}\n"
+                f"Please ensure unit_test_video.mp4 exists in outputs directory."
+            )
+        
+        # Get video properties
+        cap = cv2.VideoCapture(cls.test_video_path)
+        cls.total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cls.fps = cap.get(cv2.CAP_PROP_FPS)
+        cap.release()
+        
+        print(f"\nTest video loaded: {cls.total_frames} frames @ {cls.fps} FPS")
     
     def setUp(self):
         """Initialize pipeline for each test."""
         self.pipeline = ALPRPipeline(self.config_path)
     
-    def test_track_id_persistence(self):
-        """Test track IDs persist across frames."""
-        all_track_ids = set()
+    def _read_video_frames(self, start_frame=0, num_frames=10):
+        """
+        Read consecutive frames from test video.
         
-        for frame_path in self.test_frames:
-            frame = cv2.imread(frame_path)
-            if frame is None:
-                continue
-                
+        Args:
+            start_frame: Starting frame index
+            num_frames: Number of frames to read
+            
+        Returns:
+            List of frame arrays
+        """
+        cap = cv2.VideoCapture(self.test_video_path)
+        
+        # Seek to start frame
+        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        
+        frames = []
+        for _ in range(num_frames):
+            success, frame = cap.read()
+            if not success:
+                break
+            frames.append(frame)
+        
+        cap.release()
+        return frames
+    
+    def test_track_age_increments_consecutively(self):
+        """
+        Test that track age increments by 1 for each consecutive frame.
+        
+        This is the core test for the track lifetime issue. With consecutive
+        video frames (not sampled images), ByteTrack should properly maintain
+        track state and increment age each frame.
+        """
+        # Read first 10 consecutive frames
+        frames = self._read_video_frames(start_frame=0, num_frames=10)
+        self.assertGreater(len(frames), 0, "No frames read from video")
+        
+        # Process first frame
+        tracks = self.pipeline.process_frame(frames[0])
+        self.assertGreater(len(tracks), 0, "No tracks detected in first frame")
+        
+        # Get the first track
+        track_id = list(tracks.keys())[0]
+        initial_age = tracks[track_id].age
+        
+        # Verify new track starts at age 0
+        self.assertEqual(initial_age, 0, 
+                        "New tracks should start with age 0")
+        self.assertTrue(tracks[track_id].is_active,
+                       "New tracks should be active")
+        
+        # Process remaining frames and verify age increments
+        for frame_idx in range(1, len(frames)):
+            tracks = self.pipeline.process_frame(frames[frame_idx])
+            
+            # Track should persist
+            self.assertIn(track_id, tracks,
+                         f"Track {track_id} should persist in frame {frame_idx}")
+            
+            # Age should increment by 1 each frame
+            expected_age = frame_idx  # Frame 0 → age 0, Frame 1 → age 1, etc.
+            actual_age = tracks[track_id].age
+            self.assertEqual(actual_age, expected_age,
+                           f"Frame {frame_idx}: Age should be {expected_age}, got {actual_age}")
+            
+            # Track should remain active
+            self.assertTrue(tracks[track_id].is_active,
+                          f"Track should remain active in frame {frame_idx}")
+        
+        print(f"✓ Track age incremented correctly: 0 → {tracks[track_id].age}")
+    
+    def test_track_persistence_over_longer_sequence(self):
+        """
+        Test track persists and ages correctly over a longer sequence (30 frames).
+        """
+        # Read 30 consecutive frames
+        frames = self._read_video_frames(start_frame=0, num_frames=30)
+        self.assertGreaterEqual(len(frames), 30, "Not enough frames in video")
+        
+        # Process all frames
+        track_id = None
+        for frame_idx, frame in enumerate(frames):
             tracks = self.pipeline.process_frame(frame)
             
-            # Collect track IDs
-            for track_id in tracks.keys():
-                all_track_ids.add(track_id)
+            if frame_idx == 0:
+                # First frame - get initial track
+                self.assertGreater(len(tracks), 0, "No tracks in first frame")
+                track_id = list(tracks.keys())[0]
+            else:
+                # Subsequent frames - verify track persists
+                self.assertIn(track_id, tracks,
+                            f"Track {track_id} lost at frame {frame_idx}")
+                
+                # Verify age
+                self.assertEqual(tracks[track_id].age, frame_idx,
+                               f"Frame {frame_idx}: Expected age {frame_idx}, got {tracks[track_id].age}")
         
-        # Verify frame count
-        frames_processed = len([f for f in self.test_frames if cv2.imread(f) is not None])
-        self.assertEqual(self.pipeline.frame_count, frames_processed)
+        # Final verification - age should be 29 (frames 0-29)
+        self.assertEqual(tracks[track_id].age, 29,
+                        "Final age should be 29 for 30 frames (frames 0-29)")
         
-        # Note: Can't assert specific track counts without knowing video content
-        # Just verify tracking system works (no crashes)
+        print(f"✓ Track persisted for 30 frames with age 0→29")
     
-    def test_track_age_increments(self):
-        """Test track age increases across frames."""
+    def test_track_bbox_stability(self):
+        """
+        Test bounding box remains stable (small variations) for stationary vehicle.
+        """
+        frames = self._read_video_frames(start_frame=0, num_frames=10)
+        
         # Process first frame
-        frame1 = cv2.imread(self.test_frames[0])
-        if frame1 is None:
-            self.skipTest("Test image not found")
+        tracks = self.pipeline.process_frame(frames[0])
+        track_id = list(tracks.keys())[0]
+        initial_bbox = tracks[track_id].bbox
+        
+        # Process remaining frames and check bbox stability
+        for frame in frames[1:]:
+            tracks = self.pipeline.process_frame(frame)
+            current_bbox = tracks[track_id].bbox
             
-        tracks1 = self.pipeline.process_frame(frame1)
-        
-        # If no tracks, can't test aging
-        if len(tracks1) == 0:
-            self.skipTest("No tracks detected in first frame")
-        
-        # Get initial track
-        track_id = list(tracks1.keys())[0]
-        initial_age = tracks1[track_id].age
-        
-        # Verify age starts at 0 for new tracks
-        self.assertEqual(initial_age, 0, "New tracks should start with age 0")
-        
-        # Process second frame
-        frame2 = cv2.imread(self.test_frames[1])
-        if frame2 is None:
-            self.skipTest("Test image not found")
+            # Calculate bbox center movement
+            initial_center = ((initial_bbox[0] + initial_bbox[2]) / 2,
+                            (initial_bbox[1] + initial_bbox[3]) / 2)
+            current_center = ((current_bbox[0] + current_bbox[2]) / 2,
+                            (current_bbox[1] + current_bbox[3]) / 2)
             
-        tracks2 = self.pipeline.process_frame(frame2)
+            movement = np.sqrt((current_center[0] - initial_center[0])**2 +
+                             (current_center[1] - initial_center[1])**2)
+            
+            # For stationary vehicle, movement should be minimal (<10 pixels)
+            self.assertLess(movement, 10,
+                          f"Bbox center moved {movement:.1f} pixels (expected <10 for stationary vehicle)")
         
-        # Check if same track exists
-        if track_id in tracks2:
-            # Age should have increased
-            self.assertGreaterEqual(tracks2[track_id].age, initial_age,
-                                   "Track age should increase or stay same when track persists")
-        else:
-            # Track lost between frames, which is also valid behavior
-            self.assertTrue(True, "Track was lost between frames (acceptable)")
+        print(f"✓ Bounding box remained stable across frames")
     
-    def test_lost_track_cleanup(self):
-        """Test lost tracks are eventually removed."""
-        # Process multiple frames
-        for frame_path in self.test_frames:
-            frame = cv2.imread(frame_path)
-            if frame is None:
-                continue
+    def test_ocr_triggers_and_recognizes_text(self):
+        """
+        Test OCR triggers on new tracks and recognizes text correctly.
+        """
+        frames = self._read_video_frames(start_frame=0, num_frames=5)
+        
+        # Process first frame (should trigger OCR for new track)
+        tracks = self.pipeline.process_frame(frames[0])
+        track_id = list(tracks.keys())[0]
+        
+        # Check OCR was triggered and text recognized
+        track = tracks[track_id]
+        
+        # OCR should have been run on age=0 (new track)
+        # Note: OCR might fail if plate is not clear, but should have attempted
+        self.assertIsNotNone(track.ocr_confidence,
+                           "OCR confidence should be set after processing")
+        
+        # If text was recognized, it should match GTA V format or be None
+        if track.text is not None:
+            # Verify text format (8 characters: ##XXX### format)
+            self.assertEqual(len(track.text), 8,
+                           f"GTA V plate text should be 8 characters, got: {track.text}")
+            print(f"✓ OCR recognized text: {track.text} (confidence: {track.ocr_confidence:.2f})")
+        else:
+            print(f"✓ OCR attempted but no valid text recognized (confidence: {track.ocr_confidence:.2f})")
+    
+    def test_track_state_attributes(self):
+        """
+        Test all track attributes are properly maintained.
+        """
+        frames = self._read_video_frames(start_frame=0, num_frames=5)
+        
+        # Process frames
+        for frame_idx, frame in enumerate(frames):
+            tracks = self.pipeline.process_frame(frame)
+            
+            for track_id, track in tracks.items():
+                # Verify all required attributes exist
+                self.assertIsNotNone(track.id, "Track ID should not be None")
+                self.assertIsNotNone(track.bbox, "Bbox should not be None")
+                self.assertIsNotNone(track.detection_confidence, "Detection confidence should not be None")
+                self.assertIsNotNone(track.age, "Age should not be None")
+                self.assertIsInstance(track.is_active, bool, "is_active should be boolean")
+                
+                # Verify bbox format (x1, y1, x2, y2)
+                self.assertEqual(len(track.bbox), 4, "Bbox should have 4 coordinates")
+                self.assertLess(track.bbox[0], track.bbox[2], "x1 should be < x2")
+                self.assertLess(track.bbox[1], track.bbox[3], "y1 should be < y2")
+                
+                # Verify age matches frame index
+                if frame_idx > 0:  # Skip first frame (age=0)
+                    self.assertEqual(track.age, frame_idx,
+                                   f"Frame {frame_idx}: Age should match frame index")
+        
+        print(f"✓ All track attributes properly maintained")
+    
+    def test_frame_count_increments(self):
+        """
+        Test pipeline frame counter increments correctly.
+        """
+        frames = self._read_video_frames(start_frame=0, num_frames=10)
+        
+        self.assertEqual(self.pipeline.frame_count, 0, "Initial frame count should be 0")
+        
+        for frame_idx, frame in enumerate(frames, start=1):
+            self.pipeline.process_frame(frame)
+            self.assertEqual(self.pipeline.frame_count, frame_idx,
+                           f"Frame count should be {frame_idx}")
+        
+        print(f"✓ Frame counter incremented correctly: 0 → {self.pipeline.frame_count}")
+    
+    def test_pipeline_reset_clears_state(self):
+        """
+        Test pipeline reset clears all tracks and counters.
+        """
+        # Process some frames
+        frames = self._read_video_frames(start_frame=0, num_frames=5)
+        for frame in frames:
             self.pipeline.process_frame(frame)
         
-        initial_track_count = len(self.pipeline.tracks)
+        # Verify state before reset
+        self.assertGreater(self.pipeline.frame_count, 0, "Should have processed frames")
+        self.assertGreater(len(self.pipeline.tracks), 0, "Should have tracks")
         
-        # Process many blank frames (should trigger cleanup)
-        blank_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+        # Reset pipeline
+        self.pipeline.reset()
+        
+        # Verify state after reset
+        self.assertEqual(self.pipeline.frame_count, 0, "Frame count should be 0 after reset")
+        self.assertEqual(len(self.pipeline.tracks), 0, "Tracks should be empty after reset")
+        
+        print(f"✓ Pipeline reset cleared all state")
+    
+    def test_lost_track_cleanup(self):
+        """
+        Test that lost tracks are eventually removed from the dictionary.
+        
+        Note: Tracks are only removed when (!is_active AND age >= max_age).
+        Lost tracks with age < max_age are retained in case they reappear.
+        """
+        # Process many frames to create track with high age
+        frames = self._read_video_frames(start_frame=0, num_frames=35)
+        for frame in frames:
+            self.pipeline.process_frame(frame)
+        
+        track_count_before = len(self.pipeline.tracks)
+        self.assertGreater(track_count_before, 0, "Should have tracks before cleanup test")
+        
+        # Get track info before losing it
+        track_id = list(self.pipeline.tracks.keys())[0]
+        age_before_loss = self.pipeline.tracks[track_id].age
+        
+        # Process blank frames (no detections) to trigger track loss
+        blank_frame = np.zeros((1080, 1920, 3), dtype=np.uint8)
         max_age = self.pipeline.config['tracking'].get('max_age', 30)
         
+        # Process enough blank frames for cleanup
+        # Track will be marked as lost, and after max_age frames it should be removed
         for _ in range(max_age + 5):
             self.pipeline.process_frame(blank_frame)
         
-        # Old tracks should be cleaned up
-        final_track_count = len(self.pipeline.tracks)
+        # Tracks should be cleaned up
+        track_count_after = len(self.pipeline.tracks)
+        self.assertEqual(track_count_after, 0,
+                        f"Lost tracks with age >= {max_age} should be removed (was {track_count_before} tracks)")
         
-        # Tracks should be reduced (old ones removed)
-        # Note: Exact count depends on max_age, just verify cleanup works
-        self.assertIsInstance(final_track_count, int)
+        print(f"✓ Lost track (age={age_before_loss}) cleaned up after {max_age} frames")
+
+
+class TestVideoProperties(unittest.TestCase):
+    """Test video file properties and accessibility."""
+    
+    @classmethod
+    def setUpClass(cls):
+        """Set up test fixtures."""
+        cls.project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        cls.test_video_path = os.path.join(cls.project_root, 'outputs', 'unit_test_video.mp4')
+    
+    def test_video_file_exists(self):
+        """Test video file exists and is accessible."""
+        self.assertTrue(os.path.exists(self.test_video_path),
+                       f"Video file should exist: {self.test_video_path}")
+    
+    def test_video_can_be_opened(self):
+        """Test video can be opened with OpenCV."""
+        cap = cv2.VideoCapture(self.test_video_path)
+        self.assertTrue(cap.isOpened(), "Video should be openable")
+        cap.release()
+    
+    def test_video_has_frames(self):
+        """Test video has expected number of frames."""
+        cap = cv2.VideoCapture(self.test_video_path)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
+        
+        self.assertGreater(frame_count, 0, "Video should have frames")
+        self.assertGreaterEqual(frame_count, 30,
+                              f"Video should have at least 30 frames for testing, got {frame_count}")
+    
+    def test_video_frame_dimensions(self):
+        """Test video frames have expected dimensions."""
+        cap = cv2.VideoCapture(self.test_video_path)
+        success, frame = cap.read()
+        cap.release()
+        
+        self.assertTrue(success, "Should be able to read first frame")
+        self.assertIsNotNone(frame, "Frame should not be None")
+        
+        # Verify frame shape (height, width, channels)
+        self.assertEqual(len(frame.shape), 3, "Frame should have 3 dimensions")
+        self.assertEqual(frame.shape[2], 3, "Frame should have 3 color channels (BGR)")
+        
+        # Verify reasonable dimensions (GTA V screenshots are typically 1920x1080)
+        height, width = frame.shape[:2]
+        self.assertGreaterEqual(width, 640, f"Frame width should be >= 640, got {width}")
+        self.assertGreaterEqual(height, 480, f"Frame height should be >= 480, got {height}")
 
 
 class TestOCRTriggerLogic(unittest.TestCase):
