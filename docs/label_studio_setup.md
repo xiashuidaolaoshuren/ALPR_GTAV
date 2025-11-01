@@ -26,14 +26,28 @@ Use the following XML configuration for the labeling interface:
   <RectangleLabels name="label" toName="image">
     <Label value="license_plate" background="#FF6600"/>
   </RectangleLabels>
+  <Choices name="readability" toName="image" choice="single">
+    <Choice value="clear"/>
+    <Choice value="blurred"/>
+    <Choice value="occluded"/>
+  </Choices>
 </View>
 ```
+
+**Key Features:**
+- **RectangleLabels:** Draw bounding boxes around license plates
+- **Readability Choices:** Tag each plate as clear/blurred/occluded
+  - **clear**: Text readable, good lighting, minimal blur
+  - **blurred**: Motion blur, distance, or low resolution
+  - **occluded**: Partially blocked, shadows, or extreme angles
 
 **Interface Settings:**
 - ✅ Enable zoom and pan
 - ✅ Show image metadata
 - ✅ Enable keyboard shortcuts
 - ✅ Auto-save annotations
+
+**Note:** The readability attribute is crucial for OCR dataset preparation (Week 5 Phase 3). Only "clear" plates will be used for character recognition training.
 
 ### 4. Import Data
 
@@ -143,4 +157,5 @@ For questions or issues:
 
 ---
 
-**Last Updated:** 2025-10-09
+**Last Updated:** 2025-11-01
+**Version:** 1.1 - Added readability attribute for OCR dataset filtering

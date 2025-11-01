@@ -17,6 +17,6 @@
 - **MCP Uses:** Use the following MCP servers when developing:
   - `context7`: get the latest information and avoid deprecated methods
   - `sequential-thinking` & `shrimp-task-manager`: for structured problem solving
-  - `mcp-feedback-enhanced`: for interactive feedback, follows the mcp instructions before completing any task.
+  - `mcp-feedback-enhanced`: for interactive feedback or asking for any clarifications from users, follows the mcp instructions before completing any task.
 ---
 For more details, see `GTA_V_ALPR_Project_Plan.md`.

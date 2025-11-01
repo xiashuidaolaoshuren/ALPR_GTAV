@@ -342,6 +342,108 @@ If you encounter issues not covered in this guide or have suggestions for improv
 
 ---
 
-**Version:** 1.1  
-**Last Updated:** 2025-10-09  
+**Version:** 1.2  
+**Last Updated:** 2025-11-01  
 **Author:** ALPR Project Team
+
+---
+
+## Additional Notes from Week 5 Enhancement
+
+### Readability Attribute - Detailed Criteria
+
+The readability attribute is **critical** for OCR dataset preparation in Week 5 Phase 3. Only plates marked as "clear" will be used for character recognition training.
+
+#### Clear - Detailed Definition
+- All alphanumeric characters clearly visible and distinguishable
+- Good lighting with high contrast between text and plate background
+- Minimal to no motion blur (stationary or slow-moving vehicles)
+- Direct or slightly angled view (< 30° from perpendicular)
+- Focus is sharp, plate is in-focus relative to the rest of the image
+- Weather effects minimal (light rain acceptable if plate remains visible)
+
+**Examples:**
+- Front-facing plates on parked vehicles
+- Well-lit daytime scenes with stationary traffic
+- Close-up shots with clear focus
+
+#### Blurred - Detailed Definition
+- Motion blur from fast-moving vehicles (visible streak effects)
+- Out of focus or soft focus (camera focused elsewhere)
+- Low resolution or zoomed-out distance where characters appear fuzzy
+- Moderate weather effects (rain droplets, light fog) affecting clarity
+- Slight compression artifacts or JPEG noise reducing sharpness
+
+**Examples:**
+- Moving vehicles captured at 30+ FPS with motion blur
+- Background vehicles in scenes focused on foreground
+- Distant plates where characters are indistinct
+
+#### Occluded - Detailed Definition
+- Partially blocked by physical objects (other vehicles, pedestrians, debris)
+- Heavy shadows covering >30% of plate area
+- Extreme viewing angles (>60° from perpendicular)
+- Severe weather obstruction (heavy rain, thick fog, snow)
+- Reflections or glare obscuring significant portions
+- Damaged, dirty, or heavily weathered plates
+
+**Examples:**
+- Plates viewed from steep side angles
+- Shadows cast by overhead structures
+- Plates partially hidden behind other vehicles
+
+### Annotation Strategy for Different Conditions
+
+#### Day/Clear (Expected: ~35% clear, ~40% blurred, ~25% occluded)
+- Most plates should be "clear" unless vehicle is moving fast
+- Watch for motion blur on vehicles in transit
+- Distant plates may be "blurred" even in good lighting
+
+#### Day/Rain (Expected: ~25% clear, ~50% blurred, ~25% occluded)
+- Rain droplets on camera lens → "blurred"
+- Heavy rain obscuring plate → "occluded"
+- Light rain with clear visibility → "clear" (if otherwise sharp)
+
+#### Night/Clear (Expected: ~40% clear, ~35% blurred, ~25% occluded)
+- Well-illuminated plates (streetlights, headlights) → "clear"
+- Plates in shadows or dark areas → "occluded"
+- Motion blur more pronounced at night → "blurred"
+
+#### Night/Rain (Expected: ~15% clear, ~50% blurred, ~35% occluded)
+- Most challenging condition
+- Liberal use of "blurred" and "occluded"
+- Only well-lit, stationary, visible plates → "clear"
+
+### Quality Control Checkpoints
+
+#### After First 100 Annotations:
+- Review readability distribution
+- Aim for at least 40-50% "clear" overall
+- Adjust criteria if too conservative/liberal
+
+#### After 300 Annotations:
+- Export sample and verify YOLO format
+- Check annotation consistency
+- Refine guidelines if needed
+
+#### After 500 Annotations:
+- Complete training set ready
+- Generate statistics report
+- Identify any condition imbalances
+
+### Progress Tracking Milestones
+
+- [ ] **100 annotations**: Initial quality review
+- [ ] **300 annotations**: Mid-point check, export validation set
+- [ ] **650 annotations**: Validation set complete
+- [ ] **800 annotations**: Full dataset ready for training
+
+### OCR Dataset Filtering (Week 5 Phase 3)
+
+After detection annotation is complete, plates marked as "clear" will be:
+1. Cropped from original images using detection bounding boxes
+2. Manually reviewed for OCR ground truth annotation
+3. Used to create OCR training/evaluation dataset
+4. Measured with Character Error Rate (CER) metric
+
+**Target**: 400-500 "clear" plates for OCR dataset (50-60% of total annotations)
