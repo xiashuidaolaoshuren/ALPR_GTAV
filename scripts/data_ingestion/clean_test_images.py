@@ -191,13 +191,14 @@ class ImageCleaner:
             return False
 
     def process_images(self):
-        image_extensions = ['.jpg', '.jpeg', '.png']
-        image_files = []
-        for ext in image_extensions:
-            image_files.extend(self.images_dir.glob(f'*{ext}'))
-            image_files.extend(self.images_dir.glob(f'*{ext.upper()}'))
-
-        image_files = sorted(image_files)
+        image_extensions = {'.jpg', '.jpeg', '.png'}
+        image_files = sorted(
+            {
+                path
+                for path in self.images_dir.iterdir()
+                if path.is_file() and path.suffix.lower() in image_extensions
+            }
+        )
 
         if not image_files:
             logger.warning(f"No image files found in {self.images_dir}")
