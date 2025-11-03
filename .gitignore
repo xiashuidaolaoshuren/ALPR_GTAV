@@ -57,6 +57,12 @@ wandb/
 .neptune/
 outputs/
 
+# YOLOv8 Training Artifacts
+runs/
+*.cache
+yolo11n.pt
+training_metrics.csv
+
 # Data files
 *.csv
 *.json
