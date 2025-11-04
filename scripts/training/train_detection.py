@@ -212,7 +212,7 @@ def load_training_history(csv_path: Path) -> Optional[pd.DataFrame]:
         return None
 
 
-def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history: Optional[pd.DataFrame] = None):
+def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history: Optional[pd.DataFrame] = None, test_metrics: Optional[dict] = None):
     """
     Extract and save training metrics from Ultralytics results CSV.
     
@@ -220,6 +220,7 @@ def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history
         results_csv: Path to Ultralytics results.csv
         metrics_csv: Path to save cleaned metrics CSV
         existing_history: Previous training history (for resume)
+        test_metrics: Test set metrics dict (precision, recall, mAP50, mAP50_95)
     """
     if not results_csv.exists():
         logger.warning(f"Results CSV not found: {results_csv}")
@@ -256,8 +257,27 @@ def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history
         }
         df_clean.rename(columns=rename_map, inplace=True)
         
+        # Add test metrics columns (initialize as None for all rows)
+        df_clean['test_precision'] = None
+        df_clean['test_recall'] = None
+        df_clean['test_mAP50'] = None
+        df_clean['test_mAP50_95'] = None
+        
+        # Fill test metrics for the last epoch if provided
+        if test_metrics is not None and not df_clean.empty:
+            last_idx = df_clean.index[-1]
+            df_clean.loc[last_idx, 'test_precision'] = test_metrics.get('precision')
+            df_clean.loc[last_idx, 'test_recall'] = test_metrics.get('recall')
+            df_clean.loc[last_idx, 'test_mAP50'] = test_metrics.get('mAP50')
+            df_clean.loc[last_idx, 'test_mAP50_95'] = test_metrics.get('mAP50_95')
+        
         # If resuming, concatenate with existing history
         if existing_history is not None:
+            # Ensure existing history has test metric columns (backward compatibility)
+            for col in ['test_precision', 'test_recall', 'test_mAP50', 'test_mAP50_95']:
+                if col not in existing_history.columns:
+                    existing_history[col] = None
+            
             # Adjust epoch numbers if needed
             if not df_clean.empty and not existing_history.empty:
                 max_prev_epoch = existing_history['epoch'].max()
@@ -271,6 +291,8 @@ def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history
         # Save combined metrics
         df_combined.to_csv(metrics_csv, index=False)
         logger.info(f"Saved training metrics to {metrics_csv}")
+        if test_metrics:
+            logger.info(f"  Included test metrics: Precision={test_metrics['precision']:.4f}, Recall={test_metrics['recall']:.4f}, mAP50={test_metrics['mAP50']:.4f}")
         
         return df_combined
         
@@ -358,12 +380,22 @@ def plot_training_metrics(metrics_csv: Path, output_dir: Path):
         # Plot 2: Precision & Recall
         if 'precision' in df.columns and 'recall' in df.columns:
             fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(df['epoch'], df['precision'], label='Precision', linewidth=2, marker='o', markersize=4)
-            ax.plot(df['epoch'], df['recall'], label='Recall', linewidth=2, marker='s', markersize=4)
+            ax.plot(df['epoch'], df['precision'], label='Validation Precision', linewidth=2, marker='o', markersize=4)
+            ax.plot(df['epoch'], df['recall'], label='Validation Recall', linewidth=2, marker='s', markersize=4)
+            
+            # Add test metrics if available (only shown at final epoch)
+            if 'test_precision' in df.columns and 'test_recall' in df.columns:
+                test_data = df[df['test_precision'].notna()]
+                if not test_data.empty:
+                    ax.scatter(test_data['epoch'], test_data['test_precision'], 
+                              label='Test Precision', s=100, marker='*', c='red', zorder=5)
+                    ax.scatter(test_data['epoch'], test_data['test_recall'], 
+                              label='Test Recall', s=100, marker='X', c='orange', zorder=5)
+            
             ax.set_xlabel('Epoch', fontsize=12)
             ax.set_ylabel('Score', fontsize=12)
-            ax.set_title('Precision and Recall', fontsize=14, fontweight='bold')
-            ax.legend(fontsize=12)
+            ax.set_title('Precision and Recall (Validation + Test)', fontsize=14, fontweight='bold')
+            ax.legend(fontsize=11)
             ax.grid(True, alpha=0.3)
             ax.set_ylim([0, 1])
             
@@ -372,6 +404,47 @@ def plot_training_metrics(metrics_csv: Path, output_dir: Path):
             plt.savefig(plot_path, dpi=300, bbox_inches='tight')
             plt.close()
             logger.info(f"Saved precision/recall plot to {plot_path}")
+        
+        # Plot 3: Test Metrics (if available)
+        if 'test_mAP50' in df.columns and 'test_mAP50_95' in df.columns:
+            test_data = df[df['test_mAP50'].notna()]
+            if not test_data.empty:
+                fig, ax = plt.subplots(figsize=(10, 6))
+                
+                # Plot validation mAP as lines
+                if 'mAP50' in df.columns and 'mAP50_95' in df.columns:
+                    ax.plot(df['epoch'], df['mAP50'], label='Val mAP@0.5', 
+                           linewidth=2, marker='o', markersize=3, alpha=0.7)
+                    ax.plot(df['epoch'], df['mAP50_95'], label='Val mAP@0.5:0.95', 
+                           linewidth=2, marker='s', markersize=3, alpha=0.7)
+                
+                # Overlay test metrics as stars at final epoch
+                ax.scatter(test_data['epoch'], test_data['test_mAP50'], 
+                          label='Test mAP@0.5', s=150, marker='*', c='red', zorder=5)
+                ax.scatter(test_data['epoch'], test_data['test_mAP50_95'], 
+                          label='Test mAP@0.5:0.95', s=150, marker='X', c='orange', zorder=5)
+                
+                # Annotate test values
+                for _, row in test_data.iterrows():
+                    ax.annotate(f"{row['test_mAP50']:.3f}", 
+                               (row['epoch'], row['test_mAP50']),
+                               textcoords="offset points", xytext=(0,10), ha='center', fontsize=9)
+                    ax.annotate(f"{row['test_mAP50_95']:.3f}", 
+                               (row['epoch'], row['test_mAP50_95']),
+                               textcoords="offset points", xytext=(0,-15), ha='center', fontsize=9)
+                
+                ax.set_xlabel('Epoch', fontsize=12)
+                ax.set_ylabel('mAP', fontsize=12)
+                ax.set_title('Mean Average Precision (Validation + Test)', fontsize=14, fontweight='bold')
+                ax.legend(fontsize=11)
+                ax.grid(True, alpha=0.3)
+                ax.set_ylim([0, 1])
+                
+                plt.tight_layout()
+                plot_path = output_dir / 'test_metrics.png'
+                plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+                plt.close()
+                logger.info(f"Saved test metrics plot to {plot_path}")
         
     except Exception as e:
         logger.error(f"Error plotting training metrics: {e}")
@@ -444,7 +517,7 @@ def train_model(args, config: Dict):
             'mosaic': 1.0 if augmentation.get('mosaic', True) else 0.0,
             
             # Performance
-            'workers': 8,
+            'workers': 4,
             'cache': False,  # Set to True if enough RAM
             
             # Validation
@@ -475,10 +548,23 @@ def train_model(args, config: Dict):
         logger.info("Running post-training validation...")
         val_results = model.val()
         
+        # Post-training test evaluation
+        logger.info("="*80)
+        logger.info("Running post-training test evaluation...")
+        test_results = model.val(split='test')
+        
+        # Extract test metrics
+        test_metrics = {
+            'precision': float(test_results.box.mp),
+            'recall': float(test_results.box.mr),
+            'mAP50': float(test_results.box.map50),
+            'mAP50_95': float(test_results.box.map)
+        }
+        
         # Save and process metrics (use actual save directory)
         results_csv = actual_save_dir / 'results.csv'
         actual_metrics_csv = actual_save_dir / 'training_metrics.csv'
-        df_metrics = save_training_metrics(results_csv, actual_metrics_csv, existing_history)
+        df_metrics = save_training_metrics(results_csv, actual_metrics_csv, existing_history, test_metrics)
         
         # Plot metrics if requested
         if args.save_plots and df_metrics is not None:
@@ -503,10 +589,16 @@ def train_model(args, config: Dict):
         logger.info("="*80)
         logger.info(f"✅ Training completed successfully!")
         logger.info(f"  Total epochs: {args.epochs}")
-        logger.info(f"  Best mAP@0.5: {val_results.box.map50:.4f}")
-        logger.info(f"  Best mAP@0.5:0.95: {val_results.box.map:.4f}")
+        logger.info(f"\n📊 Validation Metrics:")
+        logger.info(f"  mAP@0.5: {val_results.box.map50:.4f}")
+        logger.info(f"  mAP@0.5:0.95: {val_results.box.map:.4f}")
         logger.info(f"  Precision: {val_results.box.mp:.4f}")
         logger.info(f"  Recall: {val_results.box.mr:.4f}")
+        logger.info(f"\n🧪 Test Metrics:")
+        logger.info(f"  mAP@0.5: {test_metrics['mAP50']:.4f}")
+        logger.info(f"  mAP@0.5:0.95: {test_metrics['mAP50_95']:.4f}")
+        logger.info(f"  Precision: {test_metrics['precision']:.4f}")
+        logger.info(f"  Recall: {test_metrics['recall']:.4f}")
         logger.info(f"\n📁 Output directory: {actual_save_dir}")
         logger.info(f"📊 Metrics CSV: {actual_metrics_csv}")
         if args.save_plots:
