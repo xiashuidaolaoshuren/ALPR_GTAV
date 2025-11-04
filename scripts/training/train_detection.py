@@ -36,7 +36,6 @@ from typing import Dict, List, Optional
 import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
-from tqdm import tqdm
 from ultralytics import YOLO
 
 # Ensure project root is importable
@@ -50,10 +49,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-# Global variable for progress bars
-train_pbar = None
-val_pbar = None
 
 
 def parse_arguments():
@@ -215,113 +210,6 @@ def load_training_history(csv_path: Path) -> Optional[pd.DataFrame]:
     except Exception as e:
         logger.warning(f"Could not load training history: {e}")
         return None
-
-
-def on_train_epoch_start(trainer):
-    """
-    Callback at the start of each training epoch.
-    Creates a progress bar for training batches.
-    """
-    global train_pbar
-    # Close previous progress bar if exists
-    if train_pbar is not None:
-        train_pbar.close()
-    
-    # Create new progress bar for this epoch
-    epoch = trainer.epoch + 1
-    total_epochs = trainer.epochs
-    train_pbar = tqdm(
-        total=len(trainer.train_loader),
-        desc=f"Epoch {epoch}/{total_epochs} [Train]",
-        unit="batch",
-        leave=True,
-        dynamic_ncols=True
-    )
-
-
-def on_train_batch_end(trainer):
-    """
-    Callback at the end of each training batch.
-    Updates the progress bar with current metrics.
-    """
-    global train_pbar
-    if train_pbar is not None:
-        # Get current losses
-        loss_items = trainer.loss_items if hasattr(trainer, 'loss_items') else None
-        
-        # Format postfix with losses
-        if loss_items is not None and len(loss_items) >= 3:
-            train_pbar.set_postfix({
-                'box_loss': f'{loss_items[0]:.4f}',
-                'cls_loss': f'{loss_items[1]:.4f}',
-                'dfl_loss': f'{loss_items[2]:.4f}'
-            })
-        
-        train_pbar.update(1)
-
-
-def on_train_epoch_end(trainer):
-    """
-    Callback at the end of each training epoch.
-    Closes the training progress bar and displays epoch summary.
-    """
-    global train_pbar
-    if train_pbar is not None:
-        train_pbar.close()
-        train_pbar = None
-
-
-def on_val_start(validator):
-    """
-    Callback at the start of validation.
-    Creates a progress bar for validation batches.
-    """
-    global val_pbar
-    # Close previous progress bar if exists
-    if val_pbar is not None:
-        val_pbar.close()
-    
-    # Create new progress bar for validation
-    val_pbar = tqdm(
-        total=len(validator.dataloader),
-        desc="Validation",
-        unit="batch",
-        leave=True,
-        dynamic_ncols=True
-    )
-
-
-def on_val_batch_end(validator):
-    """
-    Callback at the end of each validation batch.
-    Updates the progress bar.
-    """
-    global val_pbar
-    if val_pbar is not None:
-        val_pbar.update(1)
-
-
-def on_val_end(validator):
-    """
-    Callback at the end of validation.
-    Closes the validation progress bar and displays metrics.
-    """
-    global val_pbar
-    if val_pbar is not None:
-        # Display validation metrics if available
-        if hasattr(validator, 'metrics') and validator.metrics is not None:
-            metrics = validator.metrics
-            if hasattr(metrics, 'box'):
-                box_metrics = metrics.box
-                val_pbar.set_postfix({
-                    'mAP50': f'{box_metrics.map50:.4f}' if hasattr(box_metrics, 'map50') else 'N/A',
-                    'mAP50-95': f'{box_metrics.map:.4f}' if hasattr(box_metrics, 'map') else 'N/A',
-                    'precision': f'{box_metrics.mp:.4f}' if hasattr(box_metrics, 'mp') else 'N/A',
-                    'recall': f'{box_metrics.mr:.4f}' if hasattr(box_metrics, 'mr') else 'N/A'
-                })
-        
-        val_pbar.close()
-        val_pbar = None
 
 
 def save_training_metrics(results_csv: Path, metrics_csv: Path, existing_history: Optional[pd.DataFrame] = None):
@@ -573,15 +461,6 @@ def train_model(args, config: Dict):
         for key, value in train_args.items():
             logger.info(f"  {key}: {value}")
         logger.info("="*80)
-        
-        # Register custom callbacks for enhanced progress bars
-        logger.info("Registering custom progress bar callbacks...")
-        model.add_callback("on_train_epoch_start", on_train_epoch_start)
-        model.add_callback("on_train_batch_end", on_train_batch_end)
-        model.add_callback("on_train_epoch_end", on_train_epoch_end)
-        model.add_callback("on_val_start", on_val_start)
-        model.add_callback("on_val_batch_end", on_val_batch_end)
-        model.add_callback("on_val_end", on_val_end)
         
         # Start training
         logger.info("Starting training...")
