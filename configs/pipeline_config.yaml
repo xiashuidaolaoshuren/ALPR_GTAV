@@ -4,8 +4,8 @@
 # Detection Module Configuration (YOLOv8)
 detection:
   # Path to YOLOv8 model weights
-  # Default: Pre-trained license plate detection model
-  model_path: models/detection/yolov8n.pt
+  # Default: Fine-tuned license plate detection model
+  model_path: models/detection/yolov8_finetuned_best.pt
   
   # Confidence threshold for detections (0.0 - 1.0)
   # Lower values detect more plates but increase false positives
