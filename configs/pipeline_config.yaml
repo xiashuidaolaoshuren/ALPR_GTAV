@@ -5,7 +5,7 @@
 detection:
   # Path to YOLOv8 model weights
   # Default: Fine-tuned license plate detection model
-  model_path: models/detection/yolov8_finetuned_best.pt
+  model_path: models/detection/yolov8_finetuned_v2_best.pt
   
   # Confidence threshold for detections (0.0 - 1.0)
   # Lower values detect more plates but increase false positives
@@ -17,7 +17,7 @@ detection:
   
   # Image size for inference (pixels)
   # Model will resize input images to this size
-  img_size: 640
+  img_size: 1056
   
   # Enable GPU acceleration
   device: cuda  # Options: cuda, cpu
