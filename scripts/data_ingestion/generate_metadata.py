@@ -92,13 +92,14 @@ def generate_metadata(images_dir, output_file, overwrite=False):
         logger.error(f"Images directory not found: {images_dir}")
         return
 
-    image_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
-    image_files = []
-    for ext in image_extensions:
-        image_files.extend(images_path.glob(f'*{ext}'))
-        image_files.extend(images_path.glob(f'*{ext.upper()}'))
-
-    image_files = sorted(image_files)
+    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp'}
+    image_files = sorted(
+        {
+            path
+            for path in images_path.iterdir()
+            if path.is_file() and path.suffix.lower() in image_extensions
+        }
+    )
 
     if not image_files:
         logger.warning(f"No image files found in {images_dir}")
