@@ -150,11 +150,17 @@ def recognize_text(
     
     Note:
         - OCR may return multiple text lines; post-processing selects best candidate
+        - Applies OCR confusion correction (O↔0, I/L↔1, etc.) before regex validation
         - Filtering uses regex pattern to validate plate format (GTA V: r'^\\d{2}[A-Z]{3}\\d{3}$')
         - Scoring formula: p * h * min(L/8, 1) where p=confidence, h=normalized height, L=length
         - Returns None if no candidates pass regex filter or meet confidence threshold
     """
-    from src.recognition.utils import filter_by_regex, score_candidate, select_best_candidate
+    from src.recognition.utils import (
+        filter_by_regex, 
+        score_candidate, 
+        select_best_candidate,
+        correct_ocr_confusions
+    )
     
     # Validate input image
     if preprocessed_image is None or not isinstance(preprocessed_image, np.ndarray):
@@ -231,6 +237,13 @@ def recognize_text(
             # Normalize text to uppercase
             text = str(text).upper().strip()
             confidence = float(confidence)
+            
+            # Apply OCR confusion correction BEFORE filtering
+            # Corrects O↔0, I/L↔1, S↔5, B↔8, Z↔2, G↔6 based on expected position type
+            original_text = text
+            text = correct_ocr_confusions(text, regex_pattern)
+            if text != original_text:
+                logger.debug(f"Line {i}: Applied OCR correction '{original_text}' → '{text}'")
             
             # Skip empty text or low confidence
             if not text:
