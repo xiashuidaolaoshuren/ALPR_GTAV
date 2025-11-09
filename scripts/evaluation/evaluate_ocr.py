@@ -319,12 +319,22 @@ def generate_ground_truth_from_ocr(
                 
                 crop = crops[0]
                 
-                # Apply preprocessing if requested
-                if use_preprocessing:
-                    crop = preprocess_plate(crop, config.get('preprocessing', {}))
+                # Adaptive preprocessing with fallback strategy:
+                # 1. Try OCR without preprocessing first
+                # 2. If fails (no text detected), retry with preprocessing
+                preprocessing_config = config.get('preprocessing', {})
+                use_adaptive_preprocessing = preprocessing_config.get('enable_enhancement', False) or use_preprocessing
                 
-                # Run OCR
+                # First attempt: without preprocessing (faster, works for good quality images)
                 text, confidence = recognize_text(crop, ocr_model, config['recognition'])
+                
+                # If first attempt failed and adaptive preprocessing is enabled, retry with preprocessing
+                if text is None and use_adaptive_preprocessing:
+                    logger.info(f"OCR failed without preprocessing, retrying with enhancement...")
+                    crop_enhanced = preprocess_plate(crop, preprocessing_config)
+                    text, confidence = recognize_text(crop_enhanced, ocr_model, config['recognition'])
+                    if text:
+                        logger.info(f"Preprocessing improved result: '{text}'")
                 
                 if text:
                     detected_plates.append(text)
@@ -440,14 +450,26 @@ def evaluate_ocr(
                     if crops:
                         crop = crops[0]
                         
-                        # Apply preprocessing if requested
-                        if use_preprocessing:
-                            crop = preprocess_plate(crop, config.get('preprocessing', {}))
+                        # Adaptive preprocessing with fallback strategy:
+                        # 1. Try OCR without preprocessing first
+                        # 2. If fails (no text detected), retry with preprocessing
+                        preprocessing_config = config.get('preprocessing', {})
+                        use_adaptive_preprocessing = preprocessing_config.get('enable_enhancement', False) or use_preprocessing
                         
-                        # Run OCR
+                        # First attempt: without preprocessing
                         pred_text, conf = recognize_text(
                             crop, ocr_model, config['recognition']
                         )
+                        
+                        # If first attempt failed and adaptive preprocessing is enabled, retry with preprocessing
+                        if pred_text is None and use_adaptive_preprocessing:
+                            logger.info(f"OCR failed without preprocessing, retrying with enhancement...")
+                            crop_enhanced = preprocess_plate(crop, preprocessing_config)
+                            pred_text, conf = recognize_text(
+                                crop_enhanced, ocr_model, config['recognition']
+                            )
+                            if pred_text:
+                                logger.info(f"Preprocessing improved result: '{pred_text}'")
                         
                         if pred_text:
                             predicted_plates.append(pred_text)

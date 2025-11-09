@@ -204,10 +204,16 @@ def filter_by_regex(text: str, pattern: str) -> bool:
         - Pattern loaded from config for flexibility
     """
     if not text or not pattern:
+        logger.debug(f"Regex validation skipped: text='{text}' or pattern='{pattern}' is empty")
         return False
     
     try:
-        return bool(re.match(pattern, text))
+        matches = bool(re.match(pattern, text))
+        if not matches:
+            logger.warning(f"Text '{text}' failed regex validation against pattern '{pattern}'")
+        else:
+            logger.debug(f"Text '{text}' passed regex validation")
+        return matches
     except re.error as e:
         logger.error(f"Invalid regex pattern '{pattern}': {e}")
         raise

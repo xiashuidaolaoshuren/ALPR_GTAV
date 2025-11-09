@@ -84,17 +84,17 @@ tracking:
 # Preprocessing Module Configuration
 preprocessing:
   # Enable image enhancement
-  enable_enhancement: false
+  enable_enhancement: true  # Changed from false to true
   
   # Minimum width for plate crops (pixels)
   # Smaller crops will be upscaled
   min_width: 200
   
   # Use CLAHE (Contrast Limited Adaptive Histogram Equalization)
-  use_clahe: false
+  use_clahe: true  # Changed from false to true
   
   # CLAHE clip limit (higher = more contrast)
-  clahe_clip_limit: 2.0
+  clahe_clip_limit: 2.0  # Restored to 2.0 for better text detection
   
   # CLAHE tile grid size
   clahe_tile_grid_size: [8, 8]
@@ -104,8 +104,8 @@ preprocessing:
   gaussian_kernel_size: [3, 3]
   
   # Sharpening filter
-  use_sharpening: false
-  sharpen_strength: 1.0
+  use_sharpening: true  # Changed from false to true
+  sharpen_strength: 1.0  # Restored to 1.0 for better text detection
 
 # Pipeline Configuration
 pipeline:

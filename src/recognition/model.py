@@ -285,19 +285,23 @@ def recognize_text(
     
     # Step 4: Filter candidates by regex pattern
     valid_candidates = []
+    failed_candidates = []
     for candidate in candidates:
         if filter_by_regex(candidate['text'], regex_pattern):
             valid_candidates.append(candidate)
             logger.debug(f"Candidate '{candidate['text']}' passed regex filter")
         else:
-            logger.debug(f"Candidate '{candidate['text']}' failed regex filter")
+            failed_candidates.append(candidate['text'])
+            logger.info(f"Candidate '{candidate['text']}' FAILED regex filter - pattern '{regex_pattern}' not matched")
     
     if not valid_candidates:
-        logger.info(f"No candidates match GTA V plate format: {regex_pattern}")
-        logger.debug(f"Rejected candidates: {[c['text'] for c in candidates]}")
+        logger.warning(f"No candidates matched GTA V plate format: {regex_pattern}. "
+                      f"Failed candidates: {failed_candidates}")
+        logger.debug(f"All candidates rejected: {[c['text'] for c in candidates]}")
         return None, 0.0
     
-    logger.info(f"{len(valid_candidates)} candidates passed regex filter")
+    logger.info(f"{len(valid_candidates)} / {len(candidates)} candidates passed regex filter. "
+               f"Failed: {failed_candidates}")
     
     # Step 5: Score each valid candidate
     for candidate in valid_candidates:
