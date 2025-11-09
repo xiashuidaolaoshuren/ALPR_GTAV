@@ -41,7 +41,6 @@ if str(project_root) not in sys.path:
 from src.detection.model import load_detection_model, detect_plates
 from src.detection.utils import crop_detections
 from src.recognition.model import load_ocr_model, recognize_text
-from src.preprocessing.image_enhancement import preprocess_plate
 
 # Setup logging
 logging.basicConfig(
@@ -319,22 +318,18 @@ def generate_ground_truth_from_ocr(
                 
                 crop = crops[0]
                 
-                # Adaptive preprocessing with fallback strategy:
-                # 1. Try OCR without preprocessing first
-                # 2. If fails (no text detected), retry with preprocessing
+                # Use adaptive preprocessing (handled internally by recognize_text)
                 preprocessing_config = config.get('preprocessing', {})
                 use_adaptive_preprocessing = preprocessing_config.get('enable_enhancement', False) or use_preprocessing
                 
-                # First attempt: without preprocessing (faster, works for good quality images)
-                text, confidence = recognize_text(crop, ocr_model, config['recognition'])
-                
-                # If first attempt failed and adaptive preprocessing is enabled, retry with preprocessing
-                if text is None and use_adaptive_preprocessing:
-                    logger.info(f"OCR failed without preprocessing, retrying with enhancement...")
-                    crop_enhanced = preprocess_plate(crop, preprocessing_config)
-                    text, confidence = recognize_text(crop_enhanced, ocr_model, config['recognition'])
-                    if text:
-                        logger.info(f"Preprocessing improved result: '{text}'")
+                # Call recognize_text with adaptive preprocessing enabled
+                text, confidence = recognize_text(
+                    crop, 
+                    ocr_model, 
+                    config['recognition'],
+                    enable_adaptive_preprocessing=use_adaptive_preprocessing,
+                    preprocessing_config=preprocessing_config
+                )
                 
                 if text:
                     detected_plates.append(text)
@@ -450,26 +445,18 @@ def evaluate_ocr(
                     if crops:
                         crop = crops[0]
                         
-                        # Adaptive preprocessing with fallback strategy:
-                        # 1. Try OCR without preprocessing first
-                        # 2. If fails (no text detected), retry with preprocessing
+                        # Use adaptive preprocessing (handled internally by recognize_text)
                         preprocessing_config = config.get('preprocessing', {})
                         use_adaptive_preprocessing = preprocessing_config.get('enable_enhancement', False) or use_preprocessing
                         
-                        # First attempt: without preprocessing
+                        # Call recognize_text with adaptive preprocessing enabled
                         pred_text, conf = recognize_text(
-                            crop, ocr_model, config['recognition']
+                            crop, 
+                            ocr_model, 
+                            config['recognition'],
+                            enable_adaptive_preprocessing=use_adaptive_preprocessing,
+                            preprocessing_config=preprocessing_config
                         )
-                        
-                        # If first attempt failed and adaptive preprocessing is enabled, retry with preprocessing
-                        if pred_text is None and use_adaptive_preprocessing:
-                            logger.info(f"OCR failed without preprocessing, retrying with enhancement...")
-                            crop_enhanced = preprocess_plate(crop, preprocessing_config)
-                            pred_text, conf = recognize_text(
-                                crop_enhanced, ocr_model, config['recognition']
-                            )
-                            if pred_text:
-                                logger.info(f"Preprocessing improved result: '{pred_text}'")
                         
                         if pred_text:
                             predicted_plates.append(pred_text)

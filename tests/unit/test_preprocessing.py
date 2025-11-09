@@ -429,7 +429,10 @@ class TestSavePreprocessedImage(unittest.TestCase):
             # Verify can read back
             loaded = cv2.imread(output_path, cv2.IMREAD_GRAYSCALE)
             self.assertIsNotNone(loaded, "Should be able to read back")
-            self.assertEqual(loaded.shape, img.shape, "Shape should match")
+            # Compare 2D shapes only (OpenCV may return (H, W) or (H, W, 1))
+            expected_shape = img.shape[:2] if len(img.shape) == 3 else img.shape
+            loaded_shape = loaded.shape[:2] if len(loaded.shape) == 3 else loaded.shape
+            self.assertEqual(loaded_shape, expected_shape, "Shape should match")
     
     def test_save_create_directories(self):
         """Test that directories are created automatically."""

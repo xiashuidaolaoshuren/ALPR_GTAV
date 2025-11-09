@@ -14,7 +14,6 @@ import yaml
 from src.detection.model import load_detection_model
 from src.detection.utils import crop_detections
 from src.recognition.model import load_ocr_model, recognize_text
-from src.preprocessing.image_enhancement import preprocess_plate
 from src.tracking.tracker import PlateTrack
 from src.tracking.utils import cleanup_lost_tracks, get_track_summary
 
@@ -233,17 +232,17 @@ class ALPRPipeline:
                             logger.warning(f'Empty crop for track {track_id}, skipping OCR')
                             continue
                         
-                        # Preprocess plate image
-                        preprocessed = preprocess_plate(
-                            cropped_image=cropped,
-                            config=self.config['preprocessing']
-                        )
+                        # Use adaptive preprocessing (handled internally by recognize_text)
+                        preprocessing_config = self.config.get('preprocessing', {})
+                        use_adaptive_preprocessing = preprocessing_config.get('enable_enhancement', False)
                         
-                        # Run OCR
+                        # Run OCR with adaptive preprocessing enabled
                         text, ocr_conf = recognize_text(
-                            preprocessed_image=preprocessed,
+                            preprocessed_image=cropped,
                             ocr_model=self.ocr_model,
-                            config=self.config['recognition']
+                            config=self.config['recognition'],
+                            enable_adaptive_preprocessing=use_adaptive_preprocessing,
+                            preprocessing_config=preprocessing_config
                         )
                         
                         # Update track with OCR results
