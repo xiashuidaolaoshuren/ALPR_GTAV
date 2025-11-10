@@ -11,6 +11,9 @@ from typing import Dict, List, Optional
 import numpy as np
 import yaml
 
+# Pre-import torch to avoid PaddleOCR DLL load issues on Windows
+import torch  # noqa: F401
+
 from src.detection.model import load_detection_model
 from src.detection.utils import crop_detections
 from src.recognition.model import load_ocr_model, recognize_text

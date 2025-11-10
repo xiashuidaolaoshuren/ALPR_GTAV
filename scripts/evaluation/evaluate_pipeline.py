@@ -39,6 +39,9 @@ from tqdm import tqdm
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
+# Pre-import torch to avoid PaddleOCR DLL load issues on Windows
+import torch  # noqa: F401
+
 from src.pipeline.alpr_pipeline import ALPRPipeline
 from src.utils.video_io import VideoReader
 
