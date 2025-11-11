@@ -165,3 +165,31 @@ This dataset is for training or evaluating the PaddleOCR model. It will consist 
     image_003.png	46EEK827
     ```
 This format is compatible with PaddleOCR's training pipeline if fine-tuning becomes necessary.
+
+## 9. GUI Implementation
+
+To provide an interactive and user-friendly way to test and demonstrate the ALPR pipeline, a graphical user interface (GUI) will be developed.
+
+- **Framework:** **Streamlit** will be used for its simplicity and rapid development capabilities, making it ideal for creating data-centric web applications.
+
+- **UI Elements:** The GUI will feature the following components:
+    1.  **File Input:**
+        -   A file uploader (`st.file_uploader`) will allow users to select a video file from their local machine.
+        -   A button will be provided to start the ALPR processing on the uploaded file.
+    2.  **Video Display:**
+        -   A dedicated area will display the video frames, with bounding boxes and recognized license plate text overlaid in real-time.
+    3.  **Processing Progress:**
+        -   A progress bar (`st.progress`) will visualize the progress of the video processing task.
+    4.  **Controls Panel:**
+        -   **Start/Stop Buttons:** To initiate and halt the processing pipeline.
+        -   **Threshold Sliders:** Sliders to dynamically adjust the `confidence` and `IOU` thresholds for the YOLOv8 detector.
+        -   **OCR Interval:** A numeric input to control how frequently the OCR model is run on a tracked plate (e.g., every N frames).
+        -   **Device Selection:** A dropdown or radio button to select the computation device (`cuda` or `cpu`).
+    5.  **Information Panel:**
+        -   A tabbed panel (`st.tabs`) will provide detailed insights into the pipeline's operation.
+        -   **Status Tab:**
+            -   **Detected Count:** A running counter of the total number of unique license plates detected.
+            -   **Latest Recognitions:** A list displaying the last N recognized plates, along with their confidence scores.
+            -   **Per-Track Status:** A summary of the state of each tracked object (e.g., ID, last seen, recognized text).
+        -   **Log Tab:**
+            -   A text area (`st.text_area`) will be bound to a Python logging handler to display real-time log messages from the application, providing detailed diagnostics.
