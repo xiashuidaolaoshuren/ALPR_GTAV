@@ -28,3 +28,6 @@ Pillow>=9.5.0
 
 # Annotation Tool (for Week 2)
 label-studio>=1.8.0
+
+# GUI Framework
+streamlit>=1.28.0
