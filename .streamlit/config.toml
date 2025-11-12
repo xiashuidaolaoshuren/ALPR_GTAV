@@ -1,0 +1,30 @@
+# Streamlit Configuration for GTA V ALPR System
+
+[server]
+# Increase max upload size to 2GB for video files
+maxUploadSize = 2000
+
+# Enable file watcher for development
+fileWatcherType = "auto"
+
+# Address to listen on
+address = "localhost"
+port = 8501
+
+# Disable XSRF protection for local development to allow larger file uploads
+enableCORS = false
+enableXsrfProtection = false
+
+[browser]
+# Don't automatically open browser
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
+
+[theme]
+# Optional: Custom theme colors
+primaryColor = "#00FF00"  # Green (matching license plate detection boxes)
+backgroundColor = "#0E1117"  # Dark background
+secondaryBackgroundColor = "#262730"
+textColor = "#FAFAFA"
+font = "sans serif"
