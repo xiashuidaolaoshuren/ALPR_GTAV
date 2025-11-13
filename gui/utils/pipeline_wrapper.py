@@ -13,6 +13,7 @@ import threading
 import queue
 import time
 import logging
+import subprocess
 from typing import Dict, Optional, Any
 from pathlib import Path
 import cv2
@@ -21,8 +22,23 @@ import yaml
 import tempfile
 
 from src.pipeline.alpr_pipeline import ALPRPipeline
+from src.pipeline.utils import draw_tracks_on_frame
 
 logger = logging.getLogger(__name__)
+
+
+def is_ffmpeg_available() -> bool:
+    """Check if FFmpeg is available in the system."""
+    try:
+        result = subprocess.run(
+            ['ffmpeg', '-version'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=5
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
 
 
 @st.cache_resource
@@ -159,21 +175,42 @@ class GUIPipelineWrapper:
             output_dir.mkdir(parents=True, exist_ok=True)
             input_name = Path(video_path).stem
             output_path = str(output_dir / f"{input_name}_processed.mp4")
+            temp_output_path = str(output_dir / f"{input_name}_processed_temp.avi")
             
-            # Initialize VideoWriter (use mp4v codec to avoid OpenH264 dependency)
-            # Try mp4v first, fallback to XVID if needed
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
+            # Try to use H.264 codec for browser compatibility
+            # On Windows, try 'H264' or 'avc1' codecs
+            use_temp_file = False
+            fourcc = None
             
-            if not out.isOpened():
-                logger.warning("mp4v codec failed, trying XVID...")
-                fourcc = cv2.VideoWriter_fourcc(*'XVID')
-                out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
+            # Try H264 codec variants for browser compatibility
+            for codec in ['avc1', 'H264', 'X264']:
+                try:
+                    fourcc = cv2.VideoWriter_fourcc(*codec)
+                    out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
+                    if out.isOpened():
+                        logger.info(f"Using {codec} codec for browser-compatible output")
+                        break
+                    out.release()
+                except:
+                    pass
+            
+            # If H.264 variants fail, use temp file with mp4v and convert later
+            if fourcc is None or not out.isOpened():
+                logger.warning("H.264 codec not available, will use mp4v with FFmpeg conversion")
+                use_temp_file = True
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                out = cv2.VideoWriter(temp_output_path, fourcc, video_fps, (width, height))
                 
                 if not out.isOpened():
-                    logger.error("Failed to initialize VideoWriter with both mp4v and XVID")
-                    self.result_queue.put({'error': 'Failed to create output video'})
-                    return
+                    # Last resort: XVID
+                    logger.warning("mp4v failed, trying XVID...")
+                    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                    out = cv2.VideoWriter(temp_output_path, fourcc, video_fps, (width, height))
+                    
+                    if not out.isOpened():
+                        logger.error("Failed to initialize VideoWriter with any codec")
+                        self.result_queue.put({'error': 'Failed to create output video'})
+                        return
             
             # Calculate frame skip for progress updates
             if video_fps > display_fps:
@@ -207,31 +244,14 @@ class GUIPipelineWrapper:
                 tracks = self.pipeline.process_frame(frame)
                 process_time = time.time() - start_time
                 
-                # Draw detections on frame
-                frame_with_overlays = frame.copy()
-                for track_id, track in tracks.items():
-                    # Only draw active tracks (skip lost tracks)
-                    if not track.is_active or track.bbox is None:
-                        continue
-                    
-                    # Draw bounding box
-                    x1, y1, x2, y2 = map(int, track.bbox)
-                    color = (0, 255, 0) if track.text else (0, 165, 255)  # Green if text, orange if not
-                    cv2.rectangle(frame_with_overlays, (x1, y1), (x2, y2), color, 2)
-                    
-                    # Draw track ID
-                    track_label = f"ID:{track_id}"
-                    cv2.putText(frame_with_overlays, track_label, (x1, y1-10), 
-                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
-                    
-                    # Draw plate text if available
-                    if track.text:
-                        conf = track.ocr_confidence if track.ocr_confidence else track.detection_confidence
-                        text_label = f"{track.text} ({conf:.1%})"
-                        (tw, th), _ = cv2.getTextSize(text_label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
-                        cv2.rectangle(frame_with_overlays, (x1, y1-th-30), (x1+tw+10, y1-10), (0, 255, 0), -1)
-                        cv2.putText(frame_with_overlays, text_label, (x1+5, y1-15), 
-                                  cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+                # Draw detections on frame using the same utility as CLI
+                frame_with_overlays = draw_tracks_on_frame(
+                    frame,
+                    tracks,
+                    show_text=True,
+                    show_track_id=True,
+                    show_confidence=True
+                )
                 
                 # Write frame to output video
                 out.write(frame_with_overlays)
@@ -259,6 +279,60 @@ class GUIPipelineWrapper:
                         logger.warning("Result queue full, dropping progress update")
                 
                 frame_idx += 1
+            
+            # Close the output video
+            out.release()
+            
+            # Convert to H.264 if we used a temp file
+            if use_temp_file:
+                if is_ffmpeg_available():
+                    logger.info("Converting video to H.264 for browser compatibility...")
+                    try:
+                        # Use FFmpeg to convert to H.264
+                        conversion_cmd = [
+                            'ffmpeg',
+                            '-i', temp_output_path,
+                            '-c:v', 'libx264',
+                            '-preset', 'fast',
+                            '-crf', '23',
+                            '-c:a', 'aac',
+                            '-y',  # Overwrite output file
+                            output_path
+                        ]
+                        
+                        result = subprocess.run(
+                            conversion_cmd,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            timeout=300  # 5 minute timeout
+                        )
+                        
+                        if result.returncode == 0:
+                            logger.info("Video conversion successful")
+                            # Remove temp file
+                            try:
+                                Path(temp_output_path).unlink()
+                            except:
+                                pass
+                        else:
+                            logger.error(f"FFmpeg conversion failed: {result.stderr.decode()}")
+                            # Use the temp file as final output
+                            output_path = temp_output_path
+                            logger.warning("Using non-H.264 video - may not play in browser")
+                    
+                    except subprocess.TimeoutExpired:
+                        logger.error("FFmpeg conversion timed out")
+                        output_path = temp_output_path
+                        logger.warning("Using non-H.264 video - may not play in browser")
+                    
+                    except Exception as e:
+                        logger.error(f"FFmpeg conversion error: {e}")
+                        output_path = temp_output_path
+                        logger.warning("Using non-H.264 video - may not play in browser")
+                else:
+                    logger.warning("FFmpeg not available - video may not play in browser")
+                    logger.warning("Install FFmpeg for automatic H.264 conversion")
+                    output_path = temp_output_path
             
             # Send completion signal with output path
             completion_result = {

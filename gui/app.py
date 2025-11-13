@@ -234,6 +234,9 @@ def handle_start_processing():
         # Reset output video path
         st.session_state.output_video_path = None
         
+        # Note: Detection/recognition state already cleared in button handler
+        # to ensure immediate UI update before processing starts
+        
         # Create pipeline wrapper
         st.session_state.pipeline_wrapper = GUIPipelineWrapper(config)
         
@@ -404,6 +407,18 @@ def main():
         
         # Handle button clicks
         if start_btn:
+            # Clear detection and recognition results FIRST for immediate UI update
+            st.session_state.unique_plates = {}
+            st.session_state.latest_recognitions = []
+            st.session_state.all_detections = []
+            st.session_state.active_tracks = {}
+            st.session_state.total_detections = 0
+            st.session_state.total_recognitions = 0
+            st.session_state.seen_track_ids = set()
+            st.session_state.current_frame = 0
+            st.session_state.total_frames = 0
+            st.session_state.current_fps = 0.0
+            
             # Apply configuration changes when starting
             if st.session_state.config_changed:
                 st.session_state.pipeline_config = current_config.copy()
