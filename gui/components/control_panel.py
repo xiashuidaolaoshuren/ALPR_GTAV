@@ -178,22 +178,51 @@ class ControlPanel:
         
         return current_config
     
-    def render_controls(self) -> Tuple[bool, bool]:
+    def render_controls(self) -> Tuple[bool, bool, bool]:
         """
-        Render Start/Stop control buttons with Reset functionality.
+        Render Start/Stop/Pause control buttons with Reset functionality.
         
         Returns:
-            Tuple[bool, bool]: (start_pressed, stop_pressed)
+            Tuple[bool, bool, bool]: (start_pressed, stop_pressed, pause_pressed)
         """
         st.sidebar.divider()
+        
+        # Performance settings (collapsible)
+        with st.sidebar.expander("⚙️ Performance Settings", expanded=False):
+            display_fps = st.slider(
+                "Display FPS",
+                min_value=5,
+                max_value=30,
+                value=st.session_state.display_fps,
+                step=5,
+                help="Target FPS for video display. Lower values reduce CPU usage.",
+                key="display_fps_slider"
+            )
+            st.session_state.display_fps = display_fps
+            
+            update_interval = st.slider(
+                "UI Update Interval (frames)",
+                min_value=10,
+                max_value=60,
+                value=st.session_state.update_interval,
+                step=10,
+                help="Update UI every N frames. Higher values reduce overhead.",
+                key="update_interval_slider"
+            )
+            if update_interval != st.session_state.update_interval:
+                st.session_state.update_interval = update_interval
+                if st.session_state.update_batcher:
+                    st.session_state.update_batcher.update_interval = update_interval
+        
         st.sidebar.header("🎮 Processing Controls")
         
         # Check if video is uploaded
         video_uploaded = st.session_state.video_handler is not None
         processing = st.session_state.processing
+        paused = st.session_state.get('paused', False)
         
-        # Control buttons - Row 1: Start and Stop
-        col1, col2 = st.sidebar.columns(2)
+        # Control buttons - Row 1: Start, Pause, Stop
+        col1, col2, col3 = st.sidebar.columns(3)
         
         with col1:
             # Start button: disabled if processing OR no video uploaded
@@ -208,6 +237,16 @@ class ControlPanel:
             )
         
         with col2:
+            # Pause button: disabled if not processing
+            pause_btn = st.button(
+                "⏸️ Pause" if not paused else "▶️ Resume",
+                use_container_width=True,
+                disabled=not processing,
+                help="Pause/Resume video processing",
+                key="pause_btn"
+            )
+        
+        with col3:
             # Stop button: disabled if not processing
             stop_btn = st.button(
                 "⏹️ Stop",
@@ -242,13 +281,16 @@ class ControlPanel:
         
         # Status indicator
         if processing:
-            st.sidebar.success("🟢 Processing active")
+            if paused:
+                st.sidebar.warning("⏸️ Processing paused")
+            else:
+                st.sidebar.success("🟢 Processing active")
         elif video_uploaded:
             st.sidebar.info("⚪ Ready to process")
         else:
             st.sidebar.warning("🟡 No video uploaded")
         
-        return start_btn, stop_btn
+        return start_btn, stop_btn, pause_btn
     
     def get_pipeline_config_dict(self) -> Dict:
         """
