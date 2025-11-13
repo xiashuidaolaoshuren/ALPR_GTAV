@@ -186,75 +186,26 @@ class ControlPanel:
             Tuple[bool, bool, bool]: (start_pressed, stop_pressed, pause_pressed)
         """
         st.sidebar.divider()
-        
-        # Performance settings (collapsible)
-        with st.sidebar.expander("⚙️ Performance Settings", expanded=False):
-            display_fps = st.slider(
-                "Display FPS",
-                min_value=5,
-                max_value=30,
-                value=st.session_state.display_fps,
-                step=5,
-                help="Target FPS for video display. Lower values reduce CPU usage.",
-                key="display_fps_slider"
-            )
-            st.session_state.display_fps = display_fps
-            
-            update_interval = st.slider(
-                "UI Update Interval (frames)",
-                min_value=10,
-                max_value=60,
-                value=st.session_state.update_interval,
-                step=10,
-                help="Update UI every N frames. Higher values reduce overhead.",
-                key="update_interval_slider"
-            )
-            if update_interval != st.session_state.update_interval:
-                st.session_state.update_interval = update_interval
-                if st.session_state.update_batcher:
-                    st.session_state.update_batcher.update_interval = update_interval
-        
         st.sidebar.header("🎮 Processing Controls")
         
         # Check if video is uploaded
         video_uploaded = st.session_state.video_handler is not None
         processing = st.session_state.processing
-        paused = st.session_state.get('paused', False)
         
-        # Control buttons - Row 1: Start, Pause, Stop
-        col1, col2, col3 = st.sidebar.columns(3)
+        # Start button only
+        start_disabled = processing or not video_uploaded
+        start_btn = st.sidebar.button(
+            "▶️ Start Processing",
+            use_container_width=True,
+            disabled=start_disabled,
+            help="Start video processing with current configuration" if video_uploaded 
+                 else "⚠️ Please upload a video first",
+            key="start_btn"
+        )
         
-        with col1:
-            # Start button: disabled if processing OR no video uploaded
-            start_disabled = processing or not video_uploaded
-            start_btn = st.button(
-                "▶️ Start",
-                use_container_width=True,
-                disabled=start_disabled,
-                help="Start video processing with current configuration" if video_uploaded 
-                     else "⚠️ Please upload a video first",
-                key="start_btn"
-            )
-        
-        with col2:
-            # Pause button: disabled if not processing
-            pause_btn = st.button(
-                "⏸️ Pause" if not paused else "▶️ Resume",
-                use_container_width=True,
-                disabled=not processing,
-                help="Pause/Resume video processing",
-                key="pause_btn"
-            )
-        
-        with col3:
-            # Stop button: disabled if not processing
-            stop_btn = st.button(
-                "⏹️ Stop",
-                use_container_width=True,
-                disabled=not processing,
-                help="Stop video processing",
-                key="stop_btn"
-            )
+        # Placeholder for removed buttons
+        stop_btn = False
+        pause_btn = False
         
         # Reset button - Row 2
         reset_btn = st.sidebar.button(
@@ -281,14 +232,25 @@ class ControlPanel:
         
         # Status indicator
         if processing:
-            if paused:
-                st.sidebar.warning("⏸️ Processing paused")
-            else:
-                st.sidebar.success("🟢 Processing active")
+            st.sidebar.success("🟢 Processing active")
         elif video_uploaded:
             st.sidebar.info("⚪ Ready to process")
         else:
             st.sidebar.warning("🟡 No video uploaded")
+        
+        # Processing progress bar (shown only during processing)
+        if processing:
+            st.sidebar.divider()
+            st.sidebar.markdown("#### 📊 Processing Status")
+            
+            current_frame = st.session_state.get('current_frame', 0)
+            total_frames = st.session_state.get('total_frames', 1)
+            
+            if total_frames > 0:
+                progress_pct = (current_frame / total_frames) * 100
+                st.sidebar.progress(progress_pct / 100.0, text=f"Frame {current_frame}/{total_frames} ({progress_pct:.1f}%)")
+            else:
+                st.sidebar.info("Initializing...")
         
         return start_btn, stop_btn, pause_btn
     

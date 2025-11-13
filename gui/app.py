@@ -78,10 +78,28 @@ def initialize_session_state():
         log_handler = StreamlitLogHandler(max_logs=100)
         st.session_state.log_handler = log_handler
         
-        # Add handler to root logger
+        # Configure root logger
         logger = logging.getLogger()
+        logger.handlers.clear()  # Clear any existing handlers
         logger.addHandler(log_handler)
         logger.setLevel(logging.INFO)
+        
+        # Log initialization
+        logging.info("🚀 GTA V ALPR System initialized")
+        logging.info(f"Session started at {st.session_state.get('session_start', 'unknown')}")
+    else:
+        # Ensure handler persists across reruns
+        logger = logging.getLogger()
+        has_handler = any(isinstance(h, StreamlitLogHandler) for h in logger.handlers)
+        if not has_handler:
+            logger.handlers.clear()
+            logger.addHandler(st.session_state.log_handler)
+            logger.setLevel(logging.INFO)
+    
+    # Session tracking
+    if 'session_start' not in st.session_state:
+        from datetime import datetime
+        st.session_state.session_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     # Detection and recognition results
     if 'unique_plates' not in st.session_state:
@@ -93,6 +111,16 @@ def initialize_session_state():
     if 'all_detections' not in st.session_state:
         st.session_state.all_detections = []
     
+    if 'total_detections' not in st.session_state:
+        st.session_state.total_detections = 0
+    
+    if 'total_recognitions' not in st.session_state:
+        st.session_state.total_recognitions = 0
+    
+    # Track which track IDs we've seen to avoid counting duplicates
+    if 'seen_track_ids' not in st.session_state:
+        st.session_state.seen_track_ids = set()
+    
     # Tracking state
     if 'active_tracks' not in st.session_state:
         st.session_state.active_tracks = {}
@@ -100,6 +128,12 @@ def initialize_session_state():
     # Performance metrics
     if 'current_fps' not in st.session_state:
         st.session_state.current_fps = 0.0
+    
+    if 'current_frame' not in st.session_state:
+        st.session_state.current_frame = 0
+    
+    if 'total_frames' not in st.session_state:
+        st.session_state.total_frames = 0
     
     # Pipeline wrapper
     if 'pipeline_wrapper' not in st.session_state:
@@ -441,10 +475,6 @@ def main():
                 )
             except Exception as e:
                 logging.error(f"Error creating download button: {e}")
-        
-        # Progress indicator placeholders (for future use)
-        progress_placeholder = st.empty()
-        status_placeholder = st.empty()
     
     with col2:
         # Information Panel (Task 23)
@@ -459,24 +489,38 @@ def main():
     
     # Background processing loop
     if st.session_state.processing and st.session_state.pipeline_wrapper:
-        # Poll for results from processing thread
-        result = st.session_state.pipeline_wrapper.get_result(timeout=0.05)
+        # Drain all available results from queue (don't just process one)
+        results_processed = 0
+        max_results_per_rerun = 200  # Process up to 200 results per rerun for faster processing
+        should_rerun = False
+        is_complete = False
         
-        if result is not None:
+        while results_processed < max_results_per_rerun:
+            result = st.session_state.pipeline_wrapper.get_result(timeout=0.001)  # Short timeout
+            
+            if result is None:
+                break  # No more results available
+                
+            results_processed += 1
+            
             if 'error' in result:
                 # Error occurred
                 logging.error(f"Processing error: {result['error']}")
                 st.error(f"❌ Processing error: {result['error']}")
                 st.session_state.processing = False
+                should_rerun = True
+                break
                 
             elif 'done' in result and result['done']:
                 # Processing complete
                 st.session_state.processing = False
                 st.session_state.paused = False
                 st.session_state.output_video_path = result['output_video']
-                status_placeholder.success(f"✅ Processing complete! Processed {result['total_frames']} frames in {result['processing_time']:.1f}s")
                 logging.info(f"Video processing completed: {result['output_video']}")
-                st.rerun()  # Rerun to display the video
+                logging.info(f"Processed {result['total_frames']} frames in {result['processing_time']:.1f}s")
+                is_complete = True
+                should_rerun = True
+                break
                 
             elif 'progress' in result:
                 # Progress update
@@ -485,50 +529,53 @@ def main():
                 total_frames = result['total_frames']
                 processing_fps = result['processing_fps']
                 
-                # Update progress bar
-                progress = int((frame_idx / total_frames) * 100)
-                progress_placeholder.progress(
-                    progress / 100.0,
-                    text=f"Processing: Frame {frame_idx}/{total_frames} ({progress}%) | {processing_fps:.1f} FPS"
-                )
+                # Update progress tracking
+                st.session_state.current_frame = frame_idx
+                st.session_state.total_frames = total_frames
                 
-                # Update session state (batch updates)
-                if st.session_state.update_batcher.should_update():
-                    # Update FPS
-                    st.session_state.current_fps = processing_fps
+                # Update detections and recognitions
+                # Only count NEW track IDs to avoid inflating detection count
+                new_detections = 0
+                for track_id in tracks.keys():
+                    if track_id not in st.session_state.seen_track_ids:
+                        st.session_state.seen_track_ids.add(track_id)
+                        new_detections += 1
+                
+                st.session_state.total_detections += new_detections
+                
+                for track_id, track in tracks.items():
+                    # Add to active tracks
+                    st.session_state.active_tracks[track_id] = {
+                        'bbox': track.bbox.tolist() if hasattr(track.bbox, 'tolist') else list(track.bbox) if track.bbox is not None else None,
+                        'text': track.text,
+                        'confidence': track.ocr_confidence if track.text else track.detection_confidence,
+                        'age': track.age,
+                        'is_active': track.is_active
+                    }
                     
-                    # Update detections and recognitions
-                    for track_id, track in tracks.items():
-                        # Add to active tracks
-                        st.session_state.active_tracks[track_id] = {
-                            'bbox': track.bbox.tolist() if hasattr(track.bbox, 'tolist') else list(track.bbox) if track.bbox is not None else None,
-                            'text': track.text,
-                            'confidence': track.ocr_confidence if track.text else track.detection_confidence,
-                            'age': track.age,
-                            'is_active': track.is_active
+                    # Add to recognitions if text detected
+                    if track.text and track.text not in st.session_state.unique_plates:
+                        st.session_state.unique_plates[track.text] = {
+                            'confidence': track.ocr_confidence,
+                            'first_seen': frame_idx
                         }
-                        
-                        # Add to recognitions if text detected
-                        if track.text and track.text not in st.session_state.unique_plates:
-                            st.session_state.unique_plates[track.text] = {
-                                'confidence': track.ocr_confidence,
-                                'first_seen': frame_idx
-                            }
-                            st.session_state.latest_recognitions.append({
-                                'text': track.text,
-                                'confidence': track.ocr_confidence,
-                                'frame': frame_idx
-                            })
-                    
-                    # Limit list sizes to prevent memory issues
-                    if len(st.session_state.latest_recognitions) > 100:
-                        st.session_state.latest_recognitions = st.session_state.latest_recognitions[-100:]
+                        st.session_state.latest_recognitions.append({
+                            'text': track.text,
+                            'confidence': track.ocr_confidence,
+                            'frame': frame_idx
+                        })
+                        st.session_state.total_recognitions += 1
                 
-                # Rerun to update progress
-                st.rerun()
-        else:
-            # No result yet, but still processing - rerun after a delay
-            time.sleep(0.05)  # Wait 50ms before next poll
+                # Limit list sizes to prevent memory issues
+                if len(st.session_state.latest_recognitions) > 100:
+                    st.session_state.latest_recognitions = st.session_state.latest_recognitions[-100:]
+                
+                # Mark that we should rerun
+                should_rerun = True
+        
+        # Rerun if we processed any results or if still processing
+        if should_rerun or (st.session_state.processing and results_processed == 0):
+            time.sleep(0.01)  # Brief sleep to prevent CPU spinning
             st.rerun()
     
     # Footer

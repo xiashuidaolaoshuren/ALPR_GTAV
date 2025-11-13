@@ -160,14 +160,20 @@ class GUIPipelineWrapper:
             input_name = Path(video_path).stem
             output_path = str(output_dir / f"{input_name}_processed.mp4")
             
-            # Initialize VideoWriter (H264 codec for browser compatibility)
-            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+            # Initialize VideoWriter (use mp4v codec to avoid OpenH264 dependency)
+            # Try mp4v first, fallback to XVID if needed
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
             
             if not out.isOpened():
-                logger.error("Failed to initialize VideoWriter")
-                self.result_queue.put({'error': 'Failed to create output video'})
-                return
+                logger.warning("mp4v codec failed, trying XVID...")
+                fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
+                
+                if not out.isOpened():
+                    logger.error("Failed to initialize VideoWriter with both mp4v and XVID")
+                    self.result_queue.put({'error': 'Failed to create output video'})
+                    return
             
             # Calculate frame skip for progress updates
             if video_fps > display_fps:
@@ -204,25 +210,28 @@ class GUIPipelineWrapper:
                 # Draw detections on frame
                 frame_with_overlays = frame.copy()
                 for track_id, track in tracks.items():
-                    if track.bbox is not None:
-                        # Draw bounding box
-                        x1, y1, x2, y2 = map(int, track.bbox)
-                        color = (0, 255, 0) if track.text else (0, 165, 255)  # Green if text, orange if not
-                        cv2.rectangle(frame_with_overlays, (x1, y1), (x2, y2), color, 2)
-                        
-                        # Draw track ID
-                        track_label = f"ID:{track_id}"
-                        cv2.putText(frame_with_overlays, track_label, (x1, y1-10), 
-                                  cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
-                        
-                        # Draw plate text if available
-                        if track.text:
-                            conf = track.ocr_confidence if track.ocr_confidence else track.detection_confidence
-                            text_label = f"{track.text} ({conf:.1%})"
-                            (tw, th), _ = cv2.getTextSize(text_label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
-                            cv2.rectangle(frame_with_overlays, (x1, y1-th-30), (x1+tw+10, y1-10), (0, 255, 0), -1)
-                            cv2.putText(frame_with_overlays, text_label, (x1+5, y1-15), 
-                                      cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+                    # Only draw active tracks (skip lost tracks)
+                    if not track.is_active or track.bbox is None:
+                        continue
+                    
+                    # Draw bounding box
+                    x1, y1, x2, y2 = map(int, track.bbox)
+                    color = (0, 255, 0) if track.text else (0, 165, 255)  # Green if text, orange if not
+                    cv2.rectangle(frame_with_overlays, (x1, y1), (x2, y2), color, 2)
+                    
+                    # Draw track ID
+                    track_label = f"ID:{track_id}"
+                    cv2.putText(frame_with_overlays, track_label, (x1, y1-10), 
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+                    
+                    # Draw plate text if available
+                    if track.text:
+                        conf = track.ocr_confidence if track.ocr_confidence else track.detection_confidence
+                        text_label = f"{track.text} ({conf:.1%})"
+                        (tw, th), _ = cv2.getTextSize(text_label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+                        cv2.rectangle(frame_with_overlays, (x1, y1-th-30), (x1+tw+10, y1-10), (0, 255, 0), -1)
+                        cv2.putText(frame_with_overlays, text_label, (x1+5, y1-15), 
+                                  cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
                 
                 # Write frame to output video
                 out.write(frame_with_overlays)
@@ -232,8 +241,9 @@ class GUIPipelineWrapper:
                 elapsed = time.time() - self.stats['start_time']
                 self.stats['fps'] = self.stats['frames_processed'] / elapsed if elapsed > 0 else 0
                 
-                # Send progress update to GUI (at display_fps rate)
-                if frame_idx % frame_skip == 0:
+                # Send progress update to GUI (reduce frequency for better performance)
+                # Only send updates every 3rd frame or at key intervals
+                if frame_idx % 3 == 0:
                     result = {
                         'progress': True,
                         'tracks': tracks,

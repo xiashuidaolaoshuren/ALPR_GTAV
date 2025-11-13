@@ -53,61 +53,42 @@ class InfoPanel:
     
     def render_status_tab(self):
         """
-        Render the status tab with metrics, recognitions, and tracks.
+        Render the status tab with simplified metrics and unique plates.
         """
-        # Processing metrics
+        # Processing metrics - simplified
         st.markdown("#### Processing Metrics")
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
-            fps = st.session_state.get('current_fps', 0)
-            st.metric("FPS", f"{fps:.1f}")
-        
-        with col2:
-            total_detections = len(st.session_state.get('all_detections', []))
+            total_detections = st.session_state.get('total_detections', 0)
             st.metric("Total Detections", total_detections)
         
-        with col3:
-            active_tracks = len(st.session_state.get('active_tracks', {}))
-            st.metric("Active Tracks", active_tracks)
+        with col2:
+            total_recognitions = st.session_state.get('total_recognitions', 0)
+            st.metric("Total Recognitions", total_recognitions)
         
         st.divider()
         
-        # Latest recognitions
-        st.markdown("#### Latest Recognitions")
+        # All Unique Plates with details
+        st.markdown("#### 🚗 All Unique Plates")
         unique_plates = st.session_state.get('unique_plates', {})
-        latest_recognitions = st.session_state.get('latest_recognitions', [])
         
         if unique_plates:
-            st.info(f"🎯 **Total Unique Plates:** {len(unique_plates)}")
+            # Sort by first seen frame (newest first)
+            sorted_plates = sorted(
+                unique_plates.items(),
+                key=lambda x: x[1].get('first_seen', 0),
+                reverse=True
+            )
             
-            # Display latest 10 recognitions (newest first - stay at top)
-            if latest_recognitions:
-                st.markdown("**Recent Plates:**")
-                # Reverse to show newest first
-                for plate_data in reversed(latest_recognitions[-10:]):
-                    plate_text = plate_data.get('text', 'Unknown')
-                    confidence = plate_data.get('confidence', 0)
-                    frame_num = plate_data.get('frame', 'N/A')
-                    
-                    st.text(f"🚗 {plate_text} (Conf: {confidence:.2f}, Frame: {frame_num})")
-            else:
-                st.text("No recognitions yet...")
+            # Display each unique plate with number, confidence, and frame
+            for idx, (plate_text, plate_data) in enumerate(sorted_plates, 1):
+                confidence = plate_data.get('confidence', 0)
+                frame_num = plate_data.get('first_seen', 'N/A')
+                
+                st.text(f"{idx}. {plate_text} | Conf: {confidence:.2%} | Frame: {frame_num}")
         else:
-            st.text("No plates detected yet.")
-        
-        st.divider()
-        
-        # Active tracks
-        st.markdown("#### Active Tracks")
-        tracks = st.session_state.get('active_tracks', {})
-        
-        if tracks:
-            for track_id, track_info in tracks.items():
-                with st.expander(f"Track #{track_id}"):
-                    st.json(track_info)
-        else:
-            st.text("No active tracks.")
+            st.info("No plates recognized yet. Start processing to detect plates.")
     
     def render_log_tab(self):
         """
