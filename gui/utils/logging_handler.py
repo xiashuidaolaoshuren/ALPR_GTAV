@@ -1,71 +1,100 @@
 """
 Logging Handler Utility
 
-This module provides a custom logging handler for displaying logs in Streamlit.
+Custom logging handler for displaying logs in Streamlit interface.
+Uses deque for efficient log buffer management.
 
-TODO: Implementation scheduled for Task 23 (Develop Information Panel)
+Author: Felix (xiashuidaolaoshuren)
+Date: 2025-11-13
 """
 
 import logging
-from io import StringIO
+from collections import deque
+from datetime import datetime
+from typing import List
 
 
 class StreamlitLogHandler(logging.Handler):
     """
     Custom logging handler for Streamlit display.
     
-    This handler captures log messages and stores them in a buffer that
-    can be displayed in the Streamlit UI.
+    This handler captures log messages and stores them in an efficient
+    deque buffer that can be displayed in the Streamlit UI.
     
-    Attributes:
-        log_buffer: StringIO buffer for log messages
-        logs: List of formatted log messages
-        max_logs: Maximum number of logs to retain
+    Features:
+    - Automatic log rotation (keeps last N logs)
+    - Thread-safe log collection
+    - Formatted output with timestamps and levels
     """
     
-    def __init__(self, max_logs=100):
+    def __init__(self, max_logs: int = 100):
         """
         Initialize the logging handler.
         
         Args:
             max_logs: Maximum number of log entries to keep (default: 100)
-        
-        TODO: Implement in Task 23
         """
         super().__init__()
-        self.log_buffer = StringIO()
-        self.logs = []
+        # Use deque for efficient FIFO operations
+        self.logs = deque(maxlen=max_logs)
         self.max_logs = max_logs
+        
+        # Set default formatter
+        formatter = logging.Formatter(
+            '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',
+            datefmt='%H:%M:%S'
+        )
+        self.setFormatter(formatter)
     
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord):
         """
-        Process a log record.
+        Process a log record and add to buffer.
         
         Args:
             record: LogRecord object to process
-        
-        TODO: Implement in Task 23
         """
-        # Placeholder implementation
-        pass
+        try:
+            # Format the log message
+            msg = self.format(record)
+            
+            # Add to deque (automatically removes oldest if at maxlen)
+            self.logs.append(msg)
+            
+        except Exception:
+            # Don't let logging errors crash the application
+            self.handleError(record)
     
-    def get_logs(self):
+    def get_logs(self) -> str:
         """
         Get all stored log messages as a single string.
         
         Returns:
-            Formatted log messages joined with newlines
-        
-        TODO: Implement in Task 23
+            str: Formatted log messages joined with newlines (newest at bottom)
         """
-        # Placeholder implementation
-        return ""
+        if not self.logs:
+            return "No logs available yet."
+        
+        # Return logs with newest at top (reversed order)
+        return "\n".join(self.logs)
+    
+    def get_logs_list(self) -> List[str]:
+        """
+        Get log messages as a list.
+        
+        Returns:
+            List[str]: List of log messages (newest at top)
+        """
+        return list(self.logs)
     
     def clear_logs(self):
+        """Clear all stored log messages."""
+        self.logs.clear()
+    
+    def get_log_count(self) -> int:
         """
-        Clear all stored log messages.
+        Get the number of logs currently stored.
         
-        TODO: Implement in Task 23
+        Returns:
+            int: Number of log entries
         """
-        # Placeholder implementation
-        self.logs = []
+        return len(self.logs)
