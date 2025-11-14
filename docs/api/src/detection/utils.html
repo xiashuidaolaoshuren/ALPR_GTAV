@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.detection.utils API documentation</title>
+<meta name="description" content="Detection Utility Functions …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.detection.utils</code></h1>
+</header>
+<section id="section-intro">
+<p>Detection Utility Functions</p>
+<p>Provides helper functions for visualization, metrics computation,
+and post-processing of detection results.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.detection.utils.compute_iou"><code class="name flex">
+<span>def <span class="ident">compute_iou</span></span>(<span>box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) ‑> float</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compute_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -&gt; float:
+    &#34;&#34;&#34;
+    Compute Intersection over Union (IoU) for two bounding boxes.
+
+    Args:
+        box1: First bounding box in format (x1, y1, x2, y2).
+             (x1, y1) is top-left corner, (x2, y2) is bottom-right corner.
+        box2: Second bounding box in same format as box1.
+
+    Returns:
+        IoU value between 0.0 and 1.0:
+        - 0.0: No overlap between boxes
+        - 1.0: Boxes are identical
+        - Values in between: Degree of overlap
+
+    Raises:
+        ValueError: If box coordinates are invalid (e.g., x1 &gt; x2 or y1 &gt; y2).
+
+    Example:
+        &gt;&gt;&gt; box1 = (100, 100, 200, 200)  # 100x100 box
+        &gt;&gt;&gt; box2 = (150, 150, 250, 250)  # 100x100 box, partially overlapping
+        &gt;&gt;&gt; iou = compute_iou(box1, box2)
+        &gt;&gt;&gt; print(f&#34;IoU: {iou:.3f}&#34;)
+        IoU: 0.143
+
+    Note:
+        - Used for tracking, NMS (Non-Maximum Suppression), and evaluation
+        - Common thresholds: 0.5 for detection matching, 0.3-0.5 for tracking
+        - Efficient implementation using vectorized operations
+    &#34;&#34;&#34;
+    # Validate box coordinates
+    if box1[0] &gt; box1[2] or box1[1] &gt; box1[3]:
+        raise ValueError(f&#34;Invalid box1 coordinates: {box1}&#34;)
+    if box2[0] &gt; box2[2] or box2[1] &gt; box2[3]:
+        raise ValueError(f&#34;Invalid box2 coordinates: {box2}&#34;)
+
+    # Compute intersection coordinates
+    x1_inter = max(box1[0], box2[0])
+    y1_inter = max(box1[1], box2[1])
+    x2_inter = min(box1[2], box2[2])
+    y2_inter = min(box1[3], box2[3])
+
+    # Compute intersection area
+    inter_width = max(0, x2_inter - x1_inter)
+    inter_height = max(0, y2_inter - y1_inter)
+    intersection_area = inter_width * inter_height
+
+    # Compute union area
+    box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+    box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
+    union_area = box1_area + box2_area - intersection_area
+
+    # Avoid division by zero
+    if union_area == 0:
+        return 0.0
+
+    # Compute IoU
+    iou = intersection_area / union_area
+    return float(iou)</code></pre>
+</details>
+<div class="desc"><p>Compute Intersection over Union (IoU) for two bounding boxes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>box1</code></strong></dt>
+<dd>First bounding box in format (x1, y1, x2, y2).
+(x1, y1) is top-left corner, (x2, y2) is bottom-right corner.</dd>
+<dt><strong><code>box2</code></strong></dt>
+<dd>Second bounding box in same format as box1.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>IoU value between 0.0 and 1.0:
+- 0.0: No overlap between boxes
+- 1.0: Boxes are identical
+- Values in between: Degree of overlap</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If box coordinates are invalid (e.g., x1 &gt; x2 or y1 &gt; y2).</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; box1 = (100, 100, 200, 200)  # 100x100 box
+&gt;&gt;&gt; box2 = (150, 150, 250, 250)  # 100x100 box, partially overlapping
+&gt;&gt;&gt; iou = compute_iou(box1, box2)
+&gt;&gt;&gt; print(f&quot;IoU: {iou:.3f}&quot;)
+IoU: 0.143
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Used for tracking, NMS (Non-Maximum Suppression), and evaluation</li>
+<li>Common thresholds: 0.5 for detection matching, 0.3-0.5 for tracking</li>
+<li>Efficient implementation using vectorized operations</li>
+</ul></div>
+</dd>
+<dt id="src.detection.utils.crop_detections"><code class="name flex">
+<span>def <span class="ident">crop_detections</span></span>(<span>frame: numpy.ndarray,<br>detections: List[Tuple[int, int, int, int, float]],<br>padding: int = 0) ‑> List[numpy.ndarray]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def crop_detections(
+    frame: np.ndarray, detections: List[Tuple[int, int, int, int, float]], padding: int = 0
+) -&gt; List[np.ndarray]:
+    &#34;&#34;&#34;
+    Crop detected regions from frame.
+
+    Args:
+        frame: Input image in BGR format.
+        detections: List of detections in format [(x1, y1, x2, y2, confidence), ...].
+        padding: Additional padding (in pixels) to add around each crop.
+                Useful for including context around the detection.
+
+    Returns:
+        List of cropped image regions (numpy arrays), one for each detection.
+        Returns empty list if no detections.
+
+    Raises:
+        ValueError: If frame is invalid or detections are out of bounds.
+
+    Example:
+        &gt;&gt;&gt; import cv2
+        &gt;&gt;&gt; frame = cv2.imread(&#39;image.jpg&#39;)
+        &gt;&gt;&gt; detections = [(100, 100, 200, 150, 0.95)]
+        &gt;&gt;&gt; crops = crop_detections(frame, detections, padding=5)
+        &gt;&gt;&gt; for i, crop in enumerate(crops):
+        ...     cv2.imwrite(f&#39;crop_{i}.jpg&#39;, crop)
+
+    Note:
+        - Crops are automatically clipped to image boundaries
+        - Padding is useful for OCR preprocessing (context helps recognition)
+        - Cropped regions maintain the original image format (BGR)
+    &#34;&#34;&#34;
+    crops = []
+    height, width = frame.shape[:2]
+
+    for x1, y1, x2, y2, conf in detections:
+        # Add padding and clip to image boundaries
+        x1_pad = max(0, x1 - padding)
+        y1_pad = max(0, y1 - padding)
+        x2_pad = min(width, x2 + padding)
+        y2_pad = min(height, y2 + padding)
+
+        # Crop region
+        crop = frame[y1_pad:y2_pad, x1_pad:x2_pad]
+        crops.append(crop)
+
+    logger.debug(f&#34;Cropped {len(crops)} detections from frame&#34;)
+    return crops</code></pre>
+</details>
+<div class="desc"><p>Crop detected regions from frame.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame</code></strong></dt>
+<dd>Input image in BGR format.</dd>
+<dt><strong><code>detections</code></strong></dt>
+<dd>List of detections in format [(x1, y1, x2, y2, confidence), &hellip;].</dd>
+<dt><strong><code>padding</code></strong></dt>
+<dd>Additional padding (in pixels) to add around each crop.
+Useful for including context around the detection.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of cropped image regions (numpy arrays), one for each detection.
+Returns empty list if no detections.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame is invalid or detections are out of bounds.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cv2
+&gt;&gt;&gt; frame = cv2.imread('image.jpg')
+&gt;&gt;&gt; detections = [(100, 100, 200, 150, 0.95)]
+&gt;&gt;&gt; crops = crop_detections(frame, detections, padding=5)
+&gt;&gt;&gt; for i, crop in enumerate(crops):
+...     cv2.imwrite(f'crop_{i}.jpg', crop)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Crops are automatically clipped to image boundaries</li>
+<li>Padding is useful for OCR preprocessing (context helps recognition)</li>
+<li>Cropped regions maintain the original image format (BGR)</li>
+</ul></div>
+</dd>
+<dt id="src.detection.utils.draw_bounding_boxes"><code class="name flex">
+<span>def <span class="ident">draw_bounding_boxes</span></span>(<span>frame: numpy.ndarray,<br>detections: List[Tuple[int, int, int, int, float]],<br>color: Tuple[int, int, int] = (0, 255, 0),<br>thickness: int = 2,<br>show_confidence: bool = True,<br>font_scale: float = 0.5,<br>text_labels: List[str] | None = None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_bounding_boxes(
+    frame: np.ndarray,
+    detections: List[Tuple[int, int, int, int, float]],
+    color: Tuple[int, int, int] = (0, 255, 0),
+    thickness: int = 2,
+    show_confidence: bool = True,
+    font_scale: float = 0.5,
+    text_labels: Optional[List[str]] = None,
+) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Draw bounding boxes on frame with optional confidence and text labels.
+
+    Args:
+        frame: Input image in BGR format (numpy array).
+        detections: List of detections in format [(x1, y1, x2, y2, confidence), ...].
+                   Coordinates should be integers in pixel space.
+        color: Box color in BGR format. Default is green (0, 255, 0).
+        thickness: Line thickness in pixels. Default is 2.
+        show_confidence: If True, display confidence score above each box.
+        font_scale: Font size for confidence labels. Default is 0.5.
+        text_labels: Optional list of text labels (e.g., recognized plate text) to display
+                    below each bounding box. Length must match number of detections.
+                    Added in Task 19 for pipeline integration.
+
+    Returns:
+        Annotated frame with bounding boxes drawn. Returns a copy of the input frame.
+
+    Raises:
+        ValueError: If frame is not a valid numpy array, detections format is incorrect,
+                   or text_labels length doesn&#39;t match detections length.
+
+    Example:
+        &gt;&gt;&gt; import cv2
+        &gt;&gt;&gt; frame = cv2.imread(&#39;image.jpg&#39;)
+        &gt;&gt;&gt; detections = [(100, 100, 200, 150, 0.95), (300, 200, 400, 250, 0.87)]
+        &gt;&gt;&gt; # With text labels for recognized plates
+        &gt;&gt;&gt; text_labels = [&#39;ABC123&#39;, &#39;XYZ789&#39;]
+        &gt;&gt;&gt; annotated = draw_bounding_boxes(frame, detections, text_labels=text_labels)
+        &gt;&gt;&gt; cv2.imwrite(&#39;annotated.jpg&#39;, annotated)
+
+    Note:
+        - This function does not modify the input frame (creates a copy)
+        - For real-time visualization, consider reducing thickness for better performance
+        - Coordinates outside image boundaries are clipped automatically by cv2
+        - text_labels parameter added for Task 19 pipeline integration
+    &#34;&#34;&#34;
+    # Validate input frame
+    if not isinstance(frame, np.ndarray):
+        raise ValueError(f&#34;Frame must be a numpy array, got {type(frame)}&#34;)
+
+    if frame.ndim != 3:
+        raise ValueError(f&#34;Frame must have 3 dimensions, got {frame.ndim}&#34;)
+
+    # Validate text_labels if provided
+    if text_labels is not None and len(text_labels) != len(detections):
+        raise ValueError(
+            f&#34;text_labels length ({len(text_labels)}) must match &#34;
+            f&#34;detections length ({len(detections)})&#34;
+        )
+
+    # Create a copy to avoid modifying the original
+    annotated = frame.copy()
+
+    # Draw each detection
+    for i, detection in enumerate(detections):
+        if len(detection) != 5:
+            logger.warning(
+                f&#34;Invalid detection format (expected 5 elements, got {
+                    len(detection)}): {detection}&#34;
+            )
+            continue
+
+        x1, y1, x2, y2, conf = detection
+
+        # Ensure coordinates are integers
+        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+        # Draw rectangle
+        cv2.rectangle(annotated, (x1, y1), (x2, y2), color, thickness)
+
+        # Add confidence label if requested
+        if show_confidence:
+            # Format confidence with 2 decimal places
+            label = f&#34;{conf:.2f}&#34;
+
+            # Calculate label size for background
+            label_size, baseline = cv2.getTextSize(
+                label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness
+            )
+
+            # Position label above the box (or below if box is at top of image)
+            label_y = y1 - 10 if y1 &gt; 20 else y2 + 20
+
+            # Draw background rectangle for better readability
+            cv2.rectangle(
+                annotated,
+                (x1, label_y - label_size[1] - baseline),
+                (x1 + label_size[0], label_y + baseline),
+                color,
+                -1,  # Filled rectangle
+            )
+
+            # Draw text
+            cv2.putText(
+                annotated,
+                label,
+                (x1, label_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                (0, 0, 0),  # Black text for contrast
+                thickness=1,
+                lineType=cv2.LINE_AA,
+            )
+
+        # Add text label below box if provided (Task 19 integration)
+        if text_labels is not None and text_labels[i]:
+            text = text_labels[i]
+
+            # Calculate text size for background
+            text_size, baseline = cv2.getTextSize(
+                text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness
+            )
+
+            # Position text below the box (with some padding)
+            text_y = y2 + text_size[1] + 15
+
+            # Ensure text stays within frame bounds
+            if text_y + baseline &gt; frame.shape[0]:
+                text_y = y1 - 15  # Draw above box if no space below
+
+            # Draw background rectangle for better readability
+            cv2.rectangle(
+                annotated,
+                (x1, text_y - text_size[1] - baseline),
+                (x1 + text_size[0], text_y + baseline),
+                (0, 0, 0),  # Black background
+                -1,  # Filled rectangle
+            )
+
+            # Draw text
+            cv2.putText(
+                annotated,
+                text,
+                (x1, text_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                (255, 255, 255),  # White text for contrast
+                thickness=1,
+                lineType=cv2.LINE_AA,
+            )
+
+    logger.debug(f&#34;Drew {len(detections)} bounding boxes on frame&#34;)
+    return annotated</code></pre>
+</details>
+<div class="desc"><p>Draw bounding boxes on frame with optional confidence and text labels.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame</code></strong></dt>
+<dd>Input image in BGR format (numpy array).</dd>
+<dt><strong><code>detections</code></strong></dt>
+<dd>List of detections in format [(x1, y1, x2, y2, confidence), &hellip;].
+Coordinates should be integers in pixel space.</dd>
+<dt><strong><code>color</code></strong></dt>
+<dd>Box color in BGR format. Default is green (0, 255, 0).</dd>
+<dt><strong><code>thickness</code></strong></dt>
+<dd>Line thickness in pixels. Default is 2.</dd>
+<dt><strong><code>show_confidence</code></strong></dt>
+<dd>If True, display confidence score above each box.</dd>
+<dt><strong><code>font_scale</code></strong></dt>
+<dd>Font size for confidence labels. Default is 0.5.</dd>
+<dt><strong><code>text_labels</code></strong></dt>
+<dd>Optional list of text labels (e.g., recognized plate text) to display
+below each bounding box. Length must match number of detections.
+Added in Task 19 for pipeline integration.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Annotated frame with bounding boxes drawn. Returns a copy of the input frame.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame is not a valid numpy array, detections format is incorrect,
+or text_labels length doesn't match detections length.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cv2
+&gt;&gt;&gt; frame = cv2.imread('image.jpg')
+&gt;&gt;&gt; detections = [(100, 100, 200, 150, 0.95), (300, 200, 400, 250, 0.87)]
+&gt;&gt;&gt; # With text labels for recognized plates
+&gt;&gt;&gt; text_labels = ['ABC123', 'XYZ789']
+&gt;&gt;&gt; annotated = draw_bounding_boxes(frame, detections, text_labels=text_labels)
+&gt;&gt;&gt; cv2.imwrite('annotated.jpg', annotated)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>This function does not modify the input frame (creates a copy)</li>
+<li>For real-time visualization, consider reducing thickness for better performance</li>
+<li>Coordinates outside image boundaries are clipped automatically by cv2</li>
+<li>text_labels parameter added for Task 19 pipeline integration</li>
+</ul></div>
+</dd>
+<dt id="src.detection.utils.filter_detections_by_size"><code class="name flex">
+<span>def <span class="ident">filter_detections_by_size</span></span>(<span>detections: List[Tuple[int, int, int, int, float]],<br>min_width: int = 20,<br>min_height: int = 10,<br>max_width: int | None = None,<br>max_height: int | None = None) ‑> List[Tuple[int, int, int, int, float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_detections_by_size(
+    detections: List[Tuple[int, int, int, int, float]],
+    min_width: int = 20,
+    min_height: int = 10,
+    max_width: Optional[int] = None,
+    max_height: Optional[int] = None,
+) -&gt; List[Tuple[int, int, int, int, float]]:
+    &#34;&#34;&#34;
+    Filter detections based on bounding box size constraints.
+
+    Args:
+        detections: List of detections in format [(x1, y1, x2, y2, confidence), ...].
+        min_width: Minimum width in pixels. Detections smaller than this are filtered out.
+        min_height: Minimum height in pixels. Detections smaller than this are filtered out.
+        max_width: Maximum width in pixels. If None, no upper limit.
+        max_height: Maximum height in pixels. If None, no upper limit.
+
+    Returns:
+        Filtered list of detections that meet size constraints.
+
+    Example:
+        &gt;&gt;&gt; detections = [(10, 10, 15, 15, 0.9), (100, 100, 250, 180, 0.95)]
+        &gt;&gt;&gt; filtered = filter_detections_by_size(detections, min_width=30, min_height=20)
+        &gt;&gt;&gt; print(f&#34;Kept {len(filtered)} out of {len(detections)} detections&#34;)
+        Kept 1 out of 2 detections
+
+    Note:
+        - Useful for filtering out tiny false positives or unrealistic detections
+        - Typical license plates: width 100-400 pixels, height 30-150 pixels (depends on resolution)
+        - Consider image resolution when setting thresholds
+    &#34;&#34;&#34;
+    filtered = []
+
+    for x1, y1, x2, y2, conf in detections:
+        width = x2 - x1
+        height = y2 - y1
+
+        # Check minimum size
+        if width &lt; min_width or height &lt; min_height:
+            continue
+
+        # Check maximum size if specified
+        if max_width is not None and width &gt; max_width:
+            continue
+        if max_height is not None and height &gt; max_height:
+            continue
+
+        filtered.append((x1, y1, x2, y2, conf))
+
+    logger.debug(f&#34;Size filtering: {len(detections)} -&gt; {len(filtered)} detections&#34;)
+    return filtered</code></pre>
+</details>
+<div class="desc"><p>Filter detections based on bounding box size constraints.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>detections</code></strong></dt>
+<dd>List of detections in format [(x1, y1, x2, y2, confidence), &hellip;].</dd>
+<dt><strong><code>min_width</code></strong></dt>
+<dd>Minimum width in pixels. Detections smaller than this are filtered out.</dd>
+<dt><strong><code>min_height</code></strong></dt>
+<dd>Minimum height in pixels. Detections smaller than this are filtered out.</dd>
+<dt><strong><code>max_width</code></strong></dt>
+<dd>Maximum width in pixels. If None, no upper limit.</dd>
+<dt><strong><code>max_height</code></strong></dt>
+<dd>Maximum height in pixels. If None, no upper limit.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Filtered list of detections that meet size constraints.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; detections = [(10, 10, 15, 15, 0.9), (100, 100, 250, 180, 0.95)]
+&gt;&gt;&gt; filtered = filter_detections_by_size(detections, min_width=30, min_height=20)
+&gt;&gt;&gt; print(f&quot;Kept {len(filtered)} out of {len(detections)} detections&quot;)
+Kept 1 out of 2 detections
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Useful for filtering out tiny false positives or unrealistic detections</li>
+<li>Typical license plates: width 100-400 pixels, height 30-150 pixels (depends on resolution)</li>
+<li>Consider image resolution when setting thresholds</li>
+</ul></div>
+</dd>
+<dt id="src.detection.utils.non_maximum_suppression"><code class="name flex">
+<span>def <span class="ident">non_maximum_suppression</span></span>(<span>detections: List[Tuple[int, int, int, int, float]],<br>iou_threshold: float = 0.45) ‑> List[Tuple[int, int, int, int, float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def non_maximum_suppression(
+    detections: List[Tuple[int, int, int, int, float]], iou_threshold: float = 0.45
+) -&gt; List[Tuple[int, int, int, int, float]]:
+    &#34;&#34;&#34;
+    Apply Non-Maximum Suppression to remove overlapping detections.
+
+    Args:
+        detections: List of detections in format [(x1, y1, x2, y2, confidence), ...].
+        iou_threshold: IoU threshold for suppression. Detections with IoU above
+                      this threshold are considered duplicates.
+
+    Returns:
+        Filtered list of detections after NMS.
+
+    Note:
+        - YOLOv8 already applies NMS internally, so this is usually not needed
+        - Provided for custom post-processing or non-YOLO detectors
+        - Keeps detections with highest confidence scores
+    &#34;&#34;&#34;
+    # Implementation for future use
+    logger.warning(&#34;non_maximum_suppression() not yet implemented - future task&#34;)</code></pre>
+</details>
+<div class="desc"><p>Apply Non-Maximum Suppression to remove overlapping detections.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>detections</code></strong></dt>
+<dd>List of detections in format [(x1, y1, x2, y2, confidence), &hellip;].</dd>
+<dt><strong><code>iou_threshold</code></strong></dt>
+<dd>IoU threshold for suppression. Detections with IoU above
+this threshold are considered duplicates.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Filtered list of detections after NMS.</p>
+<h2 id="note">Note</h2>
+<ul>
+<li>YOLOv8 already applies NMS internally, so this is usually not needed</li>
+<li>Provided for custom post-processing or non-YOLO detectors</li>
+<li>Keeps detections with highest confidence scores</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.detection" href="index.html">src.detection</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.detection.utils.compute_iou" href="#src.detection.utils.compute_iou">compute_iou</a></code></li>
+<li><code><a title="src.detection.utils.crop_detections" href="#src.detection.utils.crop_detections">crop_detections</a></code></li>
+<li><code><a title="src.detection.utils.draw_bounding_boxes" href="#src.detection.utils.draw_bounding_boxes">draw_bounding_boxes</a></code></li>
+<li><code><a title="src.detection.utils.filter_detections_by_size" href="#src.detection.utils.filter_detections_by_size">filter_detections_by_size</a></code></li>
+<li><code><a title="src.detection.utils.non_maximum_suppression" href="#src.detection.utils.non_maximum_suppression">non_maximum_suppression</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

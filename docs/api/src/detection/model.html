@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.detection.model API documentation</title>
+<meta name="description" content="Detection Model Module …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.detection.model</code></h1>
+</header>
+<section id="section-intro">
+<p>Detection Model Module</p>
+<p>Core functionality for license plate detection using YOLOv8.
+Provides model loading and inference capabilities.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.detection.model.apply_nms"><code class="name flex">
+<span>def <span class="ident">apply_nms</span></span>(<span>detections: List[Tuple[int, int, int, int, float]],<br>iou_threshold: float = 0.3) ‑> List[Tuple[int, int, int, int, float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_nms(
+    detections: List[Tuple[int, int, int, int, float]], iou_threshold: float = 0.3
+) -&gt; List[Tuple[int, int, int, int, float]]:
+    &#34;&#34;&#34;
+    Apply Non-Maximum Suppression to remove duplicate/overlapping detections.
+
+    This is an additional NMS pass after YOLOv8&#39;s internal NMS to ensure
+    we only keep one detection per unique plate (removes near-duplicates).
+
+    Args:
+        detections: List of (x1, y1, x2, y2, confidence) tuples
+        iou_threshold: IoU threshold for considering boxes as duplicates.
+                      Lower values are more aggressive (0.3 recommended).
+
+    Returns:
+        Filtered list of detections with duplicates removed
+    &#34;&#34;&#34;
+    if not detections:
+        return []
+
+    # Sort by confidence (descending)
+    sorted_dets = sorted(detections, key=lambda x: x[4], reverse=True)
+
+    keep = []
+
+    for current in sorted_dets:
+        # Check if current box overlaps significantly with any kept box
+        should_keep = True
+
+        for kept in keep:
+            iou = calculate_iou(current[:4], kept[:4])
+
+            if iou &gt; iou_threshold:
+                # Overlaps too much with an already kept detection
+                should_keep = False
+                logger.debug(f&#34;Filtered duplicate detection (IoU={iou:.3f} &gt; {iou_threshold})&#34;)
+                break
+
+        if should_keep:
+            keep.append(current)
+
+    if len(keep) &lt; len(sorted_dets):
+        logger.info(
+            f&#34;NMS filtered {len(sorted_dets) - len(keep)} duplicate detections &#34;
+            f&#34;({len(sorted_dets)} → {len(keep)})&#34;
+        )
+
+    return keep</code></pre>
+</details>
+<div class="desc"><p>Apply Non-Maximum Suppression to remove duplicate/overlapping detections.</p>
+<p>This is an additional NMS pass after YOLOv8's internal NMS to ensure
+we only keep one detection per unique plate (removes near-duplicates).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>detections</code></strong></dt>
+<dd>List of (x1, y1, x2, y2, confidence) tuples</dd>
+<dt><strong><code>iou_threshold</code></strong></dt>
+<dd>IoU threshold for considering boxes as duplicates.
+Lower values are more aggressive (0.3 recommended).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Filtered list of detections with duplicates removed</p></div>
+</dd>
+<dt id="src.detection.model.batch_detect_plates"><code class="name flex">
+<span>def <span class="ident">batch_detect_plates</span></span>(<span>frames: List[numpy.ndarray],<br>model,<br>conf_threshold: float = 0.25,<br>iou_threshold: float = 0.45) ‑> List[List[Tuple[int, int, int, int, float]]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def batch_detect_plates(
+    frames: List[np.ndarray], model, conf_threshold: float = 0.25, iou_threshold: float = 0.45
+) -&gt; List[List[Tuple[int, int, int, int, float]]]:
+    &#34;&#34;&#34;
+    Detect license plates in multiple frames (batch processing).
+
+    Args:
+        frames: List of input images in BGR format.
+        model: Loaded YOLO model instance.
+        conf_threshold: Confidence threshold for detections.
+        iou_threshold: IOU threshold for NMS.
+
+    Returns:
+        List of detection lists, one for each input frame.
+        Each detection list has the same format as detect_plates().
+
+    Raises:
+        ValueError: If frames list is empty or contains invalid arrays.
+        RuntimeError: If batch inference fails.
+
+    Note:
+        - Batch processing is more efficient than processing frames individually
+        - All frames should have similar dimensions for optimal performance
+        - May require significant GPU memory for large batches
+    &#34;&#34;&#34;
+    # Implementation for future optimization
+    logger.warning(&#34;batch_detect_plates() not yet implemented - future task&#34;)</code></pre>
+</details>
+<div class="desc"><p>Detect license plates in multiple frames (batch processing).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frames</code></strong></dt>
+<dd>List of input images in BGR format.</dd>
+<dt><strong><code>model</code></strong></dt>
+<dd>Loaded YOLO model instance.</dd>
+<dt><strong><code>conf_threshold</code></strong></dt>
+<dd>Confidence threshold for detections.</dd>
+<dt><strong><code>iou_threshold</code></strong></dt>
+<dd>IOU threshold for NMS.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of detection lists, one for each input frame.
+Each detection list has the same format as detect_plates().</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frames list is empty or contains invalid arrays.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If batch inference fails.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<ul>
+<li>Batch processing is more efficient than processing frames individually</li>
+<li>All frames should have similar dimensions for optimal performance</li>
+<li>May require significant GPU memory for large batches</li>
+</ul></div>
+</dd>
+<dt id="src.detection.model.calculate_iou"><code class="name flex">
+<span>def <span class="ident">calculate_iou</span></span>(<span>box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) ‑> float</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculate_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -&gt; float:
+    &#34;&#34;&#34;
+    Calculate Intersection over Union (IoU) between two bounding boxes.
+
+    Args:
+        box1: First box as (x1, y1, x2, y2)
+        box2: Second box as (x1, y1, x2, y2)
+
+    Returns:
+        IoU score between 0.0 and 1.0
+    &#34;&#34;&#34;
+    x1_1, y1_1, x2_1, y2_1 = box1
+    x1_2, y1_2, x2_2, y2_2 = box2
+
+    # Calculate intersection coordinates
+    x1_i = max(x1_1, x1_2)
+    y1_i = max(y1_1, y1_2)
+    x2_i = min(x2_1, x2_2)
+    y2_i = min(y2_1, y2_2)
+
+    # Calculate intersection area
+    if x2_i &lt; x1_i or y2_i &lt; y1_i:
+        intersection = 0.0
+    else:
+        intersection = (x2_i - x1_i) * (y2_i - y1_i)
+
+    # Calculate union area
+    area1 = (x2_1 - x1_1) * (y2_1 - y1_1)
+    area2 = (x2_2 - x1_2) * (y2_2 - y1_2)
+    union = area1 + area2 - intersection
+
+    # Avoid division by zero
+    if union == 0:
+        return 0.0
+
+    return intersection / union</code></pre>
+</details>
+<div class="desc"><p>Calculate Intersection over Union (IoU) between two bounding boxes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>box1</code></strong></dt>
+<dd>First box as (x1, y1, x2, y2)</dd>
+<dt><strong><code>box2</code></strong></dt>
+<dd>Second box as (x1, y1, x2, y2)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>IoU score between 0.0 and 1.0</p></div>
+</dd>
+<dt id="src.detection.model.detect_plates"><code class="name flex">
+<span>def <span class="ident">detect_plates</span></span>(<span>frame: numpy.ndarray,<br>model,<br>conf_threshold: float = 0.25,<br>iou_threshold: float = 0.45,<br>min_area: int = 1000) ‑> List[Tuple[int, int, int, int, float]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_plates(
+    frame: np.ndarray,
+    model,
+    conf_threshold: float = 0.25,
+    iou_threshold: float = 0.45,
+    min_area: int = 1000,
+) -&gt; List[Tuple[int, int, int, int, float]]:
+    &#34;&#34;&#34;
+    Detect license plates in a single frame.
+
+    Args:
+        frame: Input image in BGR format (OpenCV convention). Should be a
+              numpy array with shape (height, width, 3).
+        model: Loaded YOLO model instance from load_detection_model().
+        conf_threshold: Confidence threshold for detections (0.0 to 1.0).
+                       Detections with confidence below this value are filtered out.
+                       Lower values detect more plates but increase false positives.
+        iou_threshold: IOU (Intersection over Union) threshold for Non-Maximum
+                      Suppression (0.0 to 1.0). Controls how much overlap is allowed
+                      between detections. Higher values allow more overlapping boxes.
+        min_area: Minimum bounding box area (pixels) to filter tiny false positives.
+                 Default 1000px filters boxes smaller than ~32×32. Set to 0 to disable.
+
+    Returns:
+        List of detections, where each detection is a tuple:
+        (x1, y1, x2, y2, confidence)
+        - x1, y1: Top-left corner coordinates (integers)
+        - x2, y2: Bottom-right corner coordinates (integers)
+        - confidence: Detection confidence score (float, 0.0 to 1.0)
+
+        Returns empty list if no plates are detected.
+
+    Raises:
+        ValueError: If frame is not a valid numpy array or has incorrect shape.
+        RuntimeError: If inference fails due to model or input issues.
+
+    Example:
+        &gt;&gt;&gt; import cv2
+        &gt;&gt;&gt; frame = cv2.imread(&#39;test_image.jpg&#39;)
+        &gt;&gt;&gt; detections = detect_plates(frame, model, conf_threshold=0.5)
+        &gt;&gt;&gt; print(f&#34;Detected {len(detections)} license plates&#34;)
+        &gt;&gt;&gt; for x1, y1, x2, y2, conf in detections:
+        ...     print(f&#34;Plate at ({x1},{y1})-({x2},{y2}) with confidence {conf:.2f}&#34;)
+
+    Note:
+        - Input frame should not be preprocessed (model handles resizing internally)
+        - Coordinates are in the original image space (not normalized)
+        - For batch processing, call this function for each frame
+    &#34;&#34;&#34;
+    # Validate input frame
+    if not isinstance(frame, np.ndarray):
+        raise ValueError(f&#34;Frame must be a numpy array, got {type(frame)}&#34;)
+
+    if frame.ndim != 3 or frame.shape[2] != 3:
+        raise ValueError(f&#34;Frame must have shape (height, width, 3), got {frame.shape}&#34;)
+
+    logger.debug(f&#34;Running detection on frame of shape {frame.shape}&#34;)
+
+    try:
+        # Run YOLOv8 inference
+        results = model.predict(frame, conf=conf_threshold, iou=iou_threshold, verbose=False)
+
+        detections = []
+
+        # Parse results
+        for result in results:
+            # Check if boxes exist
+            if not hasattr(result, &#34;boxes&#34;) or result.boxes is None:
+                logger.debug(&#34;No boxes found in results&#34;)
+                continue
+
+            boxes = result.boxes
+
+            # Extract each detection
+            for box in boxes:
+                # Get coordinates in xyxy format (x1, y1, x2, y2)
+                if hasattr(box, &#34;xyxy&#34;) and len(box.xyxy) &gt; 0:
+                    coords = box.xyxy[0].cpu().numpy()
+                    x1, y1, x2, y2 = coords
+
+                    # Get confidence score
+                    confidence = float(box.conf[0].cpu().numpy())
+
+                    # Convert to integers and append
+                    detections.append((int(x1), int(y1), int(x2), int(y2), confidence))
+
+        logger.info(f&#34;Detected {len(detections)} plates with conf &gt;= {conf_threshold:.2f}&#34;)
+
+        # Filter by minimum area to remove tiny false positives
+        if min_area &gt; 0:
+            original_count = len(detections)
+            detections = [
+                det for det in detections if (det[2] - det[0]) * (det[3] - det[1]) &gt;= min_area
+            ]
+            if len(detections) &lt; original_count:
+                logger.info(
+                    f&#34;Filtered {original_count - len(detections)} small detections &#34;
+                    f&#34;(area &lt; {min_area}px)&#34;
+                )
+
+        # Apply additional NMS to remove near-duplicate detections
+        # (more aggressive than YOLOv8&#39;s internal NMS)
+        if len(detections) &gt; 1:
+            detections = apply_nms(detections, iou_threshold=0.3)
+
+        # Log detection details in debug mode
+        if detections:
+            logger.debug(&#34;Detection details:&#34;)
+            for i, (x1, y1, x2, y2, conf) in enumerate(detections, 1):
+                w, h = x2 - x1, y2 - y1
+                logger.debug(f&#34;  {i}. ({x1},{y1})-({x2},{y2}) size={w}x{h} conf={conf:.3f}&#34;)
+
+        return detections
+
+    except Exception as e:
+        logger.error(f&#34;Detection failed: {type(e).__name__}: {str(e)}&#34;)
+        raise RuntimeError(
+            f&#34;Detection inference failed: {str(e)}\n&#34;
+            &#34;Please check that the model and input are compatible.&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>Detect license plates in a single frame.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame</code></strong></dt>
+<dd>Input image in BGR format (OpenCV convention). Should be a
+numpy array with shape (height, width, 3).</dd>
+<dt><strong><code>model</code></strong></dt>
+<dd>Loaded YOLO model instance from load_detection_model().</dd>
+<dt><strong><code>conf_threshold</code></strong></dt>
+<dd>Confidence threshold for detections (0.0 to 1.0).
+Detections with confidence below this value are filtered out.
+Lower values detect more plates but increase false positives.</dd>
+<dt><strong><code>iou_threshold</code></strong></dt>
+<dd>IOU (Intersection over Union) threshold for Non-Maximum
+Suppression (0.0 to 1.0). Controls how much overlap is allowed
+between detections. Higher values allow more overlapping boxes.</dd>
+<dt><strong><code>min_area</code></strong></dt>
+<dd>Minimum bounding box area (pixels) to filter tiny false positives.
+Default 1000px filters boxes smaller than ~32×32. Set to 0 to disable.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of detections, where each detection is a tuple:
+(x1, y1, x2, y2, confidence)
+- x1, y1: Top-left corner coordinates (integers)
+- x2, y2: Bottom-right corner coordinates (integers)
+- confidence: Detection confidence score (float, 0.0 to 1.0)</p>
+<p>Returns empty list if no plates are detected.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame is not a valid numpy array or has incorrect shape.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If inference fails due to model or input issues.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import cv2
+&gt;&gt;&gt; frame = cv2.imread('test_image.jpg')
+&gt;&gt;&gt; detections = detect_plates(frame, model, conf_threshold=0.5)
+&gt;&gt;&gt; print(f&quot;Detected {len(detections)} license plates&quot;)
+&gt;&gt;&gt; for x1, y1, x2, y2, conf in detections:
+...     print(f&quot;Plate at ({x1},{y1})-({x2},{y2}) with confidence {conf:.2f}&quot;)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Input frame should not be preprocessed (model handles resizing internally)</li>
+<li>Coordinates are in the original image space (not normalized)</li>
+<li>For batch processing, call this function for each frame</li>
+</ul></div>
+</dd>
+<dt id="src.detection.model.load_detection_model"><code class="name flex">
+<span>def <span class="ident">load_detection_model</span></span>(<span>model_path: str, device: str = 'auto')</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_detection_model(model_path: str, device: str = &#34;auto&#34;):
+    &#34;&#34;&#34;
+    Load pre-trained YOLOv8 model for license plate detection.
+
+    Args:
+        model_path: Path to YOLOv8 .pt weights file. Should be a valid file path
+                   pointing to a trained YOLOv8 model in PyTorch format.
+        device: Device to load model on. Options:
+               - &#39;cuda&#39;: Use GPU acceleration (requires CUDA)
+               - &#39;cpu&#39;: Use CPU only
+               - &#39;auto&#39;: Automatically select GPU if available, otherwise CPU
+
+    Returns:
+        Loaded YOLO model instance ready for inference.
+
+    Raises:
+        FileNotFoundError: If model_path does not exist.
+        RuntimeError: If model fails to load due to compatibility issues
+                     or corrupted weights.
+        ImportError: If required dependencies (ultralytics) are not installed.
+
+    Example:
+        &gt;&gt;&gt; model = load_detection_model(&#39;models/detection/yolov8n.pt&#39;)
+        &gt;&gt;&gt; print(f&#34;Model loaded on device: {model.device}&#34;)
+
+    Note:
+        - The model file can be large (10-100 MB) and should not be committed to Git
+        - First-time usage may download additional dependencies
+        - GPU acceleration significantly improves inference speed
+    &#34;&#34;&#34;
+    # Validate model path
+    if not os.path.exists(model_path):
+        logger.error(f&#34;Model file not found: {model_path}&#34;)
+        raise FileNotFoundError(
+            f&#34;Model file not found: {model_path}\n&#34;
+            &#34;Please download the model using: python models/detection/download_model.py&#34;
+        )
+
+    # Determine device
+    if device == &#34;auto&#34;:
+        device = &#34;cuda&#34; if torch.cuda.is_available() else &#34;cpu&#34;
+        logger.info(f&#34;Auto-selected device: {device}&#34;)
+
+    logger.info(f&#34;Loading YOLOv8 model from: {model_path}&#34;)
+    logger.info(f&#34;Target device: {device}&#34;)
+
+    try:
+        # Load YOLO model
+        model = YOLO(model_path)
+
+        # YOLOv8 handles device placement internally, but we can specify it
+        if hasattr(model, &#34;to&#34;):
+            model.to(device)
+
+        # Log model information
+        logger.info(&#34;✓ Model loaded successfully&#34;)
+        logger.info(f&#34;  Model type: {type(model).__name__}&#34;)
+
+        # Get model details if available
+        if hasattr(model, &#34;names&#34;):
+            logger.info(f&#34;  Classes: {len(model.names) if model.names else &#39;N/A&#39;}&#34;)
+
+        return model
+
+    except Exception as e:
+        logger.error(f&#34;Failed to load model: {type(e).__name__}: {str(e)}&#34;)
+        raise RuntimeError(
+            f&#34;Model loading failed: {str(e)}\n&#34;
+            &#34;The model file may be corrupted or incompatible. &#34;
+            &#34;Try re-downloading it using: python models/detection/download_model.py&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>Load pre-trained YOLOv8 model for license plate detection.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model_path</code></strong></dt>
+<dd>Path to YOLOv8 .pt weights file. Should be a valid file path
+pointing to a trained YOLOv8 model in PyTorch format.</dd>
+<dt><strong><code>device</code></strong></dt>
+<dd>Device to load model on. Options:
+- 'cuda': Use GPU acceleration (requires CUDA)
+- 'cpu': Use CPU only
+- 'auto': Automatically select GPU if available, otherwise CPU</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Loaded YOLO model instance ready for inference.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If model_path does not exist.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If model fails to load due to compatibility issues
+or corrupted weights.</dd>
+<dt><code>ImportError</code></dt>
+<dd>If required dependencies (ultralytics) are not installed.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; model = load_detection_model('models/detection/yolov8n.pt')
+&gt;&gt;&gt; print(f&quot;Model loaded on device: {model.device}&quot;)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>The model file can be large (10-100 MB) and should not be committed to Git</li>
+<li>First-time usage may download additional dependencies</li>
+<li>GPU acceleration significantly improves inference speed</li>
+</ul></div>
+</dd>
+<dt id="src.detection.model.validate_model"><code class="name flex">
+<span>def <span class="ident">validate_model</span></span>(<span>model) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_model(model) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate that the loaded model can perform inference.
+
+    Args:
+        model: Loaded YOLO model instance to validate.
+
+    Returns:
+        True if model validation succeeds, False otherwise.
+
+    Raises:
+        RuntimeError: If validation fails critically.
+
+    Note:
+        - Creates a dummy input (e.g., 640x640 random image) for testing
+        - Useful for debugging model loading issues
+        - Should be called after load_detection_model() in production
+    &#34;&#34;&#34;
+    logger.info(&#34;Validating model with dummy input...&#34;)
+
+    try:
+        # Create dummy input image (640x640 RGB)
+        dummy_input = np.random.randint(0, 255, (640, 640, 3), dtype=np.uint8)
+
+        # Run inference
+        results = model.predict(dummy_input, verbose=False)
+
+        # Check if results are valid
+        if results is None:
+            logger.error(&#34;Model returned None results&#34;)
+            return False
+
+        logger.info(&#34;✓ Model validation successful&#34;)
+        logger.info(f&#34;  Inference test passed with dummy {dummy_input.shape} input&#34;)
+
+        return True
+
+    except Exception as e:
+        logger.error(f&#34;Model validation failed: {type(e).__name__}: {str(e)}&#34;)
+        raise RuntimeError(
+            f&#34;Model validation failed: {str(e)}\n&#34;
+            &#34;The model may not be compatible with the current environment.&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>Validate that the loaded model can perform inference.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model</code></strong></dt>
+<dd>Loaded YOLO model instance to validate.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>True if model validation succeeds, False otherwise.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>RuntimeError</code></dt>
+<dd>If validation fails critically.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<ul>
+<li>Creates a dummy input (e.g., 640x640 random image) for testing</li>
+<li>Useful for debugging model loading issues</li>
+<li>Should be called after load_detection_model() in production</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.detection" href="index.html">src.detection</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.detection.model.apply_nms" href="#src.detection.model.apply_nms">apply_nms</a></code></li>
+<li><code><a title="src.detection.model.batch_detect_plates" href="#src.detection.model.batch_detect_plates">batch_detect_plates</a></code></li>
+<li><code><a title="src.detection.model.calculate_iou" href="#src.detection.model.calculate_iou">calculate_iou</a></code></li>
+<li><code><a title="src.detection.model.detect_plates" href="#src.detection.model.detect_plates">detect_plates</a></code></li>
+<li><code><a title="src.detection.model.load_detection_model" href="#src.detection.model.load_detection_model">load_detection_model</a></code></li>
+<li><code><a title="src.detection.model.validate_model" href="#src.detection.model.validate_model">validate_model</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

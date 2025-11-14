@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.recognition.utils API documentation</title>
+<meta name="description" content="Recognition Utility Functions …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.recognition.utils</code></h1>
+</header>
+<section id="section-intro">
+<p>Recognition Utility Functions</p>
+<p>Helper functions for text post-processing, filtering, and candidate scoring.
+Used by recognize_text() for selecting best OCR result.</p>
+<p>Key Features:
+- OCR confusion correction (O↔0, I/L↔1, S↔5, B↔8, Z↔2, G↔6)
+- Regex-based format validation (GTA V: 2 digits + 3 letters + 3 digits)
+- Multi-factor candidate scoring (confidence × bbox_height × length)
+- Best candidate selection based on calculated scores</p>
+<p>OCR Confusion Correction:
+The correct_ocr_confusions() function handles systematic OCR errors by mapping
+lookalike characters to the expected type (digit or letter) at each position:
+- If position expects digit: O→0, Q→0, I→1, L→1, S→5, B→8, Z→2, G→6
+- If position expects letter: 0→O, 1→I, 5→S, 2→Z, 6→G, 8→B</p>
+<p>This postprocessor is applied AFTER OCR inference but BEFORE regex validation,
+significantly improving recognition success rate (estimated +10-20% for GTA V plates).</p>
+<p>Example Pipeline:
+1. PaddleOCR inference → raw text (e.g., "I2ABC34S")
+2. Normalize to uppercase → "I2ABC34S"
+3. Apply confusion correction → "12ABC345" ✓
+4. Regex validation → passes (^\d{2}[A-Z]{3}\d{3}$)
+5. Scoring and selection → final result</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.recognition.utils.correct_ocr_confusions"><code class="name flex">
+<span>def <span class="ident">correct_ocr_confusions</span></span>(<span>text: str, plate_format: str = '^\\d{2}[A-Z]{3}\\d{3}$') ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def correct_ocr_confusions(text: str, plate_format: str = r&#34;^\d{2}[A-Z]{3}\d{3}$&#34;) -&gt; str:
+    &#34;&#34;&#34;
+    Correct common OCR character confusions based on expected position type.
+
+    Handles classic OCR confusion pairs by mapping lookalike characters to the
+    expected type (digit or letter) at each position according to the plate format.
+
+    Args:
+        text: Raw OCR text to correct (typically uppercase alphanumeric).
+        plate_format: Regex pattern defining expected character types at each position.
+                     Default: r&#39;^\\d{2}[A-Z]{3}\\d{3}$&#39; (GTA V: 2 digits, 3 letters, 3 digits)
+
+    Returns:
+        str: Corrected text with confusions resolved based on expected types.
+
+    Confusion Mappings:
+        If position expects DIGIT (\\d):
+        - O → 0, Q → 0, I → 1, L → 1, S → 5, B → 8, Z → 2, G → 6
+
+        If position expects LETTER ([A-Z]):
+        - 0 → O, 1 → I, 5 → S, 2 → Z, 6 → G, 8 → B
+
+    Example:
+        &gt;&gt;&gt; # GTA V format: ^^\\d{2}[A-Z]{3}\\d{3}$
+        &gt;&gt;&gt; correct_ocr_confusions(&#39;I2ABC34S&#39;)  # I→1, S→5
+        &#39;12ABC345&#39;
+        &gt;&gt;&gt; correct_ocr_confusions(&#39;12AB0345&#39;)  # 0→O in letter position
+        &#39;12ABO345&#39;
+        &gt;&gt;&gt; correct_ocr_confusions(&#39;OZ4BC123&#39;)  # O→0, Z→2
+        &#39;024BC123&#39;
+
+    Note:
+        - Only corrects characters that violate the expected type
+        - Preserves already-correct characters
+        - Uses conservative 1→I mapping (could be 1→L, but I is more common)
+        - Should be called AFTER OCR but BEFORE regex validation
+        - Improves recognition rate by handling systematic OCR errors
+    &#34;&#34;&#34;
+    if not text:
+        return text
+
+    # Define confusion mappings
+    DIGIT_CONFUSIONS = {
+        &#34;O&#34;: &#34;0&#34;,
+        &#34;Q&#34;: &#34;0&#34;,  # O and Q look like 0
+        &#34;I&#34;: &#34;1&#34;,
+        &#34;L&#34;: &#34;1&#34;,  # I and L look like 1
+        &#34;S&#34;: &#34;5&#34;,  # S looks like 5
+        &#34;B&#34;: &#34;8&#34;,  # B looks like 8
+        &#34;Z&#34;: &#34;2&#34;,  # Z looks like 2
+        &#34;G&#34;: &#34;6&#34;,  # G looks like 6
+    }
+
+    LETTER_CONFUSIONS = {
+        &#34;0&#34;: &#34;O&#34;,  # 0 looks like O
+        &#34;1&#34;: &#34;I&#34;,  # 1 looks like I (could also be L, but I is more common)
+        &#34;5&#34;: &#34;S&#34;,  # 5 looks like S
+        &#34;2&#34;: &#34;Z&#34;,  # 2 looks like Z
+        &#34;6&#34;: &#34;G&#34;,  # 6 looks like G
+        &#34;8&#34;: &#34;B&#34;,  # 8 looks like B
+    }
+
+    # Parse plate format to determine expected type at each position
+    # For GTA V format: r&#39;^\d{2}[A-Z]{3}\d{3}$&#39;
+    # Expected: [digit, digit, letter, letter, letter, digit, digit, digit]
+
+    expected_types = []
+
+    # Simple parser for common regex patterns
+    # Handles: \d{n}, [A-Z]{n}, \d, [A-Z]
+    pattern = plate_format.strip(&#34;^$&#34;)  # Remove anchors
+    i = 0
+    while i &lt; len(pattern):
+        if pattern[i : i + 2] == r&#34;\d&#34;:
+            # Check for {n} quantifier
+            if i + 2 &lt; len(pattern) and pattern[i + 2] == &#34;{&#34;:
+                # Extract count
+                end = pattern.find(&#34;}&#34;, i + 2)
+                if end != -1:
+                    count = int(pattern[i + 3 : end])
+                    expected_types.extend([&#34;digit&#34;] * count)
+                    i = end + 1
+                    continue
+            # Single \d
+            expected_types.append(&#34;digit&#34;)
+            i += 2
+        elif pattern[i : i + 5] == &#34;[A-Z]&#34;:
+            # Check for {n} quantifier
+            if i + 5 &lt; len(pattern) and pattern[i + 5] == &#34;{&#34;:
+                # Extract count
+                end = pattern.find(&#34;}&#34;, i + 5)
+                if end != -1:
+                    count = int(pattern[i + 6 : end])
+                    expected_types.extend([&#34;letter&#34;] * count)
+                    i = end + 1
+                    continue
+            # Single [A-Z]
+            expected_types.append(&#34;letter&#34;)
+            i += 5
+        else:
+            i += 1
+
+    # Correct text based on expected types
+    corrected = []
+    for idx, char in enumerate(text):
+        if idx &gt;= len(expected_types):
+            # Beyond expected length, keep as-is
+            corrected.append(char)
+            continue
+
+        expected_type = expected_types[idx]
+
+        if expected_type == &#34;digit&#34;:
+            # Position expects digit: apply digit confusion mapping
+            if char in DIGIT_CONFUSIONS:
+                corrected_char = DIGIT_CONFUSIONS[char]
+                if corrected_char != char:
+                    logger.debug(
+                        f&#34;Position {idx}: corrected &#39;{char}&#39; → &#39;{corrected_char}&#39; (expected digit)&#34;
+                    )
+                corrected.append(corrected_char)
+            else:
+                corrected.append(char)
+
+        elif expected_type == &#34;letter&#34;:
+            # Position expects letter: apply letter confusion mapping
+            if char in LETTER_CONFUSIONS:
+                corrected_char = LETTER_CONFUSIONS[char]
+                if corrected_char != char:
+                    logger.debug(
+                        f&#34;Position {idx}: corrected &#39;{char}&#39; → &#39;{corrected_char}&#39; (expected letter)&#34;
+                    )
+                corrected.append(corrected_char)
+            else:
+                corrected.append(char)
+
+        else:
+            # Unknown expected type, keep as-is
+            corrected.append(char)
+
+    corrected_text = &#34;&#34;.join(corrected)
+
+    if corrected_text != text:
+        logger.info(f&#34;OCR confusion correction: &#39;{text}&#39; → &#39;{corrected_text}&#39;&#34;)
+
+    return corrected_text</code></pre>
+</details>
+<div class="desc"><p>Correct common OCR character confusions based on expected position type.</p>
+<p>Handles classic OCR confusion pairs by mapping lookalike characters to the
+expected type (digit or letter) at each position according to the plate format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong></dt>
+<dd>Raw OCR text to correct (typically uppercase alphanumeric).</dd>
+<dt><strong><code>plate_format</code></strong></dt>
+<dd>Regex pattern defining expected character types at each position.
+Default: r'^\d{2}[A-Z]{3}\d{3}$' (GTA V: 2 digits, 3 letters, 3 digits)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Corrected text with confusions resolved based on expected types.</dd>
+</dl>
+<p>Confusion Mappings:
+If position expects DIGIT (\d):
+- O → 0, Q → 0, I → 1, L → 1, S → 5, B → 8, Z → 2, G → 6</p>
+<pre><code>If position expects LETTER ([A-Z]):
+- 0 → O, 1 → I, 5 → S, 2 → Z, 6 → G, 8 → B
+</code></pre>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; # GTA V format: ^^\d{2}[A-Z]{3}\d{3}$
+&gt;&gt;&gt; correct_ocr_confusions('I2ABC34S')  # I→1, S→5
+'12ABC345'
+&gt;&gt;&gt; correct_ocr_confusions('12AB0345')  # 0→O in letter position
+'12ABO345'
+&gt;&gt;&gt; correct_ocr_confusions('OZ4BC123')  # O→0, Z→2
+'024BC123'
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Only corrects characters that violate the expected type</li>
+<li>Preserves already-correct characters</li>
+<li>Uses conservative 1→I mapping (could be 1→L, but I is more common)</li>
+<li>Should be called AFTER OCR but BEFORE regex validation</li>
+<li>Improves recognition rate by handling systematic OCR errors</li>
+</ul></div>
+</dd>
+<dt id="src.recognition.utils.filter_by_regex"><code class="name flex">
+<span>def <span class="ident">filter_by_regex</span></span>(<span>text: str, pattern: str) ‑> bool</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_by_regex(text: str, pattern: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate text against regex pattern for GTA V license plate format.
+
+    Args:
+        text: Recognized text string to validate (should be uppercase alphanumeric).
+        pattern: Regex pattern string (e.g., &#39;^\\d{2}[A-Z]{3}\\d{3}$&#39; for GTA V format).
+
+    Returns:
+        bool: True if text matches pattern, False otherwise.
+
+    Raises:
+        re.error: If pattern is invalid regex.
+
+    Example:
+        &gt;&gt;&gt; filter_by_regex(&#39;12ABC345&#39;, &#39;^\\d{2}[A-Z]{3}\\d{3}$&#39;)
+        True
+        &gt;&gt;&gt; filter_by_regex(&#39;ABC-123&#39;, &#39;^\\d{2}[A-Z]{3}\\d{3}$&#39;)
+        False
+        &gt;&gt;&gt; filter_by_regex(&#39;12AB34&#39;, &#39;^\\d{2}[A-Z]{3}\\d{3}$&#39;)
+        False
+
+    Note:
+        - Used to filter out invalid OCR results (headers, small text, etc.)
+        - GTA V plate format: 2 digits, 3 letters, 3 digits (e.g., 12ABC345)
+        - Pattern loaded from config for flexibility
+    &#34;&#34;&#34;
+    if not text or not pattern:
+        logger.debug(f&#34;Regex validation skipped: text=&#39;{text}&#39; or pattern=&#39;{pattern}&#39; is empty&#34;)
+        return False
+
+    try:
+        matches = bool(re.match(pattern, text))
+        if not matches:
+            logger.warning(f&#34;Text &#39;{text}&#39; failed regex validation against pattern &#39;{pattern}&#39;&#34;)
+        else:
+            logger.debug(f&#34;Text &#39;{text}&#39; passed regex validation&#34;)
+        return matches
+    except re.error as e:
+        logger.error(f&#34;Invalid regex pattern &#39;{pattern}&#39;: {e}&#34;)
+        raise</code></pre>
+</details>
+<div class="desc"><p>Validate text against regex pattern for GTA V license plate format.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong></dt>
+<dd>Recognized text string to validate (should be uppercase alphanumeric).</dd>
+<dt><strong><code>pattern</code></strong></dt>
+<dd>Regex pattern string (e.g., '^\d{2}[A-Z]{3}\d{3}$' for GTA V format).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if text matches pattern, False otherwise.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>re.error</code></dt>
+<dd>If pattern is invalid regex.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; filter_by_regex('12ABC345', '^\d{2}[A-Z]{3}\d{3}$')
+True
+&gt;&gt;&gt; filter_by_regex('ABC-123', '^\d{2}[A-Z]{3}\d{3}$')
+False
+&gt;&gt;&gt; filter_by_regex('12AB34', '^\d{2}[A-Z]{3}\d{3}$')
+False
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Used to filter out invalid OCR results (headers, small text, etc.)</li>
+<li>GTA V plate format: 2 digits, 3 letters, 3 digits (e.g., 12ABC345)</li>
+<li>Pattern loaded from config for flexibility</li>
+</ul></div>
+</dd>
+<dt id="src.recognition.utils.score_candidate"><code class="name flex">
+<span>def <span class="ident">score_candidate</span></span>(<span>text: str, confidence: float, bbox_height: float, image_height: float) ‑> float</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def score_candidate(text: str, confidence: float, bbox_height: float, image_height: float) -&gt; float:
+    &#34;&#34;&#34;
+    Calculate score for OCR text candidate using multi-factor formula.
+
+    Scoring formula from shrimp-rules.md:
+    score = p * h * min(L/8, 1)
+    where:
+    - p = OCR confidence [0.0-1.0]
+    - h = normalized bbox height (bbox_height / image_height)
+    - L = text length (number of characters)
+
+    Args:
+        text: Recognized text string (candidate).
+        confidence: OCR confidence score for this text [0.0-1.0].
+        bbox_height: Height of text bounding box in pixels.
+        image_height: Total height of plate image in pixels.
+
+    Returns:
+        float: Calculated score [0.0-1.0], higher is better.
+
+    Raises:
+        ValueError: If confidence not in [0,1] or heights are non-positive.
+
+    Example:
+        &gt;&gt;&gt; score = score_candidate(&#39;12ABC345&#39;, 0.95, 50, 100)
+        &gt;&gt;&gt; print(f&#34;Score: {score:.3f}&#34;)
+        Score: 0.475
+
+    Note:
+        - Balances confidence, size, and length for robust selection
+        - Larger text (higher h) gets higher score (likely main plate number)
+        - Length capped at 8 to avoid bias toward long text (GTA V plates are 8 chars)
+        - Used when OCR returns multiple text lines per plate
+    &#34;&#34;&#34;
+    # Validate inputs
+    if not 0.0 &lt;= confidence &lt;= 1.0:
+        raise ValueError(f&#34;Confidence must be in [0,1], got {confidence}&#34;)
+    if bbox_height &lt;= 0 or image_height &lt;= 0:
+        raise ValueError(
+            f&#34;Heights must be positive, got bbox_height={bbox_height}, image_height={image_height}&#34;
+        )
+    if not text:
+        return 0.0
+
+    # Calculate score components
+    p = confidence  # OCR confidence
+    h = bbox_height / image_height  # Normalized bbox height
+    L = len(text)  # Text length
+
+    # Calculate final score: p * h * min(L/8, 1)
+    # For GTA V plates (8 characters), valid plates get full length contribution
+    score = p * h * min(L / 8.0, 1.0)
+
+    logger.debug(f&#34;Scored candidate &#39;{text}&#39;: p={p:.3f}, h={h:.3f}, L={L}, score={score:.3f}&#34;)
+
+    return score</code></pre>
+</details>
+<div class="desc"><p>Calculate score for OCR text candidate using multi-factor formula.</p>
+<p>Scoring formula from shrimp-rules.md:
+score = p * h * min(L/8, 1)
+where:
+- p = OCR confidence [0.0-1.0]
+- h = normalized bbox height (bbox_height / image_height)
+- L = text length (number of characters)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong></dt>
+<dd>Recognized text string (candidate).</dd>
+<dt><strong><code>confidence</code></strong></dt>
+<dd>OCR confidence score for this text [0.0-1.0].</dd>
+<dt><strong><code>bbox_height</code></strong></dt>
+<dd>Height of text bounding box in pixels.</dd>
+<dt><strong><code>image_height</code></strong></dt>
+<dd>Total height of plate image in pixels.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>Calculated score [0.0-1.0], higher is better.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If confidence not in [0,1] or heights are non-positive.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; score = score_candidate('12ABC345', 0.95, 50, 100)
+&gt;&gt;&gt; print(f&quot;Score: {score:.3f}&quot;)
+Score: 0.475
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Balances confidence, size, and length for robust selection</li>
+<li>Larger text (higher h) gets higher score (likely main plate number)</li>
+<li>Length capped at 8 to avoid bias toward long text (GTA V plates are 8 chars)</li>
+<li>Used when OCR returns multiple text lines per plate</li>
+</ul></div>
+</dd>
+<dt id="src.recognition.utils.select_best_candidate"><code class="name flex">
+<span>def <span class="ident">select_best_candidate</span></span>(<span>candidates: List[Dict]) ‑> Tuple[str | None, float]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_best_candidate(candidates: List[Dict]) -&gt; Tuple[Optional[str], float]:
+    &#34;&#34;&#34;
+    Select best text candidate from list based on scores.
+
+    Args:
+        candidates: List of candidate dictionaries, each containing:
+                   - &#39;text&#39; (str): Recognized text
+                   - &#39;confidence&#39; (float): OCR confidence [0.0-1.0]
+                   - &#39;score&#39; (float): Calculated score from score_candidate()
+                   - &#39;bbox&#39; (list): Bounding box coordinates
+
+    Returns:
+        Tuple containing:
+        - best_text (str or None): Text of highest-scoring candidate,
+                                   or None if candidates list is empty
+        - best_confidence (float): Confidence of best candidate,
+                                  or 0.0 if no candidates
+
+    Raises:
+        KeyError: If candidate dict missing required keys.
+        ValueError: If candidates list contains invalid data.
+
+    Example:
+        &gt;&gt;&gt; candidates = [
+        ...     {&#39;text&#39;: &#39;12ABC345&#39;, &#39;confidence&#39;: 0.95, &#39;score&#39;: 0.475},
+        ...     {&#39;text&#39;: &#39;HEADER&#39;, &#39;confidence&#39;: 0.80, &#39;score&#39;: 0.200}
+        ... ]
+        &gt;&gt;&gt; text, conf = select_best_candidate(candidates)
+        &gt;&gt;&gt; print(f&#34;Best: {text} ({conf:.2f})&#34;)
+        Best: 12ABC345 (0.95)
+
+    Note:
+        - Selects candidate with highest &#39;score&#39; value
+        - Returns None if candidates list is empty (no valid text found)
+        - Used as final step in recognize_text() post-processing
+        - Handles ties by selecting first candidate (stable sort)
+    &#34;&#34;&#34;
+    if not candidates:
+        logger.debug(&#34;No candidates to select from&#34;)
+        return None, 0.0
+
+    # Validate candidates have required keys
+    required_keys = {&#34;text&#34;, &#34;confidence&#34;, &#34;score&#34;}
+    for i, candidate in enumerate(candidates):
+        missing_keys = required_keys - set(candidate.keys())
+        if missing_keys:
+            raise KeyError(f&#34;Candidate {i} missing required keys: {missing_keys}&#34;)
+
+    # Select candidate with highest score
+    best = max(candidates, key=lambda x: x[&#34;score&#34;])
+
+    logger.info(
+        f&#34;Selected best candidate: &#39;{best[&#39;text&#39;]}&#39; &#34;
+        f&#34;(confidence={best[&#39;confidence&#39;]:.3f}, score={best[&#39;score&#39;]:.3f})&#34;
+    )
+
+    return best[&#34;text&#34;], best[&#34;confidence&#34;]</code></pre>
+</details>
+<div class="desc"><p>Select best text candidate from list based on scores.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>candidates</code></strong></dt>
+<dd>List of candidate dictionaries, each containing:
+- 'text' (str): Recognized text
+- 'confidence' (float): OCR confidence [0.0-1.0]
+- 'score' (float): Calculated score from score_candidate()
+- 'bbox' (list): Bounding box coordinates</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple containing:
+- best_text (str or None): Text of highest-scoring candidate,
+or None if candidates list is empty
+- best_confidence (float): Confidence of best candidate,
+or 0.0 if no candidates</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>KeyError</code></dt>
+<dd>If candidate dict missing required keys.</dd>
+<dt><code>ValueError</code></dt>
+<dd>If candidates list contains invalid data.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; candidates = [
+...     {'text': '12ABC345', 'confidence': 0.95, 'score': 0.475},
+...     {'text': 'HEADER', 'confidence': 0.80, 'score': 0.200}
+... ]
+&gt;&gt;&gt; text, conf = select_best_candidate(candidates)
+&gt;&gt;&gt; print(f&quot;Best: {text} ({conf:.2f})&quot;)
+Best: 12ABC345 (0.95)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Selects candidate with highest 'score' value</li>
+<li>Returns None if candidates list is empty (no valid text found)</li>
+<li>Used as final step in recognize_text() post-processing</li>
+<li>Handles ties by selecting first candidate (stable sort)</li>
+</ul></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src.recognition" href="index.html">src.recognition</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.recognition.utils.correct_ocr_confusions" href="#src.recognition.utils.correct_ocr_confusions">correct_ocr_confusions</a></code></li>
+<li><code><a title="src.recognition.utils.filter_by_regex" href="#src.recognition.utils.filter_by_regex">filter_by_regex</a></code></li>
+<li><code><a title="src.recognition.utils.score_candidate" href="#src.recognition.utils.score_candidate">score_candidate</a></code></li>
+<li><code><a title="src.recognition.utils.select_best_candidate" href="#src.recognition.utils.select_best_candidate">select_best_candidate</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

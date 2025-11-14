@@ -1,0 +1,1354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>src.pipeline API documentation</title>
+<meta name="description" content="ALPR Pipeline Module …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.pipeline</code></h1>
+</header>
+<section id="section-intro">
+<p>ALPR Pipeline Module</p>
+<p>Orchestrates the complete detection → recognition → tracking workflow.</p>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="src.pipeline.alpr_pipeline" href="alpr_pipeline.html">src.pipeline.alpr_pipeline</a></code></dt>
+<dd>
+<div class="desc"><p>End-to-End ALPR Pipeline Module …</p></div>
+</dd>
+<dt><code class="name"><a title="src.pipeline.utils" href="utils.html">src.pipeline.utils</a></code></dt>
+<dd>
+<div class="desc"><p>Pipeline Utility Functions …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="src.pipeline.create_side_by_side_comparison"><code class="name flex">
+<span>def <span class="ident">create_side_by_side_comparison</span></span>(<span>original_frame: numpy.ndarray, annotated_frame: numpy.ndarray) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_side_by_side_comparison(
+    original_frame: np.ndarray, annotated_frame: np.ndarray
+) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Create side-by-side comparison of original and annotated frames.
+
+    Useful for visualization and debugging.
+
+    Args:
+        original_frame: Original input frame
+        annotated_frame: Frame with annotations
+
+    Returns:
+        np.ndarray: Horizontally concatenated frames with labels
+
+    Example:
+        &gt;&gt;&gt; comparison = create_side_by_side_comparison(frame, annotated)
+        &gt;&gt;&gt; cv2.imwrite(&#39;comparison.jpg&#39;, comparison)
+    &#34;&#34;&#34;
+    # Ensure both frames have same height
+    h1, h2 = original_frame.shape[0], annotated_frame.shape[0]
+
+    if h1 != h2:
+        # Resize to match height
+        if h1 &gt; h2:
+            annotated_frame = cv2.resize(
+                annotated_frame, (int(annotated_frame.shape[1] * h1 / h2), h1)
+            )
+        else:
+            original_frame = cv2.resize(
+                original_frame, (int(original_frame.shape[1] * h2 / h1), h2)
+            )
+
+    # Add text labels
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(original_frame, &#34;Original&#34;, (10, 30), font, 1, (255, 255, 255), 2)
+    cv2.putText(annotated_frame, &#34;ALPR Results&#34;, (10, 30), font, 1, (255, 255, 255), 2)
+
+    # Concatenate horizontally
+    comparison = np.hstack([original_frame, annotated_frame])
+
+    return comparison</code></pre>
+</details>
+<div class="desc"><p>Create side-by-side comparison of original and annotated frames.</p>
+<p>Useful for visualization and debugging.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>original_frame</code></strong></dt>
+<dd>Original input frame</dd>
+<dt><strong><code>annotated_frame</code></strong></dt>
+<dd>Frame with annotations</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>Horizontally concatenated frames with labels</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; comparison = create_side_by_side_comparison(frame, annotated)
+&gt;&gt;&gt; cv2.imwrite('comparison.jpg', comparison)
+</code></pre></div>
+</dd>
+<dt id="src.pipeline.draw_tracks_on_frame"><code class="name flex">
+<span>def <span class="ident">draw_tracks_on_frame</span></span>(<span>frame: numpy.ndarray,<br>tracks: Dict[int, <a title="src.tracking.tracker.PlateTrack" href="../tracking/tracker.html#src.tracking.tracker.PlateTrack">PlateTrack</a>],<br>show_text: bool = True,<br>show_track_id: bool = True,<br>show_confidence: bool = True,<br>box_color: Tuple[int, int, int] = (0, 255, 0),<br>text_color: Tuple[int, int, int] = (255, 255, 255),<br>box_thickness: int = 2,<br>font_scale: float = 0.6) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def draw_tracks_on_frame(
+    frame: np.ndarray,
+    tracks: Dict[int, PlateTrack],
+    show_text: bool = True,
+    show_track_id: bool = True,
+    show_confidence: bool = True,
+    box_color: Tuple[int, int, int] = (0, 255, 0),
+    text_color: Tuple[int, int, int] = (255, 255, 255),
+    box_thickness: int = 2,
+    font_scale: float = 0.6,
+) -&gt; np.ndarray:
+    &#34;&#34;&#34;
+    Draw tracked plates with annotations on frame.
+
+    Visualizes all active tracks by drawing bounding boxes and optional
+    text labels (plate text, track ID, confidence) on a copy of the frame.
+
+    Args:
+        frame: Input frame in BGR format (will be copied)
+        tracks: Dictionary of active PlateTrack objects
+        show_text: Display recognized plate text
+        show_track_id: Display track ID number
+        show_confidence: Display OCR confidence score
+        box_color: BGR color for bounding boxes (default: green)
+        text_color: BGR color for text labels (default: white)
+        box_thickness: Line thickness for boxes
+        font_scale: Scale factor for text size
+
+    Returns:
+        np.ndarray: Annotated frame copy with visualizations
+
+    Example:
+        &gt;&gt;&gt; annotated = draw_tracks_on_frame(frame, tracks, show_text=True)
+        &gt;&gt;&gt; cv2.imshow(&#39;ALPR Results&#39;, annotated)
+        &gt;&gt;&gt; cv2.waitKey(1)
+
+    Note:
+        - Only draws active tracks (is_active=True)
+        - Text is drawn below the bounding box
+        - Colors use BGR format (OpenCV convention)
+    &#34;&#34;&#34;
+    # Create copy to avoid modifying original
+    annotated = frame.copy()
+
+    # Draw each active track
+    for track_id, track in tracks.items():
+        if not track.is_active:
+            continue
+
+        # Extract bbox coordinates
+        x1, y1, x2, y2 = track.bbox
+
+        # Draw bounding box
+        cv2.rectangle(annotated, (x1, y1), (x2, y2), box_color, box_thickness)
+
+        # Build text label
+        label_parts = []
+
+        if show_track_id:
+            label_parts.append(f&#34;ID:{track_id}&#34;)
+
+        if show_text and track.text:
+            label_parts.append(track.text)
+
+        if show_confidence and track.text:
+            label_parts.append(f&#34;({track.ocr_confidence:.2f})&#34;)
+
+        # Draw text label if there&#39;s anything to show
+        if label_parts:
+            label = &#34; &#34;.join(label_parts)
+
+            # Calculate text size for background
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            (text_width, text_height), baseline = cv2.getTextSize(label, font, font_scale, 1)
+
+            # Draw text background (black rectangle)
+            text_x = x1
+            text_y = y2 + text_height + 10
+
+            # Ensure text stays within frame
+            if text_y + baseline &gt; frame.shape[0]:
+                text_y = y1 - 10  # Draw above box if no space below
+
+            cv2.rectangle(
+                annotated,
+                (text_x, text_y - text_height - baseline),
+                (text_x + text_width, text_y + baseline),
+                (0, 0, 0),  # Black background
+                cv2.FILLED,
+            )
+
+            # Draw text
+            cv2.putText(
+                annotated, label, (text_x, text_y), font, font_scale, text_color, 1, cv2.LINE_AA
+            )
+
+    return annotated</code></pre>
+</details>
+<div class="desc"><p>Draw tracked plates with annotations on frame.</p>
+<p>Visualizes all active tracks by drawing bounding boxes and optional
+text labels (plate text, track ID, confidence) on a copy of the frame.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame</code></strong></dt>
+<dd>Input frame in BGR format (will be copied)</dd>
+<dt><strong><code>tracks</code></strong></dt>
+<dd>Dictionary of active PlateTrack objects</dd>
+<dt><strong><code>show_text</code></strong></dt>
+<dd>Display recognized plate text</dd>
+<dt><strong><code>show_track_id</code></strong></dt>
+<dd>Display track ID number</dd>
+<dt><strong><code>show_confidence</code></strong></dt>
+<dd>Display OCR confidence score</dd>
+<dt><strong><code>box_color</code></strong></dt>
+<dd>BGR color for bounding boxes (default: green)</dd>
+<dt><strong><code>text_color</code></strong></dt>
+<dd>BGR color for text labels (default: white)</dd>
+<dt><strong><code>box_thickness</code></strong></dt>
+<dd>Line thickness for boxes</dd>
+<dt><strong><code>font_scale</code></strong></dt>
+<dd>Scale factor for text size</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>np.ndarray</code></dt>
+<dd>Annotated frame copy with visualizations</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; annotated = draw_tracks_on_frame(frame, tracks, show_text=True)
+&gt;&gt;&gt; cv2.imshow('ALPR Results', annotated)
+&gt;&gt;&gt; cv2.waitKey(1)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Only draws active tracks (is_active=True)</li>
+<li>Text is drawn below the bounding box</li>
+<li>Colors use BGR format (OpenCV convention)</li>
+</ul></div>
+</dd>
+<dt id="src.pipeline.format_track_summary"><code class="name flex">
+<span>def <span class="ident">format_track_summary</span></span>(<span>tracks: Dict[int, <a title="src.tracking.tracker.PlateTrack" href="../tracking/tracker.html#src.tracking.tracker.PlateTrack">PlateTrack</a>],<br>verbose: bool = False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def format_track_summary(tracks: Dict[int, PlateTrack], verbose: bool = False) -&gt; str:
+    &#34;&#34;&#34;
+    Format track information as human-readable string.
+
+    Args:
+        tracks: Dictionary of PlateTrack objects
+        verbose: Include detailed per-track information
+
+    Returns:
+        str: Formatted summary string
+
+    Example:
+        &gt;&gt;&gt; summary = format_track_summary(tracks, verbose=True)
+        &gt;&gt;&gt; print(summary)
+        Active Tracks: 3
+        ================
+        Track 1: &#34;ABC123&#34; (conf=0.95, age=45)
+        Track 2: &#34;XYZ789&#34; (conf=0.87, age=12)
+        Track 3: No text (age=2)
+    &#34;&#34;&#34;
+    active_tracks = {tid: t for tid, t in tracks.items() if t.is_active}
+
+    lines = []
+    lines.append(f&#34;Active Tracks: {len(active_tracks)}&#34;)
+
+    if verbose and active_tracks:
+        lines.append(&#34;=&#34; * 40)
+        for track_id, track in sorted(active_tracks.items()):
+            if track.text:
+                lines.append(
+                    f&#39;Track {track_id}: &#34;{track.text}&#34; &#39;
+                    f&#34;(conf={track.ocr_confidence:.2f}, age={track.age})&#34;
+                )
+            else:
+                lines.append(f&#34;Track {track_id}: No text (age={track.age})&#34;)
+
+    return &#34;\n&#34;.join(lines)</code></pre>
+</details>
+<div class="desc"><p>Format track information as human-readable string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tracks</code></strong></dt>
+<dd>Dictionary of PlateTrack objects</dd>
+<dt><strong><code>verbose</code></strong></dt>
+<dd>Include detailed per-track information</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Formatted summary string</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; summary = format_track_summary(tracks, verbose=True)
+&gt;&gt;&gt; print(summary)
+Active Tracks: 3
+================
+Track 1: &quot;ABC123&quot; (conf=0.95, age=45)
+Track 2: &quot;XYZ789&quot; (conf=0.87, age=12)
+Track 3: No text (age=2)
+</code></pre></div>
+</dd>
+<dt id="src.pipeline.log_pipeline_performance"><code class="name flex">
+<span>def <span class="ident">log_pipeline_performance</span></span>(<span>frame_count: int, processing_time: float, track_count: int, ocr_count: int) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def log_pipeline_performance(
+    frame_count: int, processing_time: float, track_count: int, ocr_count: int
+) -&gt; None:
+    &#34;&#34;&#34;
+    Log pipeline performance metrics.
+
+    Args:
+        frame_count: Number of frames processed
+        processing_time: Total processing time in seconds
+        track_count: Number of active tracks
+        ocr_count: Number of OCR operations performed
+
+    Example:
+        &gt;&gt;&gt; import time
+        &gt;&gt;&gt; start = time.time()
+        &gt;&gt;&gt; # ... process frames ...
+        &gt;&gt;&gt; elapsed = time.time() - start
+        &gt;&gt;&gt; log_pipeline_performance(100, elapsed, 5, 23)
+    &#34;&#34;&#34;
+    fps = frame_count / processing_time if processing_time &gt; 0 else 0
+    avg_time = processing_time / frame_count if frame_count &gt; 0 else 0
+
+    logger.info(&#34;=&#34; * 60)
+    logger.info(&#34;Pipeline Performance Summary&#34;)
+    logger.info(&#34;=&#34; * 60)
+    logger.info(f&#34;Total frames processed: {frame_count}&#34;)
+    logger.info(f&#34;Total processing time: {processing_time:.2f}s&#34;)
+    logger.info(f&#34;Average FPS: {fps:.2f}&#34;)
+    logger.info(f&#34;Average time per frame: {avg_time * 1000:.2f}ms&#34;)
+    logger.info(f&#34;Active tracks: {track_count}&#34;)
+    logger.info(f&#34;OCR operations: {ocr_count}&#34;)
+    logger.info(&#34;=&#34; * 60)</code></pre>
+</details>
+<div class="desc"><p>Log pipeline performance metrics.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame_count</code></strong></dt>
+<dd>Number of frames processed</dd>
+<dt><strong><code>processing_time</code></strong></dt>
+<dd>Total processing time in seconds</dd>
+<dt><strong><code>track_count</code></strong></dt>
+<dd>Number of active tracks</dd>
+<dt><strong><code>ocr_count</code></strong></dt>
+<dd>Number of OCR operations performed</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; import time
+&gt;&gt;&gt; start = time.time()
+&gt;&gt;&gt; # ... process frames ...
+&gt;&gt;&gt; elapsed = time.time() - start
+&gt;&gt;&gt; log_pipeline_performance(100, elapsed, 5, 23)
+</code></pre></div>
+</dd>
+<dt id="src.pipeline.save_results_json"><code class="name flex">
+<span>def <span class="ident">save_results_json</span></span>(<span>tracks: Dict[int, <a title="src.tracking.tracker.PlateTrack" href="../tracking/tracker.html#src.tracking.tracker.PlateTrack">PlateTrack</a>],<br>output_path: str,<br>frame_number: int | None = None,<br>timestamp: str | None = None) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_results_json(
+    tracks: Dict[int, PlateTrack],
+    output_path: str,
+    frame_number: Optional[int] = None,
+    timestamp: Optional[str] = None,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Save pipeline results to JSON file.
+
+    Args:
+        tracks: Dictionary of PlateTrack objects
+        output_path: Path to output JSON file
+        frame_number: Optional frame number for context
+        timestamp: Optional timestamp string
+
+    Example:
+        &gt;&gt;&gt; save_results_json(tracks, &#39;outputs/results_frame_100.json&#39;, frame_number=100)
+    &#34;&#34;&#34;
+    # Build output dictionary
+    output = {
+        &#34;timestamp&#34;: timestamp or datetime.now().isoformat(),
+        &#34;frame_number&#34;: frame_number,
+        &#34;track_count&#34;: len(tracks),
+        &#34;tracks&#34;: serialize_tracks(tracks, include_inactive=False),
+    }
+
+    # Write to file
+    try:
+        with open(output_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as f:
+            json.dump(output, f, indent=2, ensure_ascii=False)
+        logger.info(f&#34;Results saved to: {output_path}&#34;)
+    except Exception as e:
+        logger.error(f&#34;Failed to save results: {e}&#34;)
+        raise</code></pre>
+</details>
+<div class="desc"><p>Save pipeline results to JSON file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tracks</code></strong></dt>
+<dd>Dictionary of PlateTrack objects</dd>
+<dt><strong><code>output_path</code></strong></dt>
+<dd>Path to output JSON file</dd>
+<dt><strong><code>frame_number</code></strong></dt>
+<dd>Optional frame number for context</dd>
+<dt><strong><code>timestamp</code></strong></dt>
+<dd>Optional timestamp string</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; save_results_json(tracks, 'outputs/results_frame_100.json', frame_number=100)
+</code></pre></div>
+</dd>
+<dt id="src.pipeline.serialize_tracks"><code class="name flex">
+<span>def <span class="ident">serialize_tracks</span></span>(<span>tracks: Dict[int, <a title="src.tracking.tracker.PlateTrack" href="../tracking/tracker.html#src.tracking.tracker.PlateTrack">PlateTrack</a>],<br>include_inactive: bool = False) ‑> List[dict]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def serialize_tracks(tracks: Dict[int, PlateTrack], include_inactive: bool = False) -&gt; List[dict]:
+    &#34;&#34;&#34;
+    Convert tracks to serializable dictionary format.
+
+    Useful for saving results to JSON or logging.
+
+    Args:
+        tracks: Dictionary of PlateTrack objects
+        include_inactive: Include lost/inactive tracks in output
+
+    Returns:
+        List of dictionaries, each containing:
+        - track_id: Unique track identifier
+        - bbox: Bounding box [x1, y1, x2, y2]
+        - text: Recognized plate text (or null)
+        - ocr_confidence: OCR confidence score
+        - detection_confidence: Detection confidence
+        - age: Track age in frames
+        - is_active: Active status
+
+    Example:
+        &gt;&gt;&gt; tracks_json = serialize_tracks(tracks)
+        &gt;&gt;&gt; with open(&#39;results.json&#39;, &#39;w&#39;) as f:
+        ...     json.dump(tracks_json, f, indent=2)
+    &#34;&#34;&#34;
+    serialized = []
+
+    for track_id, track in tracks.items():
+        # Skip inactive if not requested
+        if not include_inactive and not track.is_active:
+            continue
+
+        serialized.append(
+            {
+                &#34;track_id&#34;: track.id,
+                &#34;bbox&#34;: list(track.bbox),
+                &#34;text&#34;: track.text,
+                &#34;ocr_confidence&#34;: round(track.ocr_confidence, 3),
+                &#34;detection_confidence&#34;: round(track.detection_confidence, 3),
+                &#34;age&#34;: track.age,
+                &#34;frames_since_last_ocr&#34;: track.frames_since_last_ocr,
+                &#34;is_active&#34;: track.is_active,
+            }
+        )
+
+    return serialized</code></pre>
+</details>
+<div class="desc"><p>Convert tracks to serializable dictionary format.</p>
+<p>Useful for saving results to JSON or logging.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>tracks</code></strong></dt>
+<dd>Dictionary of PlateTrack objects</dd>
+<dt><strong><code>include_inactive</code></strong></dt>
+<dd>Include lost/inactive tracks in output</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>List of dictionaries, each containing:
+- track_id: Unique track identifier
+- bbox: Bounding box [x1, y1, x2, y2]
+- text: Recognized plate text (or null)
+- ocr_confidence: OCR confidence score
+- detection_confidence: Detection confidence
+- age: Track age in frames
+- is_active: Active status</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tracks_json = serialize_tracks(tracks)
+&gt;&gt;&gt; with open('results.json', 'w') as f:
+...     json.dump(tracks_json, f, indent=2)
+</code></pre></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.pipeline.ALPRPipeline"><code class="flex name class">
+<span>class <span class="ident">ALPRPipeline</span></span>
+<span>(</span><span>config_path: str)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ALPRPipeline:
+    &#34;&#34;&#34;
+    End-to-end Automatic License Plate Recognition pipeline.
+
+    This class coordinates all ALPR components to process video frames:
+    1. Detection + Tracking: Uses YOLOv8 with ByteTrack for plate detection and tracking
+    2. Track Management: Creates and updates PlateTrack objects for each detection
+    3. Conditional OCR: Runs OCR only when needed based on track state
+    4. Cleanup: Removes lost tracks to prevent memory leaks
+
+    Attributes:
+        config (dict): Full pipeline configuration loaded from YAML
+        detection_model: Loaded YOLOv8 model for plate detection
+        ocr_model: Loaded PaddleOCR model for text recognition
+        tracks (Dict[int, PlateTrack]): Active tracks indexed by track ID
+        frame_count (int): Number of frames processed
+
+    Example:
+        &gt;&gt;&gt; pipeline = ALPRPipeline(&#39;configs/pipeline_config.yaml&#39;)
+        &gt;&gt;&gt; import cv2
+        &gt;&gt;&gt; frame = cv2.imread(&#39;test_frame.jpg&#39;)
+        &gt;&gt;&gt; tracks = pipeline.process_frame(frame)
+        &gt;&gt;&gt; for track_id, track in tracks.items():
+        ...     if track.text:
+        ...         print(f&#34;Track {track_id}: {track.text} ({track.ocr_confidence:.2f})&#34;)
+    &#34;&#34;&#34;
+
+    def __init__(self, config_path: str):
+        &#34;&#34;&#34;
+        Initialize ALPR pipeline with configuration.
+
+        Loads configuration from YAML file and initializes all models.
+
+        Args:
+            config_path: Path to pipeline configuration YAML file
+
+        Raises:
+            FileNotFoundError: If config file doesn&#39;t exist
+            ValueError: If configuration validation fails
+            RuntimeError: If model initialization fails
+
+        Note:
+            - Configuration is automatically validated before use
+            - Model loading may take several seconds on first run
+            - GPU will be used if available for both detection and recognition
+            - Logs detailed initialization information
+        &#34;&#34;&#34;
+        logger.info(&#34;=&#34; * 60)
+        logger.info(&#34;Initializing ALPR Pipeline&#34;)
+        logger.info(&#34;=&#34; * 60)
+
+        # Load configuration
+        logger.info(f&#34;Loading configuration from: {config_path}&#34;)
+        try:
+            with open(config_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as f:
+                self.config = yaml.safe_load(f)
+            logger.info(&#34;✓ Configuration loaded successfully&#34;)
+        except FileNotFoundError:
+            logger.error(f&#34;Configuration file not found: {config_path}&#34;)
+            raise
+        except Exception as e:
+            logger.error(f&#34;Failed to load configuration: {e}&#34;)
+            raise RuntimeError(f&#34;Configuration loading failed: {e}&#34;)
+
+        # Validate configuration
+        logger.info(&#34;Validating configuration...&#34;)
+        try:
+            # Import validation utility
+            from scripts.utils.validate_config import ConfigValidator
+
+            validator = ConfigValidator(config_path)
+            is_valid, errors = validator.validate()
+
+            if not is_valid:
+                error_msg = &#34;Configuration validation failed:\n&#34; + &#34;\n&#34;.join(
+                    f&#34;  - {error}&#34; for error in errors
+                )
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+
+            logger.info(&#34;✓ Configuration validated successfully&#34;)
+        except ImportError:
+            logger.warning(
+                &#34;Configuration validation utility not found, skipping validation&#34;
+            )
+        except Exception as e:
+            logger.error(f&#34;Configuration validation failed: {e}&#34;)
+            raise
+
+        # Initialize detection model
+        logger.info(&#34;Loading detection model...&#34;)
+        try:
+            self.detection_model = load_detection_model(
+                model_path=self.config[&#34;detection&#34;][&#34;model_path&#34;],
+                device=self.config[&#34;detection&#34;][&#34;device&#34;],
+            )
+            logger.info(&#34;✓ Detection model loaded&#34;)
+        except Exception as e:
+            logger.error(f&#34;Failed to load detection model: {e}&#34;)
+            raise RuntimeError(f&#34;Detection model initialization failed: {e}&#34;)
+
+        # Initialize OCR model
+        logger.info(&#34;Loading OCR model...&#34;)
+        try:
+            self.ocr_model = load_ocr_model(self.config[&#34;recognition&#34;])
+            logger.info(&#34;✓ OCR model loaded&#34;)
+        except Exception as e:
+            logger.error(f&#34;Failed to load OCR model: {e}&#34;)
+            raise RuntimeError(f&#34;OCR model initialization failed: {e}&#34;)
+
+        # Initialize track storage
+        self.tracks: Dict[int, PlateTrack] = {}
+        self.frame_count = 0
+
+        logger.info(&#34;=&#34; * 60)
+        logger.info(&#34;ALPR Pipeline Initialization Complete&#34;)
+        logger.info(&#34;=&#34; * 60)
+
+    def process_frame(self, frame: np.ndarray) -&gt; Dict[int, PlateTrack]:
+        &#34;&#34;&#34;
+        Process a single video frame through the complete ALPR pipeline.
+
+        Executes the 4-stage pipeline:
+        1. Detection + Tracking: Run YOLOv8 with ByteTrack
+        2. Track Management: Update track states
+        3. Conditional OCR: Run OCR only when needed
+        4. Cleanup: Remove lost tracks
+
+        Args:
+            frame: Input frame in BGR format (OpenCV convention)
+                  Shape: (height, width, 3)
+
+        Returns:
+            Dict[int, PlateTrack]: Dictionary of active tracks indexed by track ID.
+                                  Each PlateTrack contains current state including
+                                  bbox, text, confidence, and age.
+
+        Raises:
+            ValueError: If frame is invalid
+            RuntimeError: If processing fails
+
+        Example:
+            &gt;&gt;&gt; tracks = pipeline.process_frame(frame)
+            &gt;&gt;&gt; print(f&#34;Active tracks: {len(tracks)}&#34;)
+            &gt;&gt;&gt; for track_id, track in tracks.items():
+            ...     print(f&#34;  {track_id}: {track.text or &#39;No text&#39;} &#34;
+            ...           f&#34;(age={track.age}, conf={track.ocr_confidence:.2f})&#34;)
+
+        Note:
+            - Track IDs persist across frames (ByteTrack maintains identity)
+            - OCR is only run when should_run_ocr() returns True
+            - Lost tracks are kept for max_age frames before removal
+        &#34;&#34;&#34;
+        # Validate input
+        if not isinstance(frame, np.ndarray):
+            raise ValueError(f&#34;Frame must be numpy array, got {type(frame)}&#34;)
+        if frame.ndim != 3 or frame.shape[2] != 3:
+            raise ValueError(f&#34;Frame must be BGR image with shape (H, W, 3), got {frame.shape}&#34;)
+
+        logger.debug(f&#34;Processing frame {self.frame_count} (shape={frame.shape})&#34;)
+
+        # ===== Stage 1: Detection + Tracking =====
+        logger.debug(&#34;Stage 1: Running detection + tracking&#34;)
+
+        try:
+            # Run YOLOv8 tracking (ByteTrack integration)
+            results = self.detection_model.track(
+                source=frame,
+                conf=self.config[&#34;detection&#34;][&#34;confidence_threshold&#34;],
+                iou=self.config[&#34;detection&#34;][&#34;iou_threshold&#34;],
+                tracker=&#34;bytetrack.yaml&#34;,
+                persist=True,  # Crucial: maintains track IDs across frames
+                verbose=False,
+            )
+        except Exception as e:
+            logger.error(f&#34;Detection + tracking failed: {e}&#34;)
+            raise RuntimeError(f&#34;Detection stage failed: {e}&#34;)
+
+        # ===== Stage 2: Update Track States =====
+        logger.debug(&#34;Stage 2: Updating track states&#34;)
+
+        current_track_ids = set()
+        ocr_count = 0
+
+        # Parse detection results
+        for result in results:
+            # Check if any detections exist
+            if not hasattr(result, &#34;boxes&#34;) or result.boxes is None:
+                logger.debug(&#34;No detections in this frame&#34;)
+                continue
+
+            boxes = result.boxes
+
+            # Check if tracks exist
+            if boxes.id is None:
+                logger.debug(&#34;No tracks assigned by ByteTrack&#34;)
+                continue
+
+            # Process each tracked detection
+            for box in boxes:
+                # Extract track information
+                track_id = int(box.id.item())
+                bbox = box.xyxy[0].cpu().numpy()  # [x1, y1, x2, y2]
+                confidence = float(box.conf.item())
+
+                # Convert bbox to tuple of integers
+                bbox_tuple = tuple(map(int, bbox))
+
+                # Create new track or update existing
+                if track_id not in self.tracks:
+                    self.tracks[track_id] = PlateTrack(
+                        track_id=track_id, bbox=bbox_tuple, confidence=confidence
+                    )
+                    logger.info(
+                        f&#34;New track detected: ID={track_id}, bbox={bbox_tuple}, conf={
+                            confidence:.3f}&#34;
+                    )
+                else:
+                    self.tracks[track_id].update(bbox=bbox_tuple, confidence=confidence)
+                    logger.debug(f&#34;Track updated: ID={track_id}, age={self.tracks[track_id].age}&#34;)
+
+                current_track_ids.add(track_id)
+
+                # ===== Stage 3: Conditional OCR =====
+                track = self.tracks[track_id]
+
+                # Check if OCR should be run for this track
+                if track.should_run_ocr(self.config[&#34;tracking&#34;]):
+                    logger.debug(
+                        f&#34;OCR triggered for track {track_id} &#34;
+                        f&#34;(age={
+                            track.age}, frames_since_last_ocr={
+                            track.frames_since_last_ocr})&#34;
+                    )
+
+                    try:
+                        # Crop plate from frame
+                        x1, y1, x2, y2 = bbox_tuple
+                        cropped = frame[y1:y2, x1:x2]
+
+                        if cropped.size == 0:
+                            logger.warning(f&#34;Empty crop for track {track_id}, skipping OCR&#34;)
+                            continue
+
+                        # Use adaptive preprocessing (handled internally by recognize_text)
+                        preprocessing_config = self.config.get(&#34;preprocessing&#34;, {})
+                        use_adaptive_preprocessing = preprocessing_config.get(
+                            &#34;enable_enhancement&#34;, False
+                        )
+
+                        # Run OCR with adaptive preprocessing enabled
+                        text, ocr_conf = recognize_text(
+                            preprocessed_image=cropped,
+                            ocr_model=self.ocr_model,
+                            config=self.config[&#34;recognition&#34;],
+                            enable_adaptive_preprocessing=use_adaptive_preprocessing,
+                            preprocessing_config=preprocessing_config,
+                        )
+
+                        # Update track with OCR results
+                        track.update_text(text=text, confidence=ocr_conf)
+                        ocr_count += 1
+
+                        if text:
+                            logger.info(
+                                f&#39;Track {track_id} recognized: &#34;{text}&#34; (confidence={
+                                    ocr_conf:.3f})&#39;
+                            )
+                        else:
+                            logger.debug(f&#34;Track {track_id}: No valid text recognized&#34;)
+
+                    except Exception as e:
+                        logger.error(f&#34;OCR failed for track {track_id}: {e}&#34;)
+                        # Continue processing other tracks
+                        continue
+
+        # ===== Stage 4: Cleanup Lost Tracks =====
+        logger.debug(&#34;Stage 4: Cleaning up lost tracks&#34;)
+
+        # Mark tracks that disappeared as lost
+        lost_track_ids = set(self.tracks.keys()) - current_track_ids
+
+        for track_id in lost_track_ids:
+            self.tracks[track_id].mark_lost()
+            logger.debug(f&#34;Track {track_id} marked as lost&#34;)
+
+        # Remove inactive tracks older than max_age
+        max_age = self.config[&#34;tracking&#34;].get(&#34;max_age&#34;, 30)
+        initial_count = len(self.tracks)
+
+        self.tracks = {
+            tid: track
+            for tid, track in self.tracks.items()
+            if track.is_active or track.age &lt; max_age
+        }
+
+        removed_count = initial_count - len(self.tracks)
+        if removed_count &gt; 0:
+            logger.info(f&#34;Removed {removed_count} old lost tracks&#34;)
+
+        # Increment frame counter
+        self.frame_count += 1
+
+        # Log summary
+        summary = get_track_summary(self.tracks)
+        logger.info(
+            f&#39;Frame {self.frame_count}: {summary[&#34;active&#34;]} active tracks, &#39;
+            f&#39;{summary[&#34;recognized&#34;]} recognized, {ocr_count} OCR runs&#39;
+        )
+
+        return self.tracks
+
+    def reset(self) -&gt; None:
+        &#34;&#34;&#34;
+        Reset pipeline state (clear all tracks and counters).
+
+        Useful when starting to process a new video or after processing is complete.
+
+        Example:
+            &gt;&gt;&gt; pipeline.reset()
+            &gt;&gt;&gt; print(f&#34;Tracks cleared: {len(pipeline.tracks)}&#34;)
+            Tracks cleared: 0
+        &#34;&#34;&#34;
+        logger.info(&#34;Resetting pipeline state&#34;)
+        self.tracks.clear()
+        self.frame_count = 0
+        logger.info(&#34;Pipeline reset complete&#34;)
+
+    def get_statistics(self) -&gt; dict:
+        &#34;&#34;&#34;
+        Get current pipeline statistics.
+
+        Returns:
+            dict: Statistics including:
+                - frame_count: Total frames processed
+                - track_count: Current active track count
+                - recognized_count: Tracks with recognized text
+                - avg_track_age: Average track age
+                - avg_ocr_confidence: Average OCR confidence
+
+        Example:
+            &gt;&gt;&gt; stats = pipeline.get_statistics()
+            &gt;&gt;&gt; print(f&#34;Processed {stats[&#39;frame_count&#39;]} frames, &#34;
+            ...       f&#34;{stats[&#39;recognized_count&#39;]} plates recognized&#34;)
+        &#34;&#34;&#34;
+        summary = get_track_summary(self.tracks)
+
+        return {
+            &#34;frame_count&#34;: self.frame_count,
+            &#34;track_count&#34;: summary[&#34;total&#34;],
+            &#34;active_count&#34;: summary[&#34;active&#34;],
+            &#34;recognized_count&#34;: summary[&#34;recognized&#34;],
+            &#34;avg_track_age&#34;: summary[&#34;avg_age&#34;],
+            &#34;avg_ocr_confidence&#34;: summary[&#34;avg_ocr_confidence&#34;],
+        }
+
+    def __repr__(self) -&gt; str:
+        &#34;&#34;&#34;String representation for debugging.&#34;&#34;&#34;
+        stats = self.get_statistics()
+        return (
+            f&#34;ALPRPipeline(frames={stats[&#39;frame_count&#39;]}, &#34;
+            f&#34;tracks={stats[&#39;track_count&#39;]}, &#34;
+            f&#34;recognized={stats[&#39;recognized_count&#39;]})&#34;
+        )</code></pre>
+</details>
+<div class="desc"><p>End-to-end Automatic License Plate Recognition pipeline.</p>
+<p>This class coordinates all ALPR components to process video frames:
+1. Detection + Tracking: Uses YOLOv8 with ByteTrack for plate detection and tracking
+2. Track Management: Creates and updates PlateTrack objects for each detection
+3. Conditional OCR: Runs OCR only when needed based on track state
+4. Cleanup: Removes lost tracks to prevent memory leaks</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>config</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Full pipeline configuration loaded from YAML</dd>
+<dt><strong><code>detection_model</code></strong></dt>
+<dd>Loaded YOLOv8 model for plate detection</dd>
+<dt><strong><code>ocr_model</code></strong></dt>
+<dd>Loaded PaddleOCR model for text recognition</dd>
+<dt><strong><code>tracks</code></strong> :&ensp;<code>Dict[int, PlateTrack]</code></dt>
+<dd>Active tracks indexed by track ID</dd>
+<dt><strong><code>frame_count</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of frames processed</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; pipeline = ALPRPipeline('configs/pipeline_config.yaml')
+&gt;&gt;&gt; import cv2
+&gt;&gt;&gt; frame = cv2.imread('test_frame.jpg')
+&gt;&gt;&gt; tracks = pipeline.process_frame(frame)
+&gt;&gt;&gt; for track_id, track in tracks.items():
+...     if track.text:
+...         print(f&quot;Track {track_id}: {track.text} ({track.ocr_confidence:.2f})&quot;)
+</code></pre>
+<p>Initialize ALPR pipeline with configuration.</p>
+<p>Loads configuration from YAML file and initializes all models.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>config_path</code></strong></dt>
+<dd>Path to pipeline configuration YAML file</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If config file doesn't exist</dd>
+<dt><code>ValueError</code></dt>
+<dd>If configuration validation fails</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If model initialization fails</dd>
+</dl>
+<h2 id="note">Note</h2>
+<ul>
+<li>Configuration is automatically validated before use</li>
+<li>Model loading may take several seconds on first run</li>
+<li>GPU will be used if available for both detection and recognition</li>
+<li>Logs detailed initialization information</li>
+</ul></div>
+<h3>Methods</h3>
+<dl>
+<dt id="src.pipeline.ALPRPipeline.get_statistics"><code class="name flex">
+<span>def <span class="ident">get_statistics</span></span>(<span>self) ‑> dict</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_statistics(self) -&gt; dict:
+    &#34;&#34;&#34;
+    Get current pipeline statistics.
+
+    Returns:
+        dict: Statistics including:
+            - frame_count: Total frames processed
+            - track_count: Current active track count
+            - recognized_count: Tracks with recognized text
+            - avg_track_age: Average track age
+            - avg_ocr_confidence: Average OCR confidence
+
+    Example:
+        &gt;&gt;&gt; stats = pipeline.get_statistics()
+        &gt;&gt;&gt; print(f&#34;Processed {stats[&#39;frame_count&#39;]} frames, &#34;
+        ...       f&#34;{stats[&#39;recognized_count&#39;]} plates recognized&#34;)
+    &#34;&#34;&#34;
+    summary = get_track_summary(self.tracks)
+
+    return {
+        &#34;frame_count&#34;: self.frame_count,
+        &#34;track_count&#34;: summary[&#34;total&#34;],
+        &#34;active_count&#34;: summary[&#34;active&#34;],
+        &#34;recognized_count&#34;: summary[&#34;recognized&#34;],
+        &#34;avg_track_age&#34;: summary[&#34;avg_age&#34;],
+        &#34;avg_ocr_confidence&#34;: summary[&#34;avg_ocr_confidence&#34;],
+    }</code></pre>
+</details>
+<div class="desc"><p>Get current pipeline statistics.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>Statistics including:
+- frame_count: Total frames processed
+- track_count: Current active track count
+- recognized_count: Tracks with recognized text
+- avg_track_age: Average track age
+- avg_ocr_confidence: Average OCR confidence</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; stats = pipeline.get_statistics()
+&gt;&gt;&gt; print(f&quot;Processed {stats['frame_count']} frames, &quot;
+...       f&quot;{stats['recognized_count']} plates recognized&quot;)
+</code></pre></div>
+</dd>
+<dt id="src.pipeline.ALPRPipeline.process_frame"><code class="name flex">
+<span>def <span class="ident">process_frame</span></span>(<span>self, frame: numpy.ndarray) ‑> Dict[int, <a title="src.tracking.tracker.PlateTrack" href="../tracking/tracker.html#src.tracking.tracker.PlateTrack">PlateTrack</a>]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_frame(self, frame: np.ndarray) -&gt; Dict[int, PlateTrack]:
+    &#34;&#34;&#34;
+    Process a single video frame through the complete ALPR pipeline.
+
+    Executes the 4-stage pipeline:
+    1. Detection + Tracking: Run YOLOv8 with ByteTrack
+    2. Track Management: Update track states
+    3. Conditional OCR: Run OCR only when needed
+    4. Cleanup: Remove lost tracks
+
+    Args:
+        frame: Input frame in BGR format (OpenCV convention)
+              Shape: (height, width, 3)
+
+    Returns:
+        Dict[int, PlateTrack]: Dictionary of active tracks indexed by track ID.
+                              Each PlateTrack contains current state including
+                              bbox, text, confidence, and age.
+
+    Raises:
+        ValueError: If frame is invalid
+        RuntimeError: If processing fails
+
+    Example:
+        &gt;&gt;&gt; tracks = pipeline.process_frame(frame)
+        &gt;&gt;&gt; print(f&#34;Active tracks: {len(tracks)}&#34;)
+        &gt;&gt;&gt; for track_id, track in tracks.items():
+        ...     print(f&#34;  {track_id}: {track.text or &#39;No text&#39;} &#34;
+        ...           f&#34;(age={track.age}, conf={track.ocr_confidence:.2f})&#34;)
+
+    Note:
+        - Track IDs persist across frames (ByteTrack maintains identity)
+        - OCR is only run when should_run_ocr() returns True
+        - Lost tracks are kept for max_age frames before removal
+    &#34;&#34;&#34;
+    # Validate input
+    if not isinstance(frame, np.ndarray):
+        raise ValueError(f&#34;Frame must be numpy array, got {type(frame)}&#34;)
+    if frame.ndim != 3 or frame.shape[2] != 3:
+        raise ValueError(f&#34;Frame must be BGR image with shape (H, W, 3), got {frame.shape}&#34;)
+
+    logger.debug(f&#34;Processing frame {self.frame_count} (shape={frame.shape})&#34;)
+
+    # ===== Stage 1: Detection + Tracking =====
+    logger.debug(&#34;Stage 1: Running detection + tracking&#34;)
+
+    try:
+        # Run YOLOv8 tracking (ByteTrack integration)
+        results = self.detection_model.track(
+            source=frame,
+            conf=self.config[&#34;detection&#34;][&#34;confidence_threshold&#34;],
+            iou=self.config[&#34;detection&#34;][&#34;iou_threshold&#34;],
+            tracker=&#34;bytetrack.yaml&#34;,
+            persist=True,  # Crucial: maintains track IDs across frames
+            verbose=False,
+        )
+    except Exception as e:
+        logger.error(f&#34;Detection + tracking failed: {e}&#34;)
+        raise RuntimeError(f&#34;Detection stage failed: {e}&#34;)
+
+    # ===== Stage 2: Update Track States =====
+    logger.debug(&#34;Stage 2: Updating track states&#34;)
+
+    current_track_ids = set()
+    ocr_count = 0
+
+    # Parse detection results
+    for result in results:
+        # Check if any detections exist
+        if not hasattr(result, &#34;boxes&#34;) or result.boxes is None:
+            logger.debug(&#34;No detections in this frame&#34;)
+            continue
+
+        boxes = result.boxes
+
+        # Check if tracks exist
+        if boxes.id is None:
+            logger.debug(&#34;No tracks assigned by ByteTrack&#34;)
+            continue
+
+        # Process each tracked detection
+        for box in boxes:
+            # Extract track information
+            track_id = int(box.id.item())
+            bbox = box.xyxy[0].cpu().numpy()  # [x1, y1, x2, y2]
+            confidence = float(box.conf.item())
+
+            # Convert bbox to tuple of integers
+            bbox_tuple = tuple(map(int, bbox))
+
+            # Create new track or update existing
+            if track_id not in self.tracks:
+                self.tracks[track_id] = PlateTrack(
+                    track_id=track_id, bbox=bbox_tuple, confidence=confidence
+                )
+                logger.info(
+                    f&#34;New track detected: ID={track_id}, bbox={bbox_tuple}, conf={
+                        confidence:.3f}&#34;
+                )
+            else:
+                self.tracks[track_id].update(bbox=bbox_tuple, confidence=confidence)
+                logger.debug(f&#34;Track updated: ID={track_id}, age={self.tracks[track_id].age}&#34;)
+
+            current_track_ids.add(track_id)
+
+            # ===== Stage 3: Conditional OCR =====
+            track = self.tracks[track_id]
+
+            # Check if OCR should be run for this track
+            if track.should_run_ocr(self.config[&#34;tracking&#34;]):
+                logger.debug(
+                    f&#34;OCR triggered for track {track_id} &#34;
+                    f&#34;(age={
+                        track.age}, frames_since_last_ocr={
+                        track.frames_since_last_ocr})&#34;
+                )
+
+                try:
+                    # Crop plate from frame
+                    x1, y1, x2, y2 = bbox_tuple
+                    cropped = frame[y1:y2, x1:x2]
+
+                    if cropped.size == 0:
+                        logger.warning(f&#34;Empty crop for track {track_id}, skipping OCR&#34;)
+                        continue
+
+                    # Use adaptive preprocessing (handled internally by recognize_text)
+                    preprocessing_config = self.config.get(&#34;preprocessing&#34;, {})
+                    use_adaptive_preprocessing = preprocessing_config.get(
+                        &#34;enable_enhancement&#34;, False
+                    )
+
+                    # Run OCR with adaptive preprocessing enabled
+                    text, ocr_conf = recognize_text(
+                        preprocessed_image=cropped,
+                        ocr_model=self.ocr_model,
+                        config=self.config[&#34;recognition&#34;],
+                        enable_adaptive_preprocessing=use_adaptive_preprocessing,
+                        preprocessing_config=preprocessing_config,
+                    )
+
+                    # Update track with OCR results
+                    track.update_text(text=text, confidence=ocr_conf)
+                    ocr_count += 1
+
+                    if text:
+                        logger.info(
+                            f&#39;Track {track_id} recognized: &#34;{text}&#34; (confidence={
+                                ocr_conf:.3f})&#39;
+                        )
+                    else:
+                        logger.debug(f&#34;Track {track_id}: No valid text recognized&#34;)
+
+                except Exception as e:
+                    logger.error(f&#34;OCR failed for track {track_id}: {e}&#34;)
+                    # Continue processing other tracks
+                    continue
+
+    # ===== Stage 4: Cleanup Lost Tracks =====
+    logger.debug(&#34;Stage 4: Cleaning up lost tracks&#34;)
+
+    # Mark tracks that disappeared as lost
+    lost_track_ids = set(self.tracks.keys()) - current_track_ids
+
+    for track_id in lost_track_ids:
+        self.tracks[track_id].mark_lost()
+        logger.debug(f&#34;Track {track_id} marked as lost&#34;)
+
+    # Remove inactive tracks older than max_age
+    max_age = self.config[&#34;tracking&#34;].get(&#34;max_age&#34;, 30)
+    initial_count = len(self.tracks)
+
+    self.tracks = {
+        tid: track
+        for tid, track in self.tracks.items()
+        if track.is_active or track.age &lt; max_age
+    }
+
+    removed_count = initial_count - len(self.tracks)
+    if removed_count &gt; 0:
+        logger.info(f&#34;Removed {removed_count} old lost tracks&#34;)
+
+    # Increment frame counter
+    self.frame_count += 1
+
+    # Log summary
+    summary = get_track_summary(self.tracks)
+    logger.info(
+        f&#39;Frame {self.frame_count}: {summary[&#34;active&#34;]} active tracks, &#39;
+        f&#39;{summary[&#34;recognized&#34;]} recognized, {ocr_count} OCR runs&#39;
+    )
+
+    return self.tracks</code></pre>
+</details>
+<div class="desc"><p>Process a single video frame through the complete ALPR pipeline.</p>
+<p>Executes the 4-stage pipeline:
+1. Detection + Tracking: Run YOLOv8 with ByteTrack
+2. Track Management: Update track states
+3. Conditional OCR: Run OCR only when needed
+4. Cleanup: Remove lost tracks</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>frame</code></strong></dt>
+<dd>Input frame in BGR format (OpenCV convention)
+Shape: (height, width, 3)</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[int, PlateTrack]</code></dt>
+<dd>Dictionary of active tracks indexed by track ID.
+Each PlateTrack contains current state including
+bbox, text, confidence, and age.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If frame is invalid</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If processing fails</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tracks = pipeline.process_frame(frame)
+&gt;&gt;&gt; print(f&quot;Active tracks: {len(tracks)}&quot;)
+&gt;&gt;&gt; for track_id, track in tracks.items():
+...     print(f&quot;  {track_id}: {track.text or 'No text'} &quot;
+...           f&quot;(age={track.age}, conf={track.ocr_confidence:.2f})&quot;)
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Track IDs persist across frames (ByteTrack maintains identity)</li>
+<li>OCR is only run when should_run_ocr() returns True</li>
+<li>Lost tracks are kept for max_age frames before removal</li>
+</ul></div>
+</dd>
+<dt id="src.pipeline.ALPRPipeline.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self) -&gt; None:
+    &#34;&#34;&#34;
+    Reset pipeline state (clear all tracks and counters).
+
+    Useful when starting to process a new video or after processing is complete.
+
+    Example:
+        &gt;&gt;&gt; pipeline.reset()
+        &gt;&gt;&gt; print(f&#34;Tracks cleared: {len(pipeline.tracks)}&#34;)
+        Tracks cleared: 0
+    &#34;&#34;&#34;
+    logger.info(&#34;Resetting pipeline state&#34;)
+    self.tracks.clear()
+    self.frame_count = 0
+    logger.info(&#34;Pipeline reset complete&#34;)</code></pre>
+</details>
+<div class="desc"><p>Reset pipeline state (clear all tracks and counters).</p>
+<p>Useful when starting to process a new video or after processing is complete.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; pipeline.reset()
+&gt;&gt;&gt; print(f&quot;Tracks cleared: {len(pipeline.tracks)}&quot;)
+Tracks cleared: 0
+</code></pre></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="../index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="src.pipeline.alpr_pipeline" href="alpr_pipeline.html">src.pipeline.alpr_pipeline</a></code></li>
+<li><code><a title="src.pipeline.utils" href="utils.html">src.pipeline.utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="src.pipeline.create_side_by_side_comparison" href="#src.pipeline.create_side_by_side_comparison">create_side_by_side_comparison</a></code></li>
+<li><code><a title="src.pipeline.draw_tracks_on_frame" href="#src.pipeline.draw_tracks_on_frame">draw_tracks_on_frame</a></code></li>
+<li><code><a title="src.pipeline.format_track_summary" href="#src.pipeline.format_track_summary">format_track_summary</a></code></li>
+<li><code><a title="src.pipeline.log_pipeline_performance" href="#src.pipeline.log_pipeline_performance">log_pipeline_performance</a></code></li>
+<li><code><a title="src.pipeline.save_results_json" href="#src.pipeline.save_results_json">save_results_json</a></code></li>
+<li><code><a title="src.pipeline.serialize_tracks" href="#src.pipeline.serialize_tracks">serialize_tracks</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.pipeline.ALPRPipeline" href="#src.pipeline.ALPRPipeline">ALPRPipeline</a></code></h4>
+<ul class="">
+<li><code><a title="src.pipeline.ALPRPipeline.get_statistics" href="#src.pipeline.ALPRPipeline.get_statistics">get_statistics</a></code></li>
+<li><code><a title="src.pipeline.ALPRPipeline.process_frame" href="#src.pipeline.ALPRPipeline.process_frame">process_frame</a></code></li>
+<li><code><a title="src.pipeline.ALPRPipeline.reset" href="#src.pipeline.ALPRPipeline.reset">reset</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
