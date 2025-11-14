@@ -570,17 +570,6 @@ See [Configuration Guide](docs/configuration_guide.md) for tuning parameters.
 
 ---
 
-## 🙏 Acknowledgments
-
-- **YOLOv8 Model**: [yasirfaizahmed/license-plate-object-detection](https://huggingface.co/yasirfaizahmed/license-plate-object-detection)
-- **Ultralytics**: YOLOv8 implementation
-- **PaddlePaddle**: OCR framework
-- **ByteTrack**: Multi-object tracking algorithm
-
-## 📝 License
-
-This project is for educational and research purposes. Please respect Rockstar Games' terms of service when using GTA V content.
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -704,49 +693,3 @@ See [Troubleshooting Guide](docs/troubleshooting.md) for:
 ## 📝 License
 
 This project is for educational and research purposes. Please respect Rockstar Games' terms of service when using GTA V content.
-
-## 👥 Contributors
-
-- **Felix** - Lead Developer
-
-## 🔗 Links
-
-- **GitHub Repository**: [xiashuidaolaoshuren/ALPR_GTAV](https://github.com/xiashuidaolaoshuren/ALPR_GTAV)
-- **Issues**: [Report bugs or request features](https://github.com/xiashuidaolaoshuren/ALPR_GTAV/issues)
-- **Documentation**: [Complete docs in /docs](docs/)
-
-## 📧 Contact
-
-For questions, suggestions, or collaboration:
-- **GitHub Issues**: [Create an issue](https://github.com/xiashuidaolaoshuren/ALPR_GTAV/issues)
-- **Pull Requests**: Contributions welcome!
-
----
-
-## 🗺️ Roadmap
-
-**Completed:**
-- ✅ Week 1-3: Environment setup, detection module, dataset annotation
-- ✅ Week 4-5: Recognition module, tracking integration, preprocessing pipeline
-- ✅ Week 6: Evaluation, optimization, GUI development, comprehensive documentation
-
-**Future Enhancements:**
-- 🔄 Real-time streaming support (RTSP, webcam)
-- 🎨 Custom plate format validation for GTA V
-- 🧠 Advanced OCR error correction (character confusion matrix)
-- 📱 Mobile app integration (Android/iOS)
-- 🌐 Web-based deployment (Docker + cloud hosting)
-- 🔧 Model fine-tuning GUI for domain adaptation
-
----
-
-**Project Status**: ✅ **Production Ready** - Week 6 Complete with full documentation, GUI, and optimization
-
-**Last Updated**: November 14, 2025
-
----
-
-Made with ❤️ for the GTA V modding and computer vision communities
-
-
-**Current Status**: Week 1 Complete - Environment and structure ready for Week 2 implementation (detection module).
