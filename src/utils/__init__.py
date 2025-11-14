@@ -12,4 +12,4 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 # Import utility modules
 from . import video_io
 
-__all__ = ['video_io']
+__all__ = ["video_io"]

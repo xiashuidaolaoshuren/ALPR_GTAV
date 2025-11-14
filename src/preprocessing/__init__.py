@@ -21,18 +21,14 @@ Note:
 import logging
 
 # Import main preprocessing functions
-from .image_enhancement import (
-    preprocess_plate,
-    resize_maintaining_aspect,
-    apply_clahe
-)
+from .image_enhancement import preprocess_plate, resize_maintaining_aspect, apply_clahe
 
 # Import utility functions
 from .utils import (
     validate_image,
     batch_preprocess_plates,
     save_preprocessed_image,
-    calculate_image_stats
+    calculate_image_stats,
 )
 
 # Configure logging
@@ -40,13 +36,13 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # Package metadata
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 __all__ = [
-    'preprocess_plate',
-    'resize_maintaining_aspect',
-    'apply_clahe',
-    'validate_image',
-    'batch_preprocess_plates',
-    'save_preprocessed_image',
-    'calculate_image_stats'
+    "preprocess_plate",
+    "resize_maintaining_aspect",
+    "apply_clahe",
+    "validate_image",
+    "batch_preprocess_plates",
+    "save_preprocessed_image",
+    "calculate_image_stats",
 ]

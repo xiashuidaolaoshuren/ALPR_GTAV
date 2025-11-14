@@ -10,9 +10,9 @@ Usage:
 Examples:
     # Basic visualization
     python scripts/evaluation/visualize_detection_results.py
-    
+
     # Custom input and output directory
-    python scripts/evaluation/visualize_detection_results.py --input outputs/detection_results.json --output_dir outputs/visualizations
+    python scripts/evaluation/visualize_detection_results.py --input outputs/detection_results.json --output_dir outputs/visualizations  # noqa: E501
 """
 
 import argparse
@@ -30,8 +30,7 @@ plt.switch_backend("Agg")
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -41,19 +40,19 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Visualize detection evaluation results",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
     parser.add_argument(
         "--input",
         type=str,
         default="outputs/detection_results.json",
-        help="Path to detection results JSON (default: outputs/detection_results.json)"
+        help="Path to detection results JSON (default: outputs/detection_results.json)",
     )
     parser.add_argument(
         "--output_dir",
         type=str,
         default="outputs",
-        help="Directory to save visualizations (default: outputs)"
+        help="Directory to save visualizations (default: outputs)",
     )
     return parser.parse_args()
 
@@ -76,12 +75,23 @@ def _sorted_conditions(stats: Dict) -> list[str]:
 def plot_detection_rate_by_condition(stats: Dict, output_dir: Path):
     conditions = _sorted_conditions(stats)
     detection_rates = [stats["by_condition"][c]["detection_rate"] * 100 for c in conditions]
-    colors = ["#2ecc71" if rate >= 70 else "#f39c12" if rate >= 50 else "#e74c3c" for rate in detection_rates]
+    colors = [
+        "#2ecc71" if rate >= 70 else "#f39c12" if rate >= 50 else "#e74c3c"
+        for rate in detection_rates
+    ]
 
     plt.figure(figsize=(12, 6))
     bars = plt.bar(conditions, detection_rates, color=colors, alpha=0.85, edgecolor="black")
     for bar, rate in zip(bars, detection_rates):
-        plt.text(bar.get_x() + bar.get_width() / 2.0, bar.get_height(), f"{rate:.1f}%", ha="center", va="bottom", fontsize=10, fontweight="bold")
+        plt.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            bar.get_height(),
+            f"{rate:.1f}%",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            fontweight="bold",
+        )
 
     plt.xlabel("Condition", fontsize=12, fontweight="bold")
     plt.ylabel("Detection Rate (%)", fontsize=12, fontweight="bold")
@@ -104,11 +114,21 @@ def plot_avg_detections_by_condition(stats: Dict, output_dir: Path):
     plt.figure(figsize=(12, 6))
     bars = plt.bar(conditions, avg_detections, color="#3498db", alpha=0.85, edgecolor="black")
     for bar, avg in zip(bars, avg_detections):
-        plt.text(bar.get_x() + bar.get_width() / 2.0, bar.get_height(), f"{avg:.2f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+        plt.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            bar.get_height(),
+            f"{avg:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            fontweight="bold",
+        )
 
     plt.xlabel("Condition", fontsize=12, fontweight="bold")
     plt.ylabel("Average Detections per Image", fontsize=12, fontweight="bold")
-    plt.title("Average License Plate Detections per Image by Condition", fontsize=14, fontweight="bold")
+    plt.title(
+        "Average License Plate Detections per Image by Condition", fontsize=14, fontweight="bold"
+    )
     plt.xticks(rotation=45, ha="right")
     plt.ylim(0, max(avg_detections) * 1.2 if avg_detections else 1)
     plt.grid(axis="y", alpha=0.3)
@@ -127,7 +147,15 @@ def plot_confidence_by_condition(stats: Dict, output_dir: Path):
     plt.figure(figsize=(12, 6))
     bars = plt.bar(conditions, avg_confidences, color="#9b59b6", alpha=0.85, edgecolor="black")
     for bar, conf in zip(bars, avg_confidences):
-        plt.text(bar.get_x() + bar.get_width() / 2.0, bar.get_height(), f"{conf:.3f}", ha="center", va="bottom", fontsize=10, fontweight="bold")
+        plt.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            bar.get_height(),
+            f"{conf:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            fontweight="bold",
+        )
 
     plt.xlabel("Condition", fontsize=12, fontweight="bold")
     plt.ylabel("Average Confidence", fontsize=12, fontweight="bold")
@@ -155,7 +183,7 @@ def plot_dataset_distribution(stats: Dict, output_dir: Path):
         colors=colors,
         autopct="%1.1f%%",
         startangle=90,
-        textprops={"fontsize": 10, "fontweight": "bold"}
+        textprops={"fontsize": 10, "fontweight": "bold"},
     )
     for i, (condition, count) in enumerate(zip(conditions, num_images)):
         texts[i].set_text(f"{condition}\n({count} images)")
@@ -180,9 +208,18 @@ def plot_comparison_chart(stats: Dict, output_dir: Path):
     width = 0.25
 
     plt.figure(figsize=(14, 7))
-    plt.bar(x - width, detection_rates, width, label="Detection Rate (%)", color="#2ecc71", alpha=0.85)
+    plt.bar(
+        x - width, detection_rates, width, label="Detection Rate (%)", color="#2ecc71", alpha=0.85
+    )
     plt.bar(x, avg_detections, width, label="Avg Detections (×10)", color="#3498db", alpha=0.85)
-    plt.bar(x + width, avg_confidences, width, label="Avg Confidence (×100)", color="#9b59b6", alpha=0.85)
+    plt.bar(
+        x + width,
+        avg_confidences,
+        width,
+        label="Avg Confidence (×100)",
+        color="#9b59b6",
+        alpha=0.85,
+    )
 
     plt.xlabel("Condition", fontsize=12, fontweight="bold")
     plt.ylabel("Value", fontsize=12, fontweight="bold")
@@ -202,7 +239,7 @@ def plot_overall_summary(stats: Dict, output_dir: Path):
     overall = stats["overall"]
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.axis("off")
+    ax.axis("of")
     fig.suptitle("Detection Performance Summary", fontsize=18, fontweight="bold", y=0.95)
 
     metrics = [

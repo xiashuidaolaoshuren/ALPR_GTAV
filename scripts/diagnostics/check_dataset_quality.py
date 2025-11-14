@@ -131,7 +131,13 @@ class DatasetQualityChecker:
                 )
                 all_good = False
             elif actual <= max_count:
-                logger.info("  \u2713 %s: %s images (target: %s-%s)", condition, actual, min_count, max_count)
+                logger.info(
+                    "  \u2713 %s: %s images (target: %s-%s)",
+                    condition,
+                    actual,
+                    min_count,
+                    max_count,
+                )
             else:
                 logger.info("  \u2713 %s: %s images (exceeds target)", condition, actual)
 
@@ -176,21 +182,28 @@ class DatasetQualityChecker:
             logger.warning("  Images without metadata: %s", list(missing_metadata)[:5])
 
         if missing_images:
-            self.warnings.append(f"{len(missing_images)} metadata entries without corresponding images")
+            self.warnings.append(
+                f"{len(missing_images)} metadata entries without corresponding images"
+            )
 
         if not missing_metadata and not missing_images:
             logger.info("\n\u2713 Metadata completeness: all images accounted for")
 
         unknown_fields = sum(
-            "unknown" in {entry["condition"], entry["time_of_day"], entry["weather"], entry["angle"]}
+            "unknown"
+            in {entry["condition"], entry["time_of_day"], entry["weather"], entry["angle"]}
             for entry in self.metadata_entries
         )
         if unknown_fields:
-            self.warnings.append(f"{unknown_fields} entries contain 'unknown' fields - update metadata")
+            self.warnings.append(
+                f"{unknown_fields} entries contain 'unknown' fields - update metadata"
+            )
 
         needs_review = sum("needs_review" in entry["notes"] for entry in self.metadata_entries)
         if needs_review:
-            self.warnings.append(f"{needs_review} entries marked 'needs_review' - resolve before training")
+            self.warnings.append(
+                f"{needs_review} entries marked 'needs_review' - resolve before training"
+            )
 
     def check_image_quality(self) -> None:
         """Check basic image quality metrics."""

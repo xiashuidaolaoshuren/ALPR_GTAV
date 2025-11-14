@@ -11,11 +11,9 @@ Usage:
 from __future__ import annotations
 
 import importlib
-import sys
 
 import torch
 import paddle
-
 
 
 def check_pytorch_gpu() -> bool:

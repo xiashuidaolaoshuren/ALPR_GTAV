@@ -4,7 +4,7 @@ Label Studio to YOLO Format Converter
 Convert Label Studio JSON export to YOLO format for training.
 
 Usage:
-    python scripts/annotation/convert_labelstudio_to_yolo.py --input export.json --output datasets/lpr
+    python scripts/annotation/convert_labelstudio_to_yolo.py --input export.json --output datasets/lpr  # noqa: E501
 
 The script will:
 1. Parse Label Studio JSON export
@@ -28,8 +28,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -37,60 +36,51 @@ logger = logging.getLogger(__name__)
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description='Convert Label Studio export to YOLO format',
+        description="Convert Label Studio export to YOLO format",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
 
     parser.add_argument(
-        '--input',
+        "--input", type=str, required=True, help="Path to Label Studio JSON export file"
+    )
+
+    parser.add_argument(
+        "--output",
         type=str,
-        required=True,
-        help='Path to Label Studio JSON export file'
+        default="datasets/lpr",
+        help="Output directory for YOLO dataset (default: datasets/lpr)",
     )
 
     parser.add_argument(
-        '--output',
-        type=str,
-        default='datasets/lpr',
-        help='Output directory for YOLO dataset (default: datasets/lpr)'
-    )
-
-    parser.add_argument(
-        '--train_ratio',
+        "--train_ratio",
         type=float,
         default=0.7,
-        help='Ratio of images for training set (default: 0.7)'
+        help="Ratio of images for training set (default: 0.7)",
     )
 
     parser.add_argument(
-        '--valid_ratio',
+        "--valid_ratio",
         type=float,
         default=0.2,
-        help='Ratio of images for validation set (default: 0.2)'
+        help="Ratio of images for validation set (default: 0.2)",
     )
 
     parser.add_argument(
-        '--test_ratio',
-        type=float,
-        default=0.1,
-        help='Ratio of images for test set (default: 0.1)'
+        "--test_ratio", type=float, default=0.1, help="Ratio of images for test set (default: 0.1)"
     )
 
     parser.add_argument(
-        '--seed',
-        type=int,
-        default=42,
-        help='Random seed for split reproducibility (default: 42)'
+        "--seed", type=int, default=42, help="Random seed for split reproducibility (default: 42)"
     )
-    
+
     parser.add_argument(
-        '--filter-readability',
+        "--filter-readability",
         type=str,
         default=None,
         help='Comma-separated list of readability values to include (e.g., "clear,blurred"). '
-             'If not specified, all annotations are included. '
-             'Valid values: clear, blurred, occluded'
+        "If not specified, all annotations are included. "
+        "Valid values: clear, blurred, occluded",
     )
 
     return parser.parse_args()
@@ -110,7 +100,7 @@ def load_labelstudio_export(export_path: str) -> List[Dict]:
     if not export_path.exists():
         raise FileNotFoundError(f"Export file not found: {export_path}")
 
-    with open(export_path, 'r', encoding='utf-8') as f:
+    with open(export_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     logger.info(f"Loaded {len(data)} tasks from {export_path}")
@@ -131,11 +121,11 @@ def convert_labelstudio_to_yolo(annotation: Dict, image_width: int, image_height
     """
     yolo_lines = []
 
-    for result in annotation.get('value', {}).get('rectanglelabels', []):
-        x_percent = annotation['value']['x']
-        y_percent = annotation['value']['y']
-        width_percent = annotation['value']['width']
-        height_percent = annotation['value']['height']
+    for result in annotation.get("value", {}).get("rectanglelabels", []):
+        x_percent = annotation["value"]["x"]
+        y_percent = annotation["value"]["y"]
+        width_percent = annotation["value"]["width"]
+        height_percent = annotation["value"]["height"]
 
         x_center = (x_percent + width_percent / 2) / 100.0
         y_center = (y_percent + height_percent / 2) / 100.0
@@ -149,8 +139,9 @@ def convert_labelstudio_to_yolo(annotation: Dict, image_width: int, image_height
     return yolo_lines
 
 
-def split_dataset(tasks: List[Dict], train_ratio: float, valid_ratio: float,
-                  test_ratio: float, seed: int) -> Tuple[List, List, List]:
+def split_dataset(
+    tasks: List[Dict], train_ratio: float, valid_ratio: float, test_ratio: float, seed: int
+) -> Tuple[List, List, List]:
     """
     Split dataset into train/valid/test sets.
 
@@ -177,10 +168,15 @@ def split_dataset(tasks: List[Dict], train_ratio: float, valid_ratio: float,
     n_valid = int(n_total * valid_ratio)
 
     train_tasks = shuffled_tasks[:n_train]
-    valid_tasks = shuffled_tasks[n_train:n_train + n_valid]
-    test_tasks = shuffled_tasks[n_train + n_valid:]
+    valid_tasks = shuffled_tasks[n_train : n_train + n_valid]
+    test_tasks = shuffled_tasks[n_train + n_valid :]
 
-    logger.info(f"Dataset split: {len(train_tasks)} train, {len(valid_tasks)} valid, {len(test_tasks)} test")
+    logger.info(
+        f"Dataset split: {
+            len(train_tasks)} train, {
+            len(valid_tasks)} valid, {
+                len(test_tasks)} test"
+    )
 
     return train_tasks, valid_tasks, test_tasks
 
@@ -188,18 +184,19 @@ def split_dataset(tasks: List[Dict], train_ratio: float, valid_ratio: float,
 def sanitize_image_filename(filename: str) -> str:
     """Remove internal ID prefixes from Label Studio filenames."""
     name = Path(filename).name
-    if '-' in name:
-        prefix, remainder = name.split('-', 1)
+    if "-" in name:
+        prefix, remainder = name.split("-", 1)
         if remainder:
             return remainder
     return name
 
 
-def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
-                        readability_filter: List[str] = None) -> Set[str]:
+def create_yolo_dataset(
+    tasks: List[Dict], output_dir: Path, split_name: str, readability_filter: List[str] = None
+) -> Set[str]:
     """
     Create YOLO format dataset from tasks.
-    
+
     Args:
         tasks: List of annotation tasks
         output_dir: Output directory
@@ -207,8 +204,8 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
         readability_filter: List of readability values to include (e.g., ['clear', 'blurred'])
                           If None, all annotations are included
     """
-    images_dir = output_dir / split_name / 'images'
-    labels_dir = output_dir / split_name / 'labels'
+    images_dir = output_dir / split_name / "images"
+    labels_dir = output_dir / split_name / "labels"
 
     images_dir.mkdir(parents=True, exist_ok=True)
     labels_dir.mkdir(parents=True, exist_ok=True)
@@ -220,22 +217,22 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
     processed_filenames: Set[str] = set()
 
     for task in tasks:
-        image_path = task.get('data', {}).get('image')
+        image_path = task.get("data", {}).get("image")
         if not image_path:
             logger.warning(f"No image path in task {task.get('id')}")
             continue
 
         image_filename = Path(image_path).name
         sanitized_image_filename = sanitize_image_filename(image_filename)
-        annotations = task.get('annotations') or []
+        annotations = task.get("annotations") or []
         annotation_data = annotations[0] if annotations else None
-        results = annotation_data.get('result', []) if annotation_data else []
+        results = annotation_data.get("result", []) if annotation_data else []
 
         readability_value = None
         if readability_filter and annotation_data:
             for res in results:
-                if res.get('type') == 'choices' and res.get('from_name') == 'readability':
-                    choices = res['value'].get('choices', [])
+                if res.get("type") == "choices" and res.get("from_name") == "readability":
+                    choices = res["value"].get("choices", [])
                     if choices:
                         readability_value = choices[0]
                     break
@@ -256,19 +253,19 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
         yolo_lines: List[str] = []
         filtered_count = 0
         for result in results:
-            if result.get('type') != 'rectanglelabels':
+            if result.get("type") != "rectanglelabels":
                 continue
 
             if skip_boxes_for_readability:
                 filtered_count += 1
                 continue
 
-            value = result['value']
+            value = result["value"]
 
-            x_percent = value['x']
-            y_percent = value['y']
-            width_percent = value['width']
-            height_percent = value['height']
+            x_percent = value["x"]
+            y_percent = value["y"]
+            width_percent = value["width"]
+            height_percent = value["height"]
 
             x_center = (x_percent + width_percent / 2) / 100.0
             y_center = (y_percent + height_percent / 2) / 100.0
@@ -288,8 +285,8 @@ def create_yolo_dataset(tasks: List[Dict], output_dir: Path, split_name: str,
         label_stem = Path(sanitized_image_filename).stem
         label_path = labels_dir / f"{label_stem}.txt"
 
-        with open(label_path, 'w') as f:
-            f.write('\n'.join(yolo_lines))
+        with open(label_path, "w") as f:
+            f.write("\n".join(yolo_lines))
 
         if yolo_lines:
             logger.debug(f"Processed {image_filename} -> {len(yolo_lines)} annotations")
@@ -339,13 +336,15 @@ def copy_images_for_split(filenames: Iterable[str], source_dir: Path, destinatio
     if missing:
         logger.warning(
             "Missing source images for %d file(s) in %s: %s",
-            len(missing), destination_dir, ', '.join(missing)
+            len(missing),
+            destination_dir,
+            ", ".join(missing),
         )
 
 
 def create_dataset_yaml(output_dir: Path, class_names: List[str]):
     """Create data.yaml file for YOLO training."""
-    yaml_content = f"""# GTA V License Plate Detection Dataset
+    yaml_content = """# GTA V License Plate Detection Dataset
 # Generated by convert_labelstudio_to_yolo.py
 
 path: {output_dir.absolute()}  # dataset root dir
@@ -358,8 +357,8 @@ nc: {len(class_names)}  # number of classes
 names: {class_names}  # class names
 """
 
-    yaml_path = output_dir / 'data.yaml'
-    with open(yaml_path, 'w') as f:
+    yaml_path = output_dir / "data.yaml"
+    with open(yaml_path, "w") as f:
         f.write(yaml_content)
 
     logger.info(f"Created data.yaml at {yaml_path}")
@@ -367,9 +366,9 @@ names: {class_names}  # class names
 
 def create_classes_txt(output_dir: Path, class_names: List[str]):
     """Create classes.txt file."""
-    classes_path = output_dir / 'classes.txt'
-    with open(classes_path, 'w') as f:
-        f.write('\n'.join(class_names))
+    classes_path = output_dir / "classes.txt"
+    with open(classes_path, "w") as f:
+        f.write("\n".join(class_names))
 
     logger.info(f"Created classes.txt at {classes_path}")
 
@@ -382,8 +381,8 @@ def main():
         logger.info("Loading Label Studio export...")
         tasks = load_labelstudio_export(args.input)
 
-        image_tasks = [t for t in tasks if t.get('data', {}).get('image')]
-        annotated_count = sum(1 for t in image_tasks if t.get('annotations'))
+        image_tasks = [t for t in tasks if t.get("data", {}).get("image")]
+        annotated_count = sum(1 for t in image_tasks if t.get("annotations"))
         logger.info(
             "Found %d tasks with image references (%d annotated)",
             len(image_tasks),
@@ -401,27 +400,23 @@ def main():
 
         logger.info("Splitting dataset...")
         train_tasks, valid_tasks, test_tasks = split_dataset(
-            image_tasks,
-            args.train_ratio,
-            args.valid_ratio,
-            args.test_ratio,
-            args.seed
+            image_tasks, args.train_ratio, args.valid_ratio, args.test_ratio, args.seed
         )
 
         output_dir = Path(args.output)
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Parse readability filter if provided
         readability_filter = None
         if args.filter_readability:
-            readability_filter = [r.strip() for r in args.filter_readability.split(',')]
+            readability_filter = [r.strip() for r in args.filter_readability.split(",")]
             logger.info(f"Applying readability filter: {readability_filter}")
 
-        train_files = create_yolo_dataset(train_tasks, output_dir, 'train', readability_filter)
-        valid_files = create_yolo_dataset(valid_tasks, output_dir, 'valid', readability_filter)
-        test_files = create_yolo_dataset(test_tasks, output_dir, 'test', readability_filter)
+        train_files = create_yolo_dataset(train_tasks, output_dir, "train", readability_filter)
+        valid_files = create_yolo_dataset(valid_tasks, output_dir, "valid", readability_filter)
+        test_files = create_yolo_dataset(test_tasks, output_dir, "test", readability_filter)
 
-        class_names = ['license_plate']
+        class_names = ["license_plate"]
         create_classes_txt(output_dir, class_names)
         create_dataset_yaml(output_dir, class_names)
 
@@ -431,29 +426,29 @@ def main():
         logger.info(f"\nDataset created at: {output_dir.absolute()}")
         logger.info("\nStructure:")
         logger.info(f"  {output_dir}/")
-        logger.info(f"  ├── train/")
-        logger.info(f"  │   ├── images/")
-        logger.info(f"  │   └── labels/")
-        logger.info(f"  ├── valid/")
-        logger.info(f"  │   ├── images/")
-        logger.info(f"  │   └── labels/")
-        logger.info(f"  ├── test/")
-        logger.info(f"  │   ├── images/")
-        logger.info(f"  │   └── labels/")
-        logger.info(f"  ├── data.yaml")
-        logger.info(f"  └── classes.txt")
-        source_images_dir = Path(__file__).resolve().parents[2] / 'outputs' / 'test_images'
+        logger.info("  ├── train/")
+        logger.info("  │   ├── images/")
+        logger.info("  │   └── labels/")
+        logger.info("  ├── valid/")
+        logger.info("  │   ├── images/")
+        logger.info("  │   └── labels/")
+        logger.info("  ├── test/")
+        logger.info("  │   ├── images/")
+        logger.info("  │   └── labels/")
+        logger.info("  ├── data.yaml")
+        logger.info("  └── classes.txt")
+        source_images_dir = Path(__file__).resolve().parents[2] / "outputs" / "test_images"
         if source_images_dir.exists():
             logger.info("\nCopying images from %s into dataset structure...", source_images_dir)
-            copy_images_for_split(train_files, source_images_dir, output_dir / 'train' / 'images')
-            copy_images_for_split(valid_files, source_images_dir, output_dir / 'valid' / 'images')
-            copy_images_for_split(test_files, source_images_dir, output_dir / 'test' / 'images')
+            copy_images_for_split(train_files, source_images_dir, output_dir / "train" / "images")
+            copy_images_for_split(valid_files, source_images_dir, output_dir / "valid" / "images")
+            copy_images_for_split(test_files, source_images_dir, output_dir / "test" / "images")
         else:
             logger.warning(
                 "Source image directory not found at %s; skipping image copy step.",
-                source_images_dir
+                source_images_dir,
             )
-        
+
         if args.filter_readability:
             logger.info(f"\n📊 Readability filter applied: {', '.join(readability_filter)}")
             logger.info("   Use --filter-readability 'clear' to create a recognition-only dataset")
@@ -469,5 +464,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

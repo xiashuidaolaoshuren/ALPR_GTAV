@@ -13,29 +13,24 @@ logger.setLevel(logging.INFO)
 
 # Import main functions for convenient access
 from .model import load_detection_model, detect_plates, batch_detect_plates, validate_model
-from .utils import (
-    draw_bounding_boxes,
-    compute_iou,
-    filter_detections_by_size,
-    crop_detections
-)
+from .utils import draw_bounding_boxes, compute_iou, filter_detections_by_size, crop_detections
 from .config import DetectionConfig
 
 __all__ = [
     # Model functions
-    'load_detection_model',
-    'detect_plates',
-    'batch_detect_plates',
-    'validate_model',
+    "load_detection_model",
+    "detect_plates",
+    "batch_detect_plates",
+    "validate_model",
     # Utility functions
-    'draw_bounding_boxes',
-    'compute_iou',
-    'filter_detections_by_size',
-    'crop_detections',
+    "draw_bounding_boxes",
+    "compute_iou",
+    "filter_detections_by_size",
+    "crop_detections",
     # Configuration
-    'DetectionConfig',
+    "DetectionConfig",
 ]
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 logger.info(f"Detection module initialized (version {__version__})")

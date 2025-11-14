@@ -18,16 +18,16 @@ from .config import RecognitionConfig
 
 __all__ = [
     # Model functions
-    'load_ocr_model',
-    'recognize_text',
+    "load_ocr_model",
+    "recognize_text",
     # Utility functions
-    'filter_by_regex',
-    'score_candidate',
-    'select_best_candidate',
+    "filter_by_regex",
+    "score_candidate",
+    "select_best_candidate",
     # Configuration
-    'RecognitionConfig',
+    "RecognitionConfig",
 ]
 
-__version__ = '0.1.0'
+__version__ = "0.1.0"
 
 logger.info(f"Recognition module initialized (version {__version__})")

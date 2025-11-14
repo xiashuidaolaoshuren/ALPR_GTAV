@@ -22,19 +22,13 @@ Controls:
 
 import argparse
 import logging
-import os
-import re
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
 
 import cv2
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -43,24 +37,18 @@ class ImageCleaner:
 
     def __init__(self, images_dir):
         self.images_dir = Path(images_dir)
-        self.deleted_dir = self.images_dir / 'deleted'
+        self.deleted_dir = self.images_dir / "deleted"
         self.deleted_dir.mkdir(exist_ok=True)
 
         self.processed_files = set()
         self.angle_counters = defaultdict(lambda: defaultdict(int))
 
-        self.stats = {
-            'kept': 0,
-            'skipped': 0,
-            'deleted': 0,
-            'renamed': 0,
-            'total': 0
-        }
+        self.stats = {"kept": 0, "skipped": 0, "deleted": 0, "renamed": 0, "total": 0}
 
     def parse_filename(self, filename):
-        name_without_ext = filename.rsplit('.', 1)[0]
-        extension = filename.rsplit('.', 1)[1] if '.' in filename else 'jpg'
-        parts = name_without_ext.split('_')
+        name_without_ext = filename.rsplit(".", 1)[0]
+        extension = filename.rsplit(".", 1)[1] if "." in filename else "jpg"
+        parts = name_without_ext.split("_")
 
         if len(parts) < 4:
             logger.warning(f"Filename format not recognized: {filename}")
@@ -69,22 +57,22 @@ class ImageCleaner:
         time_of_day = parts[0]
         weather = parts[1]
         location_parts = parts[2:-2]
-        location = '_'.join(location_parts)
+        location = "_".join(location_parts)
         session = parts[-2]
         image_id = parts[-1]
 
         return {
-            'time_of_day': time_of_day,
-            'weather': weather,
-            'location': location,
-            'session': session,
-            'id': image_id,
-            'extension': extension
+            "time_of_day": time_of_day,
+            "weather": weather,
+            "location": location,
+            "session": session,
+            "id": image_id,
+            "extension": extension,
         }
 
     def get_new_filename(self, parsed, angle):
         base_name = f"{parsed['time_of_day']}_{parsed['weather']}_{angle}"
-        original_id = int(parsed['id'])
+        original_id = int(parsed["id"])
         new_id = original_id
 
         while True:
@@ -96,7 +84,10 @@ class ImageCleaner:
 
             new_id += 1
             if new_id > original_id + 10000:
-                logger.error(f"Could not find unique filename after {new_id - original_id} attempts")
+                logger.error(
+                    f"Could not find unique filename after {
+                        new_id - original_id} attempts"
+                )
                 return None
 
         return new_filename
@@ -119,10 +110,11 @@ class ImageCleaner:
                 img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
             filename = image_path.name
-            cv2.putText(img, filename, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.7, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(
+                img, filename, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA
+            )
 
-            cv2.imshow('Image Cleaner - Press K(eep), S(kip), D(elete), Q(uit)', img)
+            cv2.imshow("Image Cleaner - Press K(eep), S(kip), D(elete), Q(uit)", img)
             return True
 
         except Exception as e:
@@ -141,13 +133,13 @@ class ImageCleaner:
         while True:
             choice = input("Enter choice (1/2/3/0): ").strip()
 
-            if choice == '1':
-                return 'front'
-            if choice == '2':
-                return 'rear'
-            if choice == '3':
-                return 'angle'
-            if choice == '0':
+            if choice == "1":
+                return "front"
+            if choice == "2":
+                return "rear"
+            if choice == "3":
+                return "angle"
+            if choice == "0":
                 return None
             print("Invalid choice. Please enter 1, 2, 3, or 0.")
 
@@ -191,7 +183,7 @@ class ImageCleaner:
             return False
 
     def process_images(self):
-        image_extensions = {'.jpg', '.jpeg', '.png'}
+        image_extensions = {".jpg", ".jpeg", ".png"}
         image_files = sorted(
             {
                 path
@@ -204,7 +196,7 @@ class ImageCleaner:
             logger.warning(f"No image files found in {self.images_dir}")
             return
 
-        self.stats['total'] = len(image_files)
+        self.stats["total"] = len(image_files)
         logger.info(f"Found {len(image_files)} images to process")
         print("\n" + "=" * 60)
         print("CONTROLS:")
@@ -219,52 +211,54 @@ class ImageCleaner:
 
             if not self.display_image(image_path):
                 print("Failed to display image. Skipping...")
-                self.stats['skipped'] += 1
+                self.stats["skipped"] += 1
                 continue
 
             while True:
                 key = cv2.waitKey(0) & 0xFF
 
-                if key in [ord('k'), ord('K')]:
+                if key in [ord("k"), ord("K")]:
                     cv2.destroyAllWindows()
                     angle = self.get_angle_input()
 
                     if angle is None:
                         print("Cancelled. Skipping image.")
-                        self.stats['skipped'] += 1
+                        self.stats["skipped"] += 1
                         break
 
                     if self.rename_image(image_path, angle):
-                        self.stats['kept'] += 1
-                        self.stats['renamed'] += 1
+                        self.stats["kept"] += 1
+                        self.stats["renamed"] += 1
                         print(f"✓ Image kept and renamed with angle: {angle}")
                     else:
                         print("✗ Failed to rename image. Skipping.")
-                        self.stats['skipped'] += 1
+                        self.stats["skipped"] += 1
                     break
 
-                if key in [ord('s'), ord('S')]:
+                if key in [ord("s"), ord("S")]:
                     cv2.destroyAllWindows()
                     print("Skipped.")
-                    self.stats['skipped'] += 1
+                    self.stats["skipped"] += 1
                     break
 
-                if key in [ord('d'), ord('D')]:
+                if key in [ord("d"), ord("D")]:
                     cv2.destroyAllWindows()
-                    confirm = input("Are you sure you want to delete this image? (y/n): ").strip().lower()
-                    if confirm == 'y':
+                    confirm = (
+                        input("Are you sure you want to delete this image? (y/n): ").strip().lower()
+                    )
+                    if confirm == "y":
                         if self.delete_image(image_path):
-                            self.stats['deleted'] += 1
+                            self.stats["deleted"] += 1
                             print("✓ Image deleted.")
                         else:
                             print("✗ Failed to delete image.")
-                            self.stats['skipped'] += 1
+                            self.stats["skipped"] += 1
                     else:
                         print("Deletion cancelled. Skipping.")
-                        self.stats['skipped'] += 1
+                        self.stats["skipped"] += 1
                     break
 
-                if key in [ord('q'), ord('Q')]:
+                if key in [ord("q"), ord("Q")]:
                     cv2.destroyAllWindows()
                     print("\nQuitting early...")
                     return
@@ -272,7 +266,7 @@ class ImageCleaner:
                 if key == 27:
                     cv2.destroyAllWindows()
                     print("Window closed. Skipping.")
-                    self.stats['skipped'] += 1
+                    self.stats["skipped"] += 1
                     break
 
         cv2.destroyAllWindows()
@@ -287,17 +281,20 @@ class ImageCleaner:
         print(f"  - Deleted: {self.stats['deleted']}")
         print("=" * 60)
 
-        if self.stats['deleted'] > 0:
+        if self.stats["deleted"] > 0:
             print(f"\nDeleted images moved to: {self.deleted_dir}")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Interactive tool for cleaning and organizing test images'
+        description="Interactive tool for cleaning and organizing test images"
     )
-    parser.add_argument('--images_dir', type=str,
-                        default='outputs/test_images',
-                        help='Directory containing test images')
+    parser.add_argument(
+        "--images_dir",
+        type=str,
+        default="outputs/test_images",
+        help="Directory containing test images",
+    )
 
     args = parser.parse_args()
 

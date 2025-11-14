@@ -1,7 +1,7 @@
 """
 Batch Frame Extraction Helper Script
 
-This script automates the extraction of frames from all video files in the 
+This script automates the extraction of frames from all video files in the
 outputs/raw_footage/ directory, processing each condition folder separately.
 
 Usage:
@@ -11,7 +11,6 @@ Usage:
 
 import argparse
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -23,31 +22,31 @@ if str(CURRENT_DIR) not in sys.path:
 from extract_frames import FrameExtractor  # noqa: E402
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def main():
     """Process all video files in raw_footage directory."""
     parser = argparse.ArgumentParser(
-        description='Batch process all GTA V footage for frame extraction'
+        description="Batch process all GTA V footage for frame extraction"
     )
-    parser.add_argument('--fps', type=int, default=5,
-                        help='Frame extraction rate (default: 5)')
-    parser.add_argument('--quality', type=int, default=95,
-                        help='JPEG quality (default: 95)')
-    parser.add_argument('--format', type=str, choices=['jpg', 'png'], default='jpg',
-                        help='Output format (default: jpg)')
+    parser.add_argument("--fps", type=int, default=5, help="Frame extraction rate (default: 5)")
+    parser.add_argument("--quality", type=int, default=95, help="JPEG quality (default: 95)")
+    parser.add_argument(
+        "--format",
+        type=str,
+        choices=["jpg", "png"],
+        default="jpg",
+        help="Output format (default: jpg)",
+    )
 
     args = parser.parse_args()
 
     # Define paths
     project_root = CURRENT_DIR.parent.parent
-    raw_footage_dir = project_root / 'outputs' / 'raw_footage'
-    output_dir = project_root / 'outputs' / 'test_images'
+    raw_footage_dir = project_root / "outputs" / "raw_footage"
+    output_dir = project_root / "outputs" / "test_images"
 
     # Check if raw_footage directory exists
     if not raw_footage_dir.exists():
@@ -56,16 +55,18 @@ def main():
         return 1
 
     # Define condition folders
-    condition_folders = ['day_clear', 'day_rain', 'night_clear', 'night_rain']
+    condition_folders = ["day_clear", "day_rain", "night_clear", "night_rain"]
 
     # Check which folders have videos
     folders_with_videos = []
     for folder in condition_folders:
         folder_path = raw_footage_dir / folder
         if folder_path.exists():
-            video_files = list(folder_path.glob('*.mp4')) + \
-                          list(folder_path.glob('*.avi')) + \
-                          list(folder_path.glob('*.mov'))
+            video_files = (
+                list(folder_path.glob("*.mp4"))
+                + list(folder_path.glob("*.avi"))
+                + list(folder_path.glob("*.mov"))
+            )
             if video_files:
                 folders_with_videos.append((folder, len(video_files)))
 
@@ -89,11 +90,7 @@ def main():
     logger.info(f"Output directory: {output_dir}")
 
     # Initialize extractor
-    extractor = FrameExtractor(
-        output_fps=args.fps,
-        quality=args.quality,
-        format=args.format
-    )
+    extractor = FrameExtractor(output_fps=args.fps, quality=args.quality, format=args.format)
 
     # Process each condition folder
     total_frames = 0
@@ -108,8 +105,7 @@ def main():
 
         try:
             results = extractor.batch_extract(
-                input_dir=str(folder_path),
-                output_dir=str(output_dir)
+                input_dir=str(folder_path), output_dir=str(output_dir)
             )
 
             folder_total = sum(results.values())
