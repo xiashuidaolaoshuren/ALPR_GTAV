@@ -1,22 +1,218 @@
 # Project Structure Documentation
 
-This document provides detailed explanations of the GTA V ALPR project directory structure, module responsibilities, and file placement guidelines.
+This document provides detailed explanations of the GTA V ALPR project directory structure, module responsibilities, data flow, and file placement guidelines.
 
 ## Directory Overview
 
 ```
 ALPR_GTA5/
-├── src/                    # Source code modules
+├── src/                    # Source code modules (detection, recognition, tracking, etc.)
+├── gui/                    # Streamlit GUI application and components
 ├── datasets/               # Training and validation data
 ├── models/                 # Model weights storage
-├── configs/                # Configuration files
+├── configs/                # Configuration files (YAML)
 ├── scripts/                # Componentized CLI tools (no wrappers)
-├── tests/                  # Test suite
+├── tests/                  # Test suite (unit and integration)
 ├── docs/                   # Project documentation
 ├── outputs/                # Processing results and logs
 ├── .venv/                  # Python virtual environment
 └── shrimp_data/            # Task management data
 ```
+
+## Data Flow Architecture
+
+The ALPR system follows a pipeline architecture with four main stages:
+
+```
+Video Input
+    ↓
+┌─────────────────────────────────────────┐
+│ 1. DETECTION (YOLOv8)                   │
+│    - Detect license plate bounding boxes│
+│    - Apply confidence filtering         │
+│    - Non-Maximum Suppression (NMS)      │
+└─────────────────┬───────────────────────┘
+                  ↓
+┌─────────────────────────────────────────┐
+│ 2. TRACKING (ByteTrack)                 │
+│    - Associate detections across frames │
+│    - Maintain track identity            │
+│    - Determine when to run OCR          │
+└─────────────────┬───────────────────────┘
+                  ↓
+┌─────────────────────────────────────────┐
+│ 3. PREPROCESSING (Optional)             │
+│    - CLAHE contrast enhancement         │
+│    - Sharpening for text clarity        │
+│    - Gaussian blur for noise reduction  │
+└─────────────────┬───────────────────────┘
+                  ↓
+┌─────────────────────────────────────────┐
+│ 4. RECOGNITION (PaddleOCR)              │
+│    - Detect text in plate crops         │
+│    - Recognize characters               │
+│    - Validate against regex pattern     │
+└─────────────────┬───────────────────────┘
+                  ↓
+            Results Output
+```
+
+### Pipeline Orchestration
+
+The `ALPRPipeline` class in `src/pipeline/alpr_pipeline.py` orchestrates all stages:
+
+1. **Frame Input**: Receives BGR video frame
+2. **Detection + Tracking**: YOLOv8 with ByteTrack integration
+3. **Track Management**: Update existing tracks, create new ones
+4. **Conditional OCR**: Run OCR only when `should_run_ocr()` returns True
+5. **Track Cleanup**: Remove lost tracks older than `max_age`
+6. **Result Aggregation**: Return dictionary of active tracks
+
+---
+
+## GUI Architecture
+
+The GUI is built with Streamlit and uses a component-based architecture with background threading for video processing.
+
+### Component Hierarchy
+
+```
+app.py (Main Entry Point)
+    ├── Session State Initialization
+    ├── Logging Configuration
+    └── Layout
+        ├── Sidebar
+        │   └── ControlPanel
+        │       ├── File Upload
+        │       ├── Parameter Sliders
+        │       ├── Device Selection
+        │       └── Start/Stop Buttons
+        ├── Main Area
+        │   ├── Title & Info
+        │   ├── VideoDisplay
+        │   │   ├── Frame Placeholder (st.empty())
+        │   │   └── Overlay Rendering (draw_tracks_on_frame)
+        │   └── InfoPanel (Tabs)
+        │       ├── Status Tab (metrics, latest recognitions)
+        │       └── Logs Tab (real-time log stream)
+        └── Background Thread
+            └── GUIPipelineWrapper
+                ├── Pipeline Initialization
+                ├── Frame Processing Loop
+                ├── Result Queue Management
+                └── Error Handling
+```
+
+### Threading Model
+
+The GUI uses a **single background thread** for video processing to avoid blocking the Streamlit UI:
+
+**Main Thread (Streamlit)**:
+- Handles UI rendering and user interactions
+- Updates displays with results from queue
+- Manages session state
+
+**Background Thread**:
+- Processes video frames through ALPR pipeline
+- Pushes results to thread-safe queue
+- Handles pipeline errors and cleanup
+
+**Communication**:
+- **Queue**: `queue.Queue()` for thread-safe result passing
+- **Session State**: `st.session_state.processing` flag for control
+- **Stop Event**: `threading.Event()` for graceful shutdown
+
+### Session State Management
+
+Streamlit's `st.session_state` is used to persist data across reruns:
+
+Key session state variables:
+- `pipeline`: Cached ALPRPipeline instance
+- `processing`: Boolean flag (True when processing video)
+- `video_handler`: VideoHandler instance for file management
+- `video_info`: Dictionary with video metadata (fps, frame_count, duration)
+- `results`: List of recent recognition results
+- `log_handler`: StreamlitLogHandler for capturing logs
+- `config`: Current pipeline configuration dictionary
+
+**Important**: Session state is per-user, allowing multiple users to use the GUI simultaneously.
+
+---
+
+## GUI Module (`gui/`)
+
+Streamlit-based graphical user interface for interactive ALPR processing.
+
+### `gui/app.py`
+**Purpose**: Main entry point for the GUI application
+
+**Key Responsibilities:**
+- Initialize Streamlit page configuration
+- Setup session state variables
+- Configure logging handlers
+- Render main layout (sidebar, main area, info panel)
+- Handle video upload and processing workflow
+
+### `gui/components/`
+**Purpose**: Reusable GUI components
+
+**Components:**
+
+#### `control_panel.py`
+- File upload widget (st.file_uploader)
+- Configuration sliders (confidence, IOU, OCR interval)
+- Device selection dropdown
+- Start/Stop processing buttons
+- Manages `st.session_state.config`
+
+#### `video_display.py`
+- Real-time frame display using st.empty()
+- Overlay rendering (bounding boxes, text, track IDs)
+- FPS counter and performance metrics
+- Frame update optimization
+
+#### `info_panel.py`
+- Tabbed interface (Status + Logs)
+- Status tab: Detection count, latest recognitions, per-track status
+- Logs tab: Real-time log streaming with color-coding
+- Auto-scroll to latest entries
+
+### `gui/utils/`
+**Purpose**: GUI utility functions and helpers
+
+**Utilities:**
+
+#### `pipeline_wrapper.py`
+- `GUIPipelineWrapper`: Thread-safe pipeline integration
+- Background thread management
+- Result queue handling
+- `@st.cache_resource` for model caching
+
+#### `video_handler.py`
+- VideoHandler class for temporary file management
+- Video metadata extraction (fps, frame_count, duration)
+- Frame reading with cv2.VideoCapture
+- Cleanup on session end
+
+#### `logging_handler.py`
+- StreamlitLogHandler: Custom logging handler
+- Captures logs to in-memory buffer
+- Thread-safe log access
+- Color-coded log levels (INFO=blue, WARNING=orange, ERROR=red)
+
+#### `performance.py`
+- UpdateBatcher: Frame update rate limiter
+- Prevents excessive UI updates
+- Configurable batch size and time window
+
+### `gui/electron/`
+**Purpose**: Desktop application packaging (Electron wrapper)
+
+**Contents:**
+- Electron main process script
+- Package configuration
+- Build scripts for Windows/Mac/Linux
+- Icon files and assets
 
 ---
 
