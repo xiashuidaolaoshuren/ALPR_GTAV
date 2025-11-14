@@ -1,150 +1,352 @@
+# ========================================================
 # GTA V ALPR Pipeline Configuration
-# This file contains all configuration parameters for the ALPR pipeline modules
+# ========================================================
+# This file contains all configuration parameters for the ALPR pipeline modules.
+# See docs/configuration_guide.md for detailed documentation.
+# Example configurations: configs/examples/
 
+# ========================================================
 # Detection Module Configuration (YOLOv8)
+# ========================================================
+# Handles license plate detection using YOLOv8 object detection model.
+
 detection:
   # Path to YOLOv8 model weights
-  # Default: Fine-tuned license plate detection model
+  # - Default: Fine-tuned model trained on GTA V license plates
+  # - Pretrained baseline: models/detection/yolov8n.pt
+  # - Fine-tuned v1: models/detection/yolov8_finetuned_best.pt
+  # - Fine-tuned v2 (best): models/detection/yolov8_finetuned_v2_best.pt
   model_path: models/detection/yolov8_finetuned_v2_best.pt
   
-  # Confidence threshold for detections (0.0 - 1.0)
-  # Lower values detect more plates but increase false positives
+  # Confidence threshold for detections (range: 0.0 - 1.0)
+  # - Controls minimum confidence score for a detection to be considered valid
+  # - Lower values: More detections, higher false positive rate
+  # - Higher values: Fewer detections, lower false positive rate
+  # - Recommended: 0.25 (balanced), 0.20 (speed), 0.35 (accuracy)
   confidence_threshold: 0.25
   
-  # Intersection over Union (IOU) threshold for NMS (0.0 - 1.0)
-  # Higher values allow more overlapping detections
+  # Intersection over Union (IOU) threshold for Non-Maximum Suppression (range: 0.0 - 1.0)
+  # - Used to filter overlapping bounding boxes
+  # - Lower values: Fewer overlapping detections, may merge valid plates
+  # - Higher values: More overlapping detections, may duplicate plates
+  # - Recommended: 0.45 (balanced), 0.50 (speed), 0.40 (accuracy)
   iou_threshold: 0.45
   
   # Image size for inference (pixels)
-  # Model will resize input images to this size
+  # - Model resizes input images to this size before processing
+  # - Larger sizes: Better accuracy for small plates, slower inference
+  # - Smaller sizes: Faster inference, may miss small plates
+  # - Supported: 640, 1056 (default), 1280
+  # - Recommended: 1056 (balanced), 640 (speed), 1056 (accuracy)
   img_size: 1056
   
-  # Enable GPU acceleration
+  # Compute device for inference
+  # - cuda: Use GPU acceleration (requires CUDA-capable GPU)
+  # - cpu: Use CPU (slower but works on any machine)
+  # - Recommended: cuda (if available)
   device: cuda  # Options: cuda, cpu
   
   # Maximum number of detections per image
+  # - Limits the number of plates detected in a single frame
+  # - Higher values: More detections per frame, slower processing
+  # - Lower values: Fewer detections, faster processing
+  # - Recommended: 100 (default), may reduce for crowded scenes
   max_det: 100
 
+# ========================================================
 # Recognition Module Configuration (PaddleOCR)
+# ========================================================
+# Handles text recognition from detected license plate crops using PaddleOCR.
+
 recognition:
   # Enable GPU acceleration for OCR
+  # - true: Use GPU (faster, requires CUDA-capable GPU)
+  # - false: Use CPU (slower but works on any machine)
+  # - Recommended: true (if CUDA available)
   use_gpu: true
   
   # Use angle classification to correct text orientation
+  # - Detects and corrects rotated or tilted text
+  # - true: More robust to orientation, slightly slower
+  # - false: Faster but may fail on rotated text
+  # - Recommended: true (balanced), false (speed only)
   use_textline_orientation: true
   
-  # Language model to use
-  lang: en  # Options: en, ch (Chinese), etc.
+  # Language model to use for recognition
+  # - en: English alphabet and numbers
+  # - ch: Chinese characters (not needed for GTA V)
+  # - Recommended: en
+  lang: en  # Options: en, ch, etc.
   
-  # Recognition confidence threshold (0.0 - 1.0)
+  # Recognition confidence threshold (range: 0.0 - 1.0)
+  # - Minimum confidence for OCR result to be considered valid
+  # - Lower values: More results, higher error rate
+  # - Higher values: Fewer results, lower error rate
+  # - Recommended: 0.5 (balanced), 0.4 (speed), 0.6 (accuracy)
   rec_threshold: 0.5
   
-  # Show detailed OCR logs
+  # Show detailed OCR logs (debugging only)
+  # - Prints PaddleOCR internal logs to console
+  # - Recommended: false (reduces clutter)
   show_log: false
   
-  # Enable recognition algorithm (disable for detection-only mode)
+  # Enable recognition algorithm
+  # - Set to false for detection-only mode (no OCR)
+  # - Recommended: true
   use_rec: true
 
   # --- Post-processing and Filtering ---
-  # Regex to validate and filter recognized plate text
-  # GTA V format: 2 digits, 3 uppercase letters, 3 digits (e.g., 12ABC345)
+  
+  # Regex pattern to validate recognized plate text
+  # - GTA V format: 2 digits + 3 uppercase letters + 3 digits (e.g., 12ABC345)
+  # - Filters out invalid text patterns from OCR results
+  # - Set to empty string ('') to disable regex filtering
+  # - Recommended: '^\d{2}[A-Z]{3}\d{3}$' (GTA V format)
   regex: '^\d{2}[A-Z]{3}\d{3}$'
   
-  # If multiple text lines are detected, prefer the one from the largest bounding box
+  # Prefer text from largest bounding box
+  # - When multiple text lines detected, choose text from largest box
+  # - true: More robust to headers/banners in plate images
+  # - false: Use first detected text line
+  # - Recommended: true
   prefer_largest_box: true
   
-  # Mask a ratio of the top of the cropped plate image to ignore headers/banners
-  # e.g., 0.25 would mask the top 25% of the image
+  # Mask ratio of top of cropped plate image
+  # - Ignores top portion of image (e.g., headers, banners)
+  # - Range: 0.0 (no masking) to 1.0 (mask entire image)
+  # - 0.25 would mask top 25% of the image
+  # - Recommended: 0.0 (GTA V plates have no headers)
   mask_top_ratio: 0.0
   
-  # Minimum confidence for a filtered line to be considered a valid result
+  # Minimum confidence for filtered text line
+  # - After filtering, only accept results above this confidence
+  # - Range: 0.0 - 1.0
+  # - Lower than rec_threshold for post-regex validation
+  # - Recommended: 0.3
   min_conf: 0.3
 
+# ========================================================
 # Tracking Module Configuration
+# ========================================================
+# Maintains identity of detected plates across video frames and manages OCR calls.
+
 tracking:
   # Tracking algorithm type
+  # - bytetrack: Fast and robust multi-object tracker (recommended)
+  # - botsort: Advanced tracker with ReID features (slower)
+  # - iou: Simple IOU-based tracker (fastest, less robust)
+  # - Recommended: bytetrack
   tracker_type: bytetrack  # Options: bytetrack, botsort, iou
   
   # Maximum frames to keep lost tracks alive
+  # - Tracks without detections for this many frames are deleted
+  # - Higher values: More robust to occlusions, slower track cleanup
+  # - Lower values: Faster track cleanup, may lose temporarily occluded plates
+  # - Recommended: 30 (balanced), 20 (speed), 40 (accuracy)
   max_age: 30
   
   # Minimum number of detections before confirming track
+  # - Track must be detected this many times before considered valid
+  # - Higher values: Fewer false tracks, may miss briefly visible plates
+  # - Lower values: More tracks, higher false positive rate
+  # - Recommended: 3 (balanced), 2 (speed), 4 (accuracy)
   min_hits: 3
   
-  # IOU threshold for matching detections to tracks
+  # IOU threshold for matching detections to existing tracks
+  # - Minimum overlap required to associate detection with track
+  # - Range: 0.0 - 1.0
+  # - Higher values: Stricter matching, may create duplicate tracks
+  # - Lower values: Looser matching, may merge different plates
+  # - Recommended: 0.3 (balanced), 0.25 (accuracy)
   iou_threshold: 0.3
   
-  # Frames between OCR calls for same plate (optimization)
-  # Reduces redundant OCR processing
+  # Frames between OCR calls for the same tracked plate
+  # - Reduces redundant OCR processing for stable tracks
+  # - Lower values: More frequent OCR, higher accuracy for changing conditions
+  # - Higher values: Less OCR, faster processing, may miss text changes
+  # - Recommended: 30 (balanced), 45 (speed), 20 (accuracy)
+  # - Set to 1 to run OCR every frame (not recommended)
   ocr_interval: 30
   
   # Confidence threshold for accepting OCR results
+  # - Minimum confidence required to save OCR result for a track
+  # - Range: 0.0 - 1.0
+  # - Higher values: Only high-quality OCR results saved
+  # - Lower values: More lenient, may save noisy results
+  # - Recommended: 0.7 (balanced), 0.6 (speed), 0.75 (accuracy)
   ocr_confidence_threshold: 0.7
 
+# ========================================================
 # Preprocessing Module Configuration
+# ========================================================
+# Image enhancement applied to detected plate crops before OCR.
+
 preprocessing:
-  # Enable image enhancement
-  enable_enhancement: true  # Changed from false to true
+  # Enable image enhancement pipeline
+  # - Applies CLAHE, Gaussian blur, and sharpening filters
+  # - true: Better OCR accuracy, slower processing
+  # - false: Faster processing, may reduce OCR quality
+  # - Recommended: true (accuracy), false (speed)
+  enable_enhancement: true
   
   # Minimum width for plate crops (pixels)
-  # Smaller crops will be upscaled
+  # - Crops smaller than this will be upscaled to improve OCR
+  # - Higher values: Better OCR for small plates, more memory usage
+  # - Lower values: Less memory, may reduce OCR quality for small plates
+  # - Recommended: 200 (balanced), 150 (speed), 250 (accuracy)
   min_width: 200
   
-  # Use CLAHE (Contrast Limited Adaptive Histogram Equalization)
-  use_clahe: true  # Changed from false to true
+  # --- CLAHE (Contrast Limited Adaptive Histogram Equalization) ---
+  # Improves contrast for text visibility
   
-  # CLAHE clip limit (higher = more contrast)
-  clahe_clip_limit: 2.0  # Restored to 2.0 for better text detection
+  # Enable CLAHE
+  # - Enhances local contrast in different regions of the image
+  # - Recommended: true (helps with varying lighting conditions)
+  use_clahe: true
   
-  # CLAHE tile grid size
+  # CLAHE clip limit (range: 1.0 - 4.0)
+  # - Controls maximum contrast enhancement
+  # - Higher values: More aggressive enhancement, may amplify noise
+  # - Lower values: Conservative enhancement, preserves details
+  # - Recommended: 2.0 (balanced), 1.5 (conservative), 3.0 (aggressive)
+  clahe_clip_limit: 2.0
+  
+  # CLAHE tile grid size [height, width]
+  # - Divides image into tiles for localized enhancement
+  # - Larger tiles: More uniform enhancement, less localized
+  # - Smaller tiles: More localized enhancement, may create artifacts
+  # - Must be positive integers, both dimensions must be equal
+  # - Recommended: [8, 8] (balanced), [4, 4] (more localized)
   clahe_tile_grid_size: [8, 8]
   
-  # Gaussian blur for noise reduction
+  # --- Gaussian Blur ---
+  # Reduces noise but may blur text
+  
+  # Enable Gaussian blur
+  # - Smooths image to reduce noise
+  # - May reduce text clarity if overused
+  # - Recommended: false (preserves text sharpness)
   use_gaussian_blur: false
+  
+  # Gaussian kernel size [height, width]
+  # - Controls blur intensity
+  # - Larger kernel: More blur, more noise reduction
+  # - Smaller kernel: Less blur, preserves details
+  # - Must be odd positive integers
+  # - Recommended: [3, 3] (light blur), [5, 5] (moderate blur)
   gaussian_kernel_size: [3, 3]
   
-  # Sharpening filter
-  use_sharpening: true  # Changed from false to true
-  sharpen_strength: 1.0  # Restored to 1.0 for better text detection
+  # --- Sharpening Filter ---
+  # Enhances text edges for better OCR
+  
+  # Enable sharpening
+  # - Enhances edges to make text more crisp
+  # - May amplify noise if image is already noisy
+  # - Recommended: true (improves text clarity)
+  use_sharpening: true
+  
+  # Sharpening strength (range: 0.5 - 2.0)
+  # - Controls intensity of sharpening effect
+  # - Higher values: More aggressive sharpening, may create artifacts
+  # - Lower values: Subtle enhancement, safer
+  # - Recommended: 1.0 (balanced), 0.7 (conservative), 1.5 (aggressive)
+  sharpen_strength: 1.0
 
+# ========================================================
 # Pipeline Configuration
+# ========================================================
+# Global pipeline settings for video processing and output management.
+
 pipeline:
   # Enable complete pipeline (detection + recognition + tracking)
+  # - true: Run full ALPR pipeline
+  # - false: Detection-only mode (no OCR)
+  # - Recommended: true
   enable_full_pipeline: true
   
-  # Save intermediate results (crops, annotated images)
+  # Save intermediate results
+  # - Saves cropped plate images and annotated frames
+  # - true: Useful for debugging and analysis, uses more disk space
+  # - false: Faster, uses less disk space
+  # - Recommended: true (development), false (production)
   save_intermediate: true
   
   # Output directory for results
+  # - All pipeline outputs (crops, annotations, logs) saved here
+  # - Relative paths are relative to project root
+  # - Recommended: outputs (default)
   output_dir: outputs
   
   # Video processing batch size (frames)
+  # - Number of frames processed at once
+  # - Higher values: Better GPU utilization, more memory usage
+  # - Lower values: Less memory, may reduce throughput
+  # - Recommended: 32 (balanced), 64 (high-end GPU), 16 (limited memory)
   batch_size: 32
   
+  # --- Logging Configuration ---
+  
   # Enable logging
+  # - Writes pipeline events and errors to log file
+  # - Recommended: true
   enable_logging: true
+  
+  # Log level
+  # - DEBUG: Detailed diagnostic information
+  # - INFO: General informational messages
+  # - WARNING: Warning messages for potential issues
+  # - ERROR: Error messages only
+  # - Recommended: INFO (balanced), DEBUG (troubleshooting)
   log_level: INFO  # Options: DEBUG, INFO, WARNING, ERROR
+  
+  # Log file path
+  # - Relative paths are relative to project root
+  # - Recommended: outputs/alpr_pipeline.log
   log_file: outputs/alpr_pipeline.log
 
-# Data Augmentation (for training)
+# ========================================================
+# Data Augmentation Configuration (Training Only)
+# ========================================================
+# Augmentation settings for YOLOv8 training. Not used during inference.
+
 augmentation:
-  # Horizontal flip probability
+  # Horizontal flip probability (range: 0.0 - 1.0)
+  # - Randomly flips training images horizontally
+  # - Recommended: 0.5 (50% chance)
   horizontal_flip: 0.5
   
-  # Vertical flip probability
+  # Vertical flip probability (range: 0.0 - 1.0)
+  # - Randomly flips training images vertically
+  # - Not recommended for license plates (text becomes inverted)
+  # - Recommended: 0.0 (disabled)
   vertical_flip: 0.0
   
-  # Random brightness/contrast adjustment range
+  # Random brightness/contrast adjustment range (range: 0.0 - 1.0)
+  # - Randomly adjusts image brightness and contrast
+  # - Helps model generalize to different lighting conditions
+  # - Recommended: 0.2 (moderate variation)
   brightness_contrast_limit: 0.2
   
-  # Blur probability
+  # Blur limit (pixels)
+  # - Maximum blur radius for random blur augmentation
+  # - Simulates camera motion or focus issues
+  # - Recommended: 3 (light blur)
   blur_limit: 3
   
-  # Random crop probability
+  # Random crop probability (range: 0.0 - 1.0)
+  # - Randomly crops training images
+  # - May cut off parts of license plates
+  # - Recommended: 0.0 (disabled for license plates)
   random_crop: 0.0
   
   # Rotation range (degrees)
+  # - Maximum rotation angle for random rotation augmentation
+  # - Simulates camera tilt or plate orientation
+  # - Recommended: 10 (moderate rotation)
   rotation_limit: 10
   
   # Enable Mosaic augmentation (YOLO-specific)
+  # - Combines 4 training images into one mosaic
+  # - Improves model robustness to scale and position
+  # - Recommended: true
   mosaic: true

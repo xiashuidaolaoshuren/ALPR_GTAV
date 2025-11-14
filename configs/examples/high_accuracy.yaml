@@ -1,0 +1,123 @@
+# High Accuracy Configuration - Optimized for Quality
+# Use this configuration when accuracy is more important than speed
+# Trade-off: Lower FPS for higher recognition accuracy
+# Recommended for: Batch processing, forensic analysis, critical applications
+
+# Detection Module - Accuracy-Optimized Settings
+detection:
+  # Use the fine-tuned model for best accuracy
+  model_path: models/detection/yolov8_finetuned_v2_best.pt
+  
+  # Higher confidence threshold filters out false positives
+  # Only high-confidence detections are processed
+  confidence_threshold: 0.35
+  
+  # Lower IOU threshold for better overlap handling
+  iou_threshold: 0.40
+  
+  # Larger image size for better accuracy
+  # Maximum supported size for detail preservation
+  img_size: 1056
+  
+  # GPU recommended for reasonable speed
+  device: cuda
+  
+  # Allow more detections for completeness
+  max_det: 100
+
+# Recognition Module - Accuracy-Optimized Settings
+recognition:
+  # GPU acceleration for reasonable speed
+  use_gpu: true
+  
+  # Enable angle classification for rotated text
+  use_textline_orientation: true
+  
+  # English language model
+  lang: en
+  
+  # Higher recognition threshold for quality
+  rec_threshold: 0.6
+  
+  # Enable detailed logging for debugging
+  show_log: false
+  
+  # Enable recognition
+  use_rec: true
+
+  # Post-processing settings - Strict validation
+  regex: '^\d{2}[A-Z]{3}\d{3}$'
+  prefer_largest_box: true
+  mask_top_ratio: 0.0
+  min_conf: 0.4
+
+# Tracking Module - Accuracy-Optimized Settings
+tracking:
+  # ByteTrack with longer tracking for accuracy
+  tracker_type: bytetrack
+  
+  # Longer track age maintains stable tracks
+  max_age: 40
+  
+  # Higher min_hits requires more evidence before confirmation
+  min_hits: 4
+  
+  # Lower IOU threshold for precise matching
+  iou_threshold: 0.25
+  
+  # Shorter OCR interval for frequent re-recognition
+  # Run OCR every 20 frames to catch text improvements
+  ocr_interval: 20
+  
+  # Higher threshold ensures only quality OCR results
+  ocr_confidence_threshold: 0.75
+
+# Preprocessing Module - Enhanced Processing
+preprocessing:
+  # Enable all enhancements for quality
+  enable_enhancement: true
+  
+  # Higher minimum width for better OCR input
+  min_width: 250
+  
+  # Enable CLAHE for contrast improvement
+  use_clahe: true
+  clahe_clip_limit: 2.0
+  clahe_tile_grid_size: [8, 8]
+  
+  # Disable Gaussian blur to preserve detail
+  use_gaussian_blur: false
+  gaussian_kernel_size: [3, 3]
+  
+  # Enable sharpening for text clarity
+  use_sharpening: true
+  sharpen_strength: 1.0
+
+# Pipeline Configuration - Quality-Focused
+pipeline:
+  # Full pipeline enabled
+  enable_full_pipeline: true
+  
+  # Save intermediate results for analysis
+  save_intermediate: true
+  
+  # Output directory
+  output_dir: outputs
+  
+  # Moderate batch size for memory management
+  batch_size: 32
+  
+  # Detailed logging for debugging
+  enable_logging: true
+  log_level: INFO
+  log_file: outputs/alpr_pipeline.log
+
+# Data Augmentation (Training Only)
+augmentation:
+  horizontal_flip: 0.5
+  vertical_flip: 0.0
+  brightness_contrast_limit: 0.2
+  blur_limit: 3
+  random_crop: 0.0
+  rotation_limit: 10
+  mosaic: true

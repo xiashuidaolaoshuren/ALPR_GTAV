@@ -1,0 +1,121 @@
+# Balanced Configuration - Production-Ready Settings
+# Optimized for a balance between speed and accuracy
+# Recommended for: Real-time applications, general-purpose usage
+# Expected: 30-45 FPS on RTX 3070 Ti with good accuracy
+
+# Detection Module - Balanced Settings
+detection:
+  # Use the fine-tuned model for good accuracy
+  model_path: models/detection/yolov8_finetuned_v2_best.pt
+  
+  # Balanced confidence threshold
+  confidence_threshold: 0.30
+  
+  # Moderate IOU threshold for good overlap handling
+  iou_threshold: 0.45
+  
+  # Standard image size for balanced performance
+  img_size: 1056
+  
+  # GPU recommended for real-time processing
+  device: cuda
+  
+  # Standard detection limit
+  max_det: 100
+
+# Recognition Module - Balanced Settings
+recognition:
+  # GPU acceleration for speed
+  use_gpu: true
+  
+  # Enable angle classification for robustness
+  use_textline_orientation: true
+  
+  # English language model
+  lang: en
+  
+  # Moderate recognition threshold
+  rec_threshold: 0.5
+  
+  # Minimal logging for performance
+  show_log: false
+  
+  # Enable recognition
+  use_rec: true
+
+  # Post-processing settings - Standard validation
+  regex: '^\d{2}[A-Z]{3}\d{3}$'
+  prefer_largest_box: true
+  mask_top_ratio: 0.0
+  min_conf: 0.3
+
+# Tracking Module - Balanced Settings
+tracking:
+  # ByteTrack for robust tracking
+  tracker_type: bytetrack
+  
+  # Moderate track age for balance
+  max_age: 30
+  
+  # Standard min_hits for confirmation
+  min_hits: 3
+  
+  # Balanced IOU threshold
+  iou_threshold: 0.3
+  
+  # Moderate OCR interval for efficiency
+  # Run OCR every 30 frames for balance
+  ocr_interval: 30
+  
+  # Moderate threshold for quality control
+  ocr_confidence_threshold: 0.6
+
+# Preprocessing Module - Selective Processing
+preprocessing:
+  # Enable enhancements for quality
+  enable_enhancement: true
+  
+  # Standard minimum width
+  min_width: 200
+  
+  # Enable CLAHE for contrast improvement
+  use_clahe: true
+  clahe_clip_limit: 2.0
+  clahe_tile_grid_size: [8, 8]
+  
+  # Light Gaussian blur for noise reduction
+  use_gaussian_blur: true
+  gaussian_kernel_size: [3, 3]
+  
+  # Disable sharpening to save computation
+  use_sharpening: false
+  sharpen_strength: 1.0
+
+# Pipeline Configuration - Production Settings
+pipeline:
+  # Full pipeline enabled
+  enable_full_pipeline: true
+  
+  # Save intermediate results for debugging
+  save_intermediate: true
+  
+  # Output directory
+  output_dir: outputs
+  
+  # Balanced batch size for performance
+  batch_size: 48
+  
+  # Standard logging for monitoring
+  enable_logging: true
+  log_level: INFO
+  log_file: outputs/alpr_pipeline.log
+
+# Data Augmentation (Training Only)
+augmentation:
+  horizontal_flip: 0.5
+  vertical_flip: 0.0
+  brightness_contrast_limit: 0.2
+  blur_limit: 3
+  random_crop: 0.0
+  rotation_limit: 10
+  mosaic: true

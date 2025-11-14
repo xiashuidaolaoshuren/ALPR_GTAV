@@ -7,6 +7,7 @@ on video frames.
 """
 
 import logging
+from pathlib import Path
 from typing import Dict
 import numpy as np
 import yaml
@@ -60,9 +61,11 @@ class ALPRPipeline:
 
         Raises:
             FileNotFoundError: If config file doesn't exist
+            ValueError: If configuration validation fails
             RuntimeError: If model initialization fails
 
         Note:
+            - Configuration is automatically validated before use
             - Model loading may take several seconds on first run
             - GPU will be used if available for both detection and recognition
             - Logs detailed initialization information
@@ -83,6 +86,31 @@ class ALPRPipeline:
         except Exception as e:
             logger.error(f"Failed to load configuration: {e}")
             raise RuntimeError(f"Configuration loading failed: {e}")
+
+        # Validate configuration
+        logger.info("Validating configuration...")
+        try:
+            # Import validation utility
+            from scripts.utils.validate_config import ConfigValidator
+
+            validator = ConfigValidator(config_path)
+            is_valid, errors = validator.validate()
+
+            if not is_valid:
+                error_msg = "Configuration validation failed:\n" + "\n".join(
+                    f"  - {error}" for error in errors
+                )
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+
+            logger.info("✓ Configuration validated successfully")
+        except ImportError:
+            logger.warning(
+                "Configuration validation utility not found, skipping validation"
+            )
+        except Exception as e:
+            logger.error(f"Configuration validation failed: {e}")
+            raise
 
         # Initialize detection model
         logger.info("Loading detection model...")

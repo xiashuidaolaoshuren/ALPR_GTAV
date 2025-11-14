@@ -1,0 +1,123 @@
+# High Performance Configuration - Optimized for Speed
+# Use this configuration when real-time processing is critical
+# Trade-off: Lower accuracy for higher FPS
+# Recommended for: Live video streams, real-time demonstrations, resource-constrained systems
+
+# Detection Module - Speed-Optimized Settings
+detection:
+  # Use the fine-tuned model
+  model_path: models/detection/yolov8_finetuned_v2_best.pt
+  
+  # Lower confidence threshold for faster detection
+  # Catches more plates but may include false positives
+  confidence_threshold: 0.20
+  
+  # Higher IOU threshold reduces NMS processing time
+  iou_threshold: 0.50
+  
+  # Smaller image size for faster inference
+  # 640 is the fastest, 1056 provides better accuracy
+  img_size: 640
+  
+  # GPU required for high performance
+  device: cuda
+  
+  # Limit detections to reduce post-processing
+  max_det: 50
+
+# Recognition Module - Speed-Optimized Settings
+recognition:
+  # GPU acceleration essential for speed
+  use_gpu: true
+  
+  # Disable angle classification to save time
+  use_textline_orientation: false
+  
+  # English language model (fastest)
+  lang: en
+  
+  # Lower recognition threshold for speed
+  rec_threshold: 0.4
+  
+  # Disable logging for performance
+  show_log: false
+  
+  # Enable recognition
+  use_rec: true
+
+  # Post-processing settings
+  regex: '^\d{2}[A-Z]{3}\d{3}$'
+  prefer_largest_box: true
+  mask_top_ratio: 0.0
+  min_conf: 0.25
+
+# Tracking Module - Speed-Optimized Settings
+tracking:
+  # ByteTrack is fastest
+  tracker_type: bytetrack
+  
+  # Short track age reduces memory usage
+  max_age: 20
+  
+  # Lower min_hits for faster track confirmation
+  min_hits: 2
+  
+  # Higher IOU threshold reduces matching complexity
+  iou_threshold: 0.35
+  
+  # Long OCR interval minimizes redundant processing
+  # Only run OCR every 45 frames
+  ocr_interval: 45
+  
+  # Lower threshold accepts more OCR results quickly
+  ocr_confidence_threshold: 0.6
+
+# Preprocessing Module - Minimal Processing
+preprocessing:
+  # Disable enhancement for speed
+  enable_enhancement: false
+  
+  # Lower minimum width reduces upscaling time
+  min_width: 150
+  
+  # Disable CLAHE to save processing time
+  use_clahe: false
+  clahe_clip_limit: 2.0
+  clahe_tile_grid_size: [8, 8]
+  
+  # Disable Gaussian blur
+  use_gaussian_blur: false
+  gaussian_kernel_size: [3, 3]
+  
+  # Disable sharpening
+  use_sharpening: false
+  sharpen_strength: 1.0
+
+# Pipeline Configuration - Performance-Focused
+pipeline:
+  # Full pipeline enabled
+  enable_full_pipeline: true
+  
+  # Disable intermediate saves for speed
+  save_intermediate: false
+  
+  # Output directory
+  output_dir: outputs
+  
+  # Larger batch size for better GPU utilization
+  batch_size: 64
+  
+  # Minimal logging
+  enable_logging: true
+  log_level: WARNING
+  log_file: outputs/alpr_pipeline.log
+
+# Data Augmentation (Training Only)
+augmentation:
+  horizontal_flip: 0.5
+  vertical_flip: 0.0
+  brightness_contrast_limit: 0.2
+  blur_limit: 3
+  random_crop: 0.0
+  rotation_limit: 10
+  mosaic: true
