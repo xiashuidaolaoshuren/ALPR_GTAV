@@ -1,0 +1,52 @@
+appId: com.gtav.alpr
+productName: GTA V ALPR System
+directories:
+  output: dist
+win:
+  target:
+    - nsis
+  icon: build/icon.png
+  certificateFile: null
+  certificatePassword: null
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+files:
+  - main.js
+  - preload.js
+  - build/**/*
+extraResources:
+  - from: ../../.venv
+    to: python
+    filter:
+      - '**/*'
+      - '!**/__pycache__'
+      - '!**/tests'
+      - '!**/test'
+      - '!**/*.pyc'
+      - '!**/*.pyo'
+  - from: ../../models
+    to: models
+    filter:
+      - '**/*.pt'
+  - from: ../../configs
+    to: configs
+    filter:
+      - '**/*.yaml'
+      - '**/*.yml'
+  - from: ../../gui
+    to: gui
+    filter:
+      - '**/*.py'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '!electron/**/*'
+      - '!**/__pycache__'
+  - from: ../../src
+    to: src
+    filter:
+      - '**/*.py'
+      - '!**/__pycache__'
+      - '!**/*.pyc'
