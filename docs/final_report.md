@@ -73,7 +73,7 @@ This dataset was created to fine-tune the YOLOv8 detection model.
     -   `blurred`: The plate is out of focus or affected by motion blur.
     -   `occluded`: The plate is partially hidden by an object.
     This granular annotation strategy was crucial. It allowed the detection model to be trained on *all* visible plates, making it robust in identifying plates even in challenging conditions. Simultaneously, it provided a simple mechanism to filter for only `clear` plates when creating the high-quality dataset for the subsequent OCR task.
--  ** Use of readability Attribute**: The `readability` attribute enabled the creation of two distinct datasets from the same annotations:
+-  **Use of readability Attribute**: The `readability` attribute enabled the creation of two distinct datasets from the same annotations:
     1.  A comprehensive detection dataset including all plates (clear, blurred, occluded) for robust model training.
     2.  A high-quality OCR dataset filtered to include only `clear` plates, ensuring optimal recognition performance for potential OCR fine-tuning.
 -   **Format Conversion**: After annotation, the Label Studio JSON output was converted into the YOLO format (`<class_id> <x_center> <y_center> <width> <height>`) using a custom Python script. The dataset was then split into training, validation, and test sets.
