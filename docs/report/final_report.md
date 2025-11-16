@@ -220,7 +220,14 @@ Future work should focus on a quantitative evaluation of the OCR and tracking co
 
 ---
 
-## 8. References
+## 8. Use of AI Tools
+Several AI tools were uilized during the project development for the following purposes:
+- **Project Clarification and Suggestion**: I used AI Tools to help clarify my project goals, suggest methodologies, and outline the report structure. This helped in organizing my thoughts and ensuring a comprehensive approach.
+- **Code Debugging**: I used AI Tools to help debug issues encountered during model training. This significantly sped up the development process.
+- **Documentation**: AI Tools were also employed to help document the codebase, create README files for various scripts, and adding comments to complex sections of code. It ensured that the documentation was clear and helpful for future reference.
+
+
+## 9. References
 
 - Buslaev, A., et al. (2020). Albumentations: Fast and Flexible Image Augmentations. *Information*, 11(2), 125.
 - Hsu, G.-S., et al. (2013). Application-Oriented License Plate Recognition. *IEEE Transactions on Intelligent Transportation Systems*, 14(2), 963-967.
