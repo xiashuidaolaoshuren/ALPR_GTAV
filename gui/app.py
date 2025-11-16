@@ -77,6 +77,7 @@ def initialize_session_state():
     if 'log_handler' not in st.session_state:
         # Create logging handler
         log_handler = StreamlitLogHandler(max_logs=100)
+        log_handler.setLevel(logging.DEBUG)  # Capture all log levels
         st.session_state.log_handler = log_handler
         
         # Configure root logger
@@ -84,6 +85,11 @@ def initialize_session_state():
         logger.handlers.clear()  # Clear any existing handlers
         logger.addHandler(log_handler)
         logger.setLevel(logging.INFO)
+        
+        # Configure 'src' logger to ensure ALPR pipeline logs are captured
+        src_logger = logging.getLogger('src')
+        src_logger.setLevel(logging.INFO)
+        src_logger.propagate = True  # Ensure propagation to root logger
         
         # Log initialization
         logging.info("🚀 GTA V ALPR System initialized")
@@ -96,6 +102,11 @@ def initialize_session_state():
             logger.handlers.clear()
             logger.addHandler(st.session_state.log_handler)
             logger.setLevel(logging.INFO)
+            
+            # Reconfigure 'src' logger
+            src_logger = logging.getLogger('src')
+            src_logger.setLevel(logging.INFO)
+            src_logger.propagate = True
     
     # Session tracking
     if 'session_start' not in st.session_state:
@@ -183,6 +194,11 @@ def cleanup_previous_video():
         st.session_state.processing = False
         st.session_state.paused = False
         st.session_state.current_fps = 0.0
+        st.session_state.current_frame = 0
+        st.session_state.total_frames = 0
+        st.session_state.total_detections = 0
+        st.session_state.total_recognitions = 0
+        st.session_state.seen_track_ids = set()
         st.session_state.processing_thread = None
         st.session_state.output_video_path = None
 

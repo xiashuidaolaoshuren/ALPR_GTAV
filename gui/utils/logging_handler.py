@@ -39,6 +39,9 @@ class StreamlitLogHandler(logging.Handler):
         self.logs = deque(maxlen=max_logs)
         self.max_logs = max_logs
         
+        # Set handler level to DEBUG to capture all messages
+        self.setLevel(logging.DEBUG)
+        
         # Set default formatter
         formatter = logging.Formatter(
             '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s',

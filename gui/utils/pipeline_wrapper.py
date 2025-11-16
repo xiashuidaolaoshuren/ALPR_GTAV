@@ -13,6 +13,7 @@ import threading
 import queue
 import time
 import logging
+from gui.utils.logging_handler import StreamlitLogHandler
 import subprocess
 from typing import Dict, Optional, Any
 from pathlib import Path
@@ -62,6 +63,20 @@ def load_cached_pipeline(config_str: str, device: str):
         - Shared across all user sessions (memory efficient)
         - Cache persists until Streamlit server restarts
     """
+    # Configure logging BEFORE importing/loading pipeline
+    # This ensures import-time logs from src modules are captured
+    if hasattr(st.session_state, 'log_handler'):
+        root_logger = logging.getLogger()
+        has_handler = any(isinstance(h, StreamlitLogHandler) for h in root_logger.handlers)
+        if not has_handler:
+            root_logger.addHandler(st.session_state.log_handler)
+        root_logger.setLevel(logging.INFO)
+        
+        # Configure src logger
+        src_logger = logging.getLogger('src')
+        src_logger.setLevel(logging.INFO)
+        src_logger.propagate = True
+    
     logger.info(f"Loading cached pipeline (device={device})")
     
     # Create temporary config file
@@ -113,6 +128,19 @@ class GUIPipelineWrapper:
                 - recognition: OCR config (min_conf)
                 - tracking: tracking config (ocr_interval)
         """
+        # Configure logging FIRST before any pipeline operations
+        if hasattr(st.session_state, 'log_handler'):
+            root_logger = logging.getLogger()
+            has_handler = any(isinstance(h, StreamlitLogHandler) for h in root_logger.handlers)
+            if not has_handler:
+                root_logger.addHandler(st.session_state.log_handler)
+            root_logger.setLevel(logging.INFO)
+            
+            # Configure src logger
+            src_logger = logging.getLogger('src')
+            src_logger.setLevel(logging.INFO)
+            src_logger.propagate = True
+        
         logger.info("Initializing GUIPipelineWrapper")
         
         # Build config YAML string for caching
@@ -150,6 +178,25 @@ class GUIPipelineWrapper:
             video_path: Path to video file
             display_fps: Target FPS for progress updates (not output FPS)
         """
+        # Configure logging for this background thread
+        # This ensures logs from ALPR pipeline are captured in the GUI
+        if hasattr(st.session_state, 'log_handler'):
+            thread_logger = logging.getLogger()
+            # Add handler if not already present (avoid duplicates)
+            has_handler = any(isinstance(h, StreamlitLogHandler) for h in thread_logger.handlers)
+            if not has_handler:
+                thread_logger.addHandler(st.session_state.log_handler)
+                thread_logger.setLevel(logging.INFO)
+            
+            # Configure src logger for ALPR pipeline modules
+            src_logger = logging.getLogger('src')
+            src_logger.setLevel(logging.INFO)
+            src_logger.propagate = True
+            
+            logger.info("✓ Background thread logging configured successfully")
+        else:
+            logger.warning("⚠ StreamlitLogHandler not available in session state")
+        
         logger.info(f"Starting background processing: {video_path}")
         
         cap = None
