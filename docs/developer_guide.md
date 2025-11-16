@@ -753,7 +753,7 @@ pytest tests/ -v
 python -c "import torch; print(torch.cuda.is_available())"
 
 # Test GUI
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 ### Running Tests
@@ -807,7 +807,7 @@ import pdb; pdb.set_trace()
 
 **1. Streamlit Debug Mode:**
 ```bash
-streamlit run gui/app.py --logger.level=debug
+python -m streamlit run gui/app.py --logger.level=debug
 ```
 
 **2. Session State Inspection:**

@@ -103,7 +103,7 @@ python models/detection/download_model.py
 
 **Launch Streamlit interface:**
 ```powershell
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 This opens a web interface at `http://localhost:8501` with:
@@ -189,7 +189,7 @@ The Streamlit GUI provides an intuitive interface for video processing:
 
 **Launch:**
 ```powershell
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 **Features:**

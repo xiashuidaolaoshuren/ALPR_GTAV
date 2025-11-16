@@ -102,7 +102,7 @@ All checks passed! ✓
 
 **6. Test GUI Launch**
 ```powershell
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 Opens browser at `http://localhost:8501`
@@ -119,14 +119,14 @@ The Streamlit GUI provides an intuitive interface for video processing with real
 ```powershell
 cd ALPR_GTAV
 .venv\Scripts\Activate.ps1
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 **Method 2: Command Prompt**
 ```cmd
 cd ALPR_GTAV
 .venv\Scripts\activate.bat
-streamlit run gui/app.py
+python -m streamlit run gui/app.py
 ```
 
 **Method 3: VS Code**
@@ -787,7 +787,7 @@ ffmpeg -i input.mp4 -vcodec libx264 -crf 23 -preset medium output.mp4
 **Goal:** Process a single video with real-time visualization
 
 **Steps:**
-1. Launch GUI: `streamlit run gui/app.py`
+1. Launch GUI: `python -m streamlit run gui/app.py`
 2. Upload video file
 3. Adjust parameters if needed (usually defaults work)
 4. Click "Start Processing"
@@ -1108,7 +1108,7 @@ ffmpeg -i input.mp4 -vcodec libx264 output.mp4
 A: GUI refresh loop issue. Restart Streamlit:
 ```powershell
 # Press Ctrl+C in terminal
-# Re-run: streamlit run gui/app.py
+# Re-run: python -m streamlit run gui/app.py
 ```
 
 ---
