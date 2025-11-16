@@ -242,6 +242,7 @@ Several AI tools were uilized during the project development for the following p
 - **Waymo**. Simulation City. Retrieved from [https://waymo.com/blog/2021/10/simulation-city/](https://waymo.com/blog/2021/10/simulation-city/)
 - **NVIDIA**. Drive Constellation. Retrieved from [https://www.nvidia.com/en-us/self-driving-cars/drive-constellation/](https://www.nvidia.com/en-us/self-driving-cars/drive-constellation/)
 - **Intel Labs & Darmstadt University**. (2016). Playing for Data: Ground Truth from Computer Games. *ECCV 2016*.
+- **Yasir Faiz Ahmed**. (2023). License Plate Object Detection. *Hugging Face*. Retrieved from [https://huggingface.co/yasirfaizahmed/license-plate-object-detection](https://huggingface.co/yasirfaizahmed/license-plate-object-detection)
 - **Ultralytics YOLOv8:** [https://github.com/ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
 - **PaddleOCR:** [https://github.com/PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
