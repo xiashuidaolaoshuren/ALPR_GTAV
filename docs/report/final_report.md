@@ -24,7 +24,7 @@ The problem is interesting not just as a technical challenge, but for its signif
 
 My overall plan is to construct a modular, two-stage pipeline: a YOLOv8 model for license plate detection, followed by a PaddleOCR engine for character recognition, with a ByteTrack algorithm for object tracking to optimize performance.
 
-The contributions of this work extend beyond the gaming community. By developing a system that functions in a high-fidelity simulation, I am exploring solutions to the critical **"sim-to-real" domain gap**. The techniques used to make a model effective in GTA V can inform strategies for transferring models trained on synthetic data to real-world applications. Furthermore, this project provides a blueprint for using simulated environments as a safe, cost-effective, and scalable platform for testing and validating computer vision components before their deployment in physical systems like autonomous cars.
+The contributions of this work extend beyond the gaming community. By developing and validating a system entirely within this high-fidelity simulation, my project serves as a case study that **investigates the nature of the "sim-to-real" domain gap**. The dramatic performance difference between a real-world baseline and a fine-tuned synthetic model quantifies this gap and highlights the critical need for in-domain data, a foundational step for any future sim-to-real transfer. Furthermore, this project provides a blueprint for using simulated environments as a safe, cost-effective, and scalable platform for testing and validating computer vision components before their deployment in physical systems like autonomous cars.
 
 ---
 
@@ -214,7 +214,7 @@ A limitation of this study is the focus on detection metrics. While OCR performa
 
 This project successfully developed a high-performance Automatic License Plate Recognition system for Grand Theft Auto V. By leveraging a two-stage pipeline with a fine-tuned YOLOv8 detector and a robust PaddleOCR engine, the system achieves excellent detection and recognition results across a wide range of in-game conditions.
 
-The key takeaway is the critical importance of in-domain fine-tuning. The custom-annotated dataset of GTA V license plates was the single most important factor in achieving high accuracy, bridging the significant gap between real-world and synthetic data domains. The final model (`detection_finetuned_v2`) is capable of detecting license plates with high confidence and a low error rate, providing a solid foundation for the full ALPR pipeline.
+The key takeaway is the project's direct investigation into the sim-to-real domain gap. The custom-annotated dataset of GTA V license plates was the single most important factor in achieving high accuracy, and the stark performance difference between the baseline and fine-tuned models **quantifies the significance of this gap**. The final model (`detection_finetuned`) is capable of detecting license plates with high confidence and a low error rate, providing a solid foundation for the full ALPR pipeline.
 
 Future work should focus on a quantitative evaluation of the OCR and tracking components, further optimization for real-time performance, and expanding the training dataset to cover even more edge cases within the game world. The designed Streamlit GUI provides a clear path for creating an interactive and demonstrable final application.
 
