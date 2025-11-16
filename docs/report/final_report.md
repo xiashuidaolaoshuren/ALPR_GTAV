@@ -62,7 +62,7 @@ The performance of the ALPR system is critically dependent on the quality and di
 
 **1. Data Acquisition**:
 -   **Source**: All data was sourced directly from Grand Theft Auto V gameplay on a PC. Raw video footage was captured using **OBS Studio** at 1080p resolution and 60 FPS to ensure high-quality frames for analysis.
--   **Raw Footage**: The script captured high-resolution screenshots and short video clips. Images is extracted from the raw footage, resulting in a cleaned dataset of nearly 1200 images. This collection captured vehicles from multiple angles, distances, and speeds, forming the primary source material for annotation.
+-   **Raw Footage**: I manually captured high-resolution screenshots and short video clips. Images is extracted from the raw footage, resulting in a cleaned dataset of nearly 1200 images. This collection captured vehicles from multiple angles, distances, and speeds, forming the primary source material for annotation.
 
 **2. License Plate Detection Dataset (YOLO Format)**:
 This dataset was created to fine-tune the YOLOv8 detection model.
