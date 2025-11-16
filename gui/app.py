@@ -13,6 +13,7 @@ import streamlit as st
 import logging
 import cv2
 import time
+import yaml
 from pathlib import Path
 
 # Import GUI components
@@ -190,36 +191,32 @@ def build_pipeline_config() -> dict:
     """
     Build pipeline configuration dict from GUI session state.
     
+    Loads the base configuration from configs/pipeline_config.yaml and
+    overrides specific parameters from GUI settings.
+    
     Returns:
-        dict: Pipeline configuration in expected format
+        dict: Complete pipeline configuration with GUI overrides
     """
+    # Load base configuration from file
+    with open('configs/pipeline_config.yaml', 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+    
+    # Apply GUI overrides
     gui_config = st.session_state.pipeline_config
     
-    return {
-        'detection': {
-            'model_path': 'models/detection/yolov8_finetuned_v2_best.pt',
-            'confidence_threshold': gui_config['conf_threshold'],
-            'iou_threshold': gui_config['iou_threshold'],
-            'device': gui_config['device']
-        },
-        'recognition': {
-            'use_gpu': gui_config['device'] == 'cuda',
-            'lang': 'en',
-            'det': False,
-            'rec': True,
-            'show_log': False,
-            'min_conf': gui_config['min_ocr_conf']
-        },
-        'tracking': {
-            'max_age': 30,
-            'min_hits': 3,
-            'iou_threshold': 0.3,
-            'ocr_interval': gui_config['ocr_interval']
-        },
-        'preprocessing': {
-            'enabled': False
-        }
-    }
+    # Override detection settings
+    config['detection']['confidence_threshold'] = gui_config['conf_threshold']
+    config['detection']['iou_threshold'] = gui_config['iou_threshold']
+    config['detection']['device'] = gui_config['device']
+    
+    # Override recognition settings
+    config['recognition']['use_gpu'] = gui_config['device'] == 'cuda'
+    config['recognition']['min_conf'] = gui_config['min_ocr_conf']
+    
+    # Override tracking settings
+    config['tracking']['ocr_interval'] = gui_config['ocr_interval']
+    
+    return config
 
 
 def handle_start_processing():

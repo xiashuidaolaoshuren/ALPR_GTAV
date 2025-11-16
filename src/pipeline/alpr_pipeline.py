@@ -94,7 +94,8 @@ class ALPRPipeline:
             from scripts.utils.validate_config import ConfigValidator
 
             validator = ConfigValidator(config_path)
-            is_valid, errors = validator.validate()
+            is_valid = validator.validate()
+            errors = validator.get_errors()
 
             if not is_valid:
                 error_msg = "Configuration validation failed:\n" + "\n".join(
