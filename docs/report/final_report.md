@@ -224,6 +224,7 @@ Several AI tools were uilized during the project development for the following p
 - **Code Debugging**: I used AI Tools to help debug issues encountered during model training. This significantly sped up the development process.
 - **Documentation**: AI Tools were also employed to help document the codebase, create README files for various scripts, and adding comments to complex sections of code. It ensured that the documentation was clear and helpful for future reference.
 
+---
 
 ## 9. References
 
@@ -244,3 +245,7 @@ Several AI tools were uilized during the project development for the following p
 - **Ultralytics YOLOv8:** [https://github.com/ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
 - **PaddleOCR:** [https://github.com/PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
+---
+
+## 10. Appendix
+- **Github Repository:** [https://github.com/xiashuidaolaoshuren/ALPR_GTAV](https://github.com/xiashuidaolaoshuren/ALPR_GTAV)
