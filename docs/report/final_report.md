@@ -91,7 +91,7 @@ This dataset was created to evaluate and potentially fine-tune the OCR model.
 
 ### 3.2. Pipeline Architecture
 
-My approach is centered around a modular, two-stage pipeline.
+My approach is centered around a modular, three-stage pipeline.
 
 **Baseline**: My primary baseline for detection is a pre-trained YOLOv8 model (`yasirfaizahmed/license-plate-object-detection`) fine-tuned on real-world license plates. I will evaluate its zero-shot performance on GTA V data to gauge the domain gap between real and synthetic imagery. For recognition, the baseline is the general-purpose English recognition model provided by PaddleOCR.
 
