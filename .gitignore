@@ -50,7 +50,7 @@ venv.bak/
 *.pth
 *.ckpt
 *.safetensors
-models/
+!models/detection/yolov8_finetuned_v2_best.pt
 checkpoints/
 logs/
 wandb/
