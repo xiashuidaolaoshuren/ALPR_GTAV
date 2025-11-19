@@ -82,7 +82,7 @@ python scripts/diagnostics/verify_gpu.py
 
 Expected output:
 ```
-✓ PyTorch CUDA available (Device: NVIDIA GeForce RTX 3070 Ti)
+✓ PyTorch CUDA available (Device: {YOUR_GPU_NAME})
 ✓ PaddlePaddle GPU available
 ✓ All required packages installed
 ```
