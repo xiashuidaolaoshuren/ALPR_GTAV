@@ -651,12 +651,12 @@ def train_model(args, config: Dict):
         # Post-training validation
         logger.info("=" * 80)
         logger.info("Running post-training validation...")
-        val_results = model.val()
+        val_results = model.val(project=str(actual_save_dir.parent), name=f"{actual_save_dir.name}_val")
 
         # Post-training test evaluation
         logger.info("=" * 80)
         logger.info("Running post-training test evaluation...")
-        test_results = model.val(split="test")
+        test_results = model.val(split="test", project=str(actual_save_dir.parent), name=f"{actual_save_dir.name}_test")
 
         # Extract test metrics
         test_metrics = {
