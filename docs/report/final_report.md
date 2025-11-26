@@ -16,7 +16,7 @@ This report details the development and evaluation of a real-time Automatic Lice
 
 Automatic License Plate Recognition (ALPR) is a technology that uses optical character recognition (OCR) on images to read vehicle registration plates. While a mature field with widespread applications in law enforcement and traffic management, its application in synthetic environments like video games offers a unique and valuable research frontier. This project develops a proof-of-concept ALPR system for Grand Theft Auto V (GTA V), tackling challenges like stylized graphics, variable lighting, and non-standard fonts.
 
-Grand Theft Auto V (GTA V) is an open-world action-adventure game renowned for its detailed and dynamic simulation of a contemporary city, developed by **Rockstar Games**. Its high-fidelity graphics, realistic physics engine, and complex AI for traffic and pedestrians create a rich, interactive environment that closely mirrors real-world urban settings. This makes GTA V an ideal and challenging testbed for computer vision systems. The game's varied environmental conditions—including a full day-night cycle, changing weather, and diverse vehicle models—provide a cost-effective and safe platform for generating the vast and varied datasets required to train and validate robust perception algorithms, such as those needed for autonomous driving.
+Grand Theft Auto V (GTA V) is an open-world action-adventure game renowned for its detailed and dynamic simulation of a contemporary city, developed by **Rockstar Games**. Its high-fidelity graphics, realistic physics engine, and complex AI for traffic and pedestrians create a rich, interactive environment that closely mirrors real-world urban settings. This makes GTA V an ideal and challenging testbed for computer vision systems. The game's varied environmental conditions—including a full day-night cycle, changing weather, and diverse vehicle models—provide a cost-effective and safe platform for generating the vast and varied datasets required to train and validate robust perception algorithms, such as those needed for autonomous driving and automatic license plate recognition.
 
 The concept of using video games as training grounds for AI is well-established. Major companies and research institutions have leveraged simulators for years; for example, Waymo uses its proprietary "Simulation City," and NVIDIA has its "Drive Constellation" platform. The use of commercial games, however, was notably pioneered by researchers from institutions like Intel Labs and Darmstadt University, who demonstrated that GTA V could be used to extract rich, automatically annotated data for training autonomous driving models. This project follows in that tradition, using a commercial game as a cost-effective and scalable data source.
 
@@ -91,7 +91,7 @@ This dataset was created to evaluate and potentially fine-tune the OCR model.
 
 ### 3.2. Pipeline Architecture
 
-My approach is centered around a modular, three-stage pipeline.
+My approach is centered around a modular, two-stage pipeline.
 
 **Baseline**: My primary baseline for detection is a pre-trained YOLOv8 model (`yasirfaizahmed/license-plate-object-detection`) fine-tuned on real-world license plates. I will evaluate its zero-shot performance on GTA V data to gauge the domain gap between real and synthetic imagery. For recognition, the baseline is the general-purpose English recognition model provided by PaddleOCR.
 
@@ -100,8 +100,7 @@ My approach is centered around a modular, three-stage pipeline.
 -   **Process**: Each video frame is passed to my fine-tuned model, which returns a set of bounding boxes corresponding to potential license plates. I will use a confidence threshold to filter out weak detections. This fine-tuning step is critical for bridging the "sim-to-real" gap and achieving high accuracy.
 
 **Stage 2: License Plate Recognition**
--   **Model**: I will use the **PaddleOCR** engine.
--   **Preprocessing**: The cropped plate image from Stage 1 will be preprocessed. This may include grayscale conversion, resizing to an optimal dimension, and contrast enhancement (e.g., using CLAHE) to improve OCR accuracy.
+-   **Model**: I PaddleOCR** engine.- is used.   **Preprocessing**: The cropped plate image from Stage 1 will be preprocessed. This may include grayscale conversion, resizing to an optimal dimension, and contrast enhancement (e.g., using CLAHE) to improve OCR accuracy.
 -   **Post-processing**: Since PaddleOCR may detect multiple lines of text on a plate (e.g., the state name and the plate number), I will implement a rule-based filter to select the correct text. This filter will:
     1.  Validate candidates against the known GTA V plate regex (`^\d{2}[A-Z]{3}\d{3}$`).
     2.  Score the remaining candidates using a formula that considers OCR confidence, the text's bounding box height, and its length: $score = p \cdot h \cdot \min(\frac{L}{8}, 1)$.
@@ -174,6 +173,58 @@ To provide a comprehensive view of the improvements gained from fine-tuning, the
 
 While a systematic quantitative analysis of the OCR module was not the primary focus of this phase, qualitative assessments were performed. The PaddleOCR engine, combined with the rule-based post-processing (regex `^\d{2}[A-Z]{3}\d{3}$` and character confusion correction), demonstrated strong performance on clearly detected license plates. The primary sources of error in the end-to-end pipeline were failures in detection, not recognition. When a plate was correctly detected and was reasonably clear, the OCR module was highly effective.
 
+### 4.5. Model Size Comparison: YOLOv8n vs YOLOv8m
+
+To validate the choice of YOLOv8n as the detection backbone, a comprehensive comparison was conducted between YOLOv8n and the larger YOLOv8m variant. This comparison aimed to quantify the trade-offs between model size, accuracy, and inference speed.
+
+**Training Methodology:**
+- YOLOv8m was first trained on the HuggingFace license plate dataset (keremberke/license-plate-object-detection, 6,176 training images) for 50 epochs
+- The model was then fine-tuned on the custom GTA V dataset (560 training images) for 30 epochs with a reduced learning rate (0.001) to adapt to the synthetic domain
+- Both models used identical hyperparameters where applicable: batch size of 16, image size of 640x640, and standard YOLO augmentation settings
+
+**Experimental Results:**
+
+| Metric | YOLOv8n | YOLOv8m | Difference |
+|--------|---------|---------|------------|
+| **Model Complexity** |
+| Parameters | 3,011,043 | 25,856,899 | +22,845,856 (8.6x) |
+| Model Size | 5.99 MB | 49.59 MB | +43.60 MB (8.3x) |
+| **Accuracy (GTA V Test Set)** |
+| mAP@0.5 | 90.08% | 93.21% | +3.48% |
+| mAP@0.5:0.95 | 76.48% | 76.96% | +0.63% |
+| Precision | 96.13% | 93.39% | -2.85% |
+| Recall | 89.81% | 88.35% | -1.62% |
+| F1 Score | 92.86% | 90.80% | -2.22% |
+| **Speed (CUDA-Synchronized)** |
+| Preprocess | 1.00 ms | 0.66 ms | -34% |
+| Inference | 7.15 ms | 9.48 ms | +32.62% |
+| Postprocess | 1.04 ms | 0.99 ms | -4.8% |
+| Total Time | 9.20 ms | 11.13 ms | +21.00% |
+| **Throughput (FPS)** | 108.73 | 89.86 | -17.3% |
+
+**Analysis:**
+
+The results reveal a counterintuitive finding: despite being 8.6x larger, YOLOv8m only provides a modest **3.48% improvement in mAP@0.5** while suffering a **32.62% slowdown in inference time**. This represents a poor performance-to-cost ratio for several reasons:
+
+1. **Diminishing Returns on Small Datasets**: The custom GTA V training dataset contains only 560 images. YOLOv8m's additional 22.8 million parameters offer minimal advantage when the training data is insufficient to fully utilize its capacity. The model likely benefits from the larger HuggingFace dataset but cannot effectively leverage its size during GTA V fine-tuning.
+
+2. **Real-time Performance Requirements**: For real-time ALPR in gameplay, maintaining high throughput is critical. YOLOv8n achieves 108.73 FPS, providing a comfortable margin above the 60 FPS target for smooth processing. YOLOv8m's 89.86 FPS, while still real-time capable, offers less headroom for additional pipeline components (tracking, OCR) and system overhead.
+
+3. **Deployment Efficiency**: The 8.3x larger model size (49.59 MB vs 5.99 MB) increases memory footprint and loading time without proportional accuracy gains. In production scenarios, this would impact system resource utilization and scalability.
+
+4. **Task-Specific Characteristics**: License plate detection in GTA V is a relatively simple visual task with consistent plate designs, standardized formatting, and limited intra-class variation. This simplicity favors compact models that can learn the essential features without requiring the representational capacity of larger architectures.
+
+**Decision Rationale:**
+
+Based on these findings, **YOLOv8n remains the optimal choice** for this application:
+
+- The **90.08% mAP@0.5** achieved by YOLOv8n is already sufficient for robust detection across all tested conditions (day/night, clear/rain)
+- The **21% faster inference** (108.73 FPS vs 89.86 FPS) provides better real-time performance with lower computational cost
+- The smaller model size enables easier deployment and lower resource consumption
+- The 3.48% accuracy gain from YOLOv8m does not justify the significant speed penalty and increased complexity
+
+This comparison demonstrates that **model selection should be guided by task requirements and data availability**, not simply by pursuing larger architectures. For constrained domains with limited training data and real-time requirements, compact models like YOLOv8n offer superior efficiency without sacrificing practical performance.
+
 ---
 
 ## 5. GUI Implementation
@@ -224,7 +275,6 @@ Several AI tools were uilized during the project development for the following p
 - **Code Debugging**: I used AI Tools to help debug issues encountered during model training. This significantly sped up the development process.
 - **Documentation**: AI Tools were also employed to help document the codebase, create README files for various scripts, and adding comments to complex sections of code. It ensured that the documentation was clear and helpful for future reference.
 
----
 
 ## 9. References
 
@@ -245,7 +295,3 @@ Several AI tools were uilized during the project development for the following p
 - **Ultralytics YOLOv8:** [https://github.com/ultralytics/ultralytics](https://github.com/ultralytics/ultralytics)
 - **PaddleOCR:** [https://github.com/PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 
----
-
-## 10. Appendix
-- **Github Repository:** [https://github.com/xiashuidaolaoshuren/ALPR_GTAV](https://github.com/xiashuidaolaoshuren/ALPR_GTAV)
