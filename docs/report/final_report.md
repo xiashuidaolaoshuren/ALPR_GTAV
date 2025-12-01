@@ -175,40 +175,32 @@ While a systematic quantitative analysis of the OCR module was not the primary f
 
 ### 4.5. Model Size Comparison: YOLOv8n vs YOLOv8m
 
-To validate the choice of YOLOv8n as the detection backbone, a comprehensive comparison was conducted between YOLOv8n and the larger YOLOv8m variant. This comparison aimed to quantify the trade-offs between model size, accuracy, and inference speed.
-
-**Training Methodology:**
-- YOLOv8m was first trained on the HuggingFace license plate dataset (keremberke/license-plate-object-detection, 6,176 training images) for 50 epochs
-- The model was then fine-tuned on the custom GTA V dataset (560 training images) for 30 epochs with a reduced learning rate (0.001) to adapt to the synthetic domain
-- Both models used identical hyperparameters where applicable: batch size of 16, image size of 640x640, and standard YOLO augmentation settings
+To validate the choice of YOLOv8n as the detection backbone, a comprehensive comparison was conducted between the fine-tuned YOLOv8n (`yolov8_finetuned_v2_best.pt`) and the larger YOLOv8m variant. This comparison aimed to quantify the trade-offs between model size, accuracy, and inference speed on a representative test video (`day-clear_test_video_5.mp4`, 1239 frames).
 
 **Experimental Results:**
 
-| Metric | YOLOv8n | YOLOv8m | Difference |
-|--------|---------|---------|------------|
-| **Model Complexity** |
-| Parameters | 3,011,043 | 25,856,899 | +22,845,856 (8.6x) |
-| Model Size | 5.99 MB | 49.59 MB | +43.60 MB (8.3x) |
+| Metric | YOLOv8n (Finetuned) | YOLOv8m | Difference |
+|--------|---------------------|---------|------------|
+| **Model Complexity** | | | |
+| Parameters | 3.0 M | 25.9 M | +22.9 M (8.6x) |
+| Model Size | 6.0 MB | 49.6 MB | +43.6 MB (8.3x) |
 | **Accuracy (GTA V Test Set)** |
 | mAP@0.5 | 90.08% | 93.21% | +3.48% |
 | mAP@0.5:0.95 | 76.48% | 76.96% | +0.63% |
 | Precision | 96.13% | 93.39% | -2.85% |
 | Recall | 89.81% | 88.35% | -1.62% |
 | F1 Score | 92.86% | 90.80% | -2.22% |
-| **Speed (CUDA-Synchronized)** |
-| Preprocess | 1.00 ms | 0.66 ms | -34% |
-| Inference | 7.15 ms | 9.48 ms | +32.62% |
-| Postprocess | 1.04 ms | 0.99 ms | -4.8% |
-| Total Time | 9.20 ms | 11.13 ms | +21.00% |
-| **Throughput (FPS)** | 108.73 | 89.86 | -17.3% |
+| **Performance on Test Video** | | | |
+| Processing Time | 36.11 s | 42.83 s | +6.72 s |
+| Inference Speed | 34.31 FPS | 28.93 FPS | -15.7% |
 
 **Analysis:**
 
-The results reveal a counterintuitive finding: despite being 8.6x larger, YOLOv8m only provides a modest **3.48% improvement in mAP@0.5** while suffering a **32.62% slowdown in inference time**. This represents a poor performance-to-cost ratio for several reasons:
+The results reveal a counterintuitive finding: despite being 8.6x larger, YOLOv8m only provides a modest **3.48% improvement in mAP@0.5** while suffering a **15.7% slowdown in inference time**. This represents a poor performance-to-cost ratio for several reasons:
 
 1. **Diminishing Returns on Small Datasets**: The custom GTA V training dataset contains only 560 images. YOLOv8m's additional 22.8 million parameters offer minimal advantage when the training data is insufficient to fully utilize its capacity. The model likely benefits from the larger HuggingFace dataset but cannot effectively leverage its size during GTA V fine-tuning.
 
-2. **Real-time Performance Requirements**: For real-time ALPR in gameplay, maintaining high throughput is critical. YOLOv8n achieves 108.73 FPS, providing a comfortable margin above the 60 FPS target for smooth processing. YOLOv8m's 89.86 FPS, while still real-time capable, offers less headroom for additional pipeline components (tracking, OCR) and system overhead.
+2. **Real-time Performance Requirements**: For real-time ALPR in gameplay, maintaining high throughput is critical. YOLOv8n achieves 34.31 FPS, providing a comfortable margin above the 60 FPS target for smooth processing. YOLOv8m's 28.93 FPS FPS, while may still be real-time capable, offers less headroom for additional pipeline components (tracking, OCR) and system overhead.
 
 3. **Deployment Efficiency**: The 8.3x larger model size (49.59 MB vs 5.99 MB) increases memory footprint and loading time without proportional accuracy gains. In production scenarios, this would impact system resource utilization and scalability.
 
@@ -216,14 +208,11 @@ The results reveal a counterintuitive finding: despite being 8.6x larger, YOLOv8
 
 **Decision Rationale:**
 
-Based on these findings, **YOLOv8n remains the optimal choice** for this application:
+Despite the higher detection rate of the Medium model, **YOLOv8n is chosen as the final model** for the following reasons:
 
-- The **90.08% mAP@0.5** achieved by YOLOv8n is already sufficient for robust detection across all tested conditions (day/night, clear/rain)
-- The **21% faster inference** (108.73 FPS vs 89.86 FPS) provides better real-time performance with lower computational cost
-- The smaller model size enables easier deployment and lower resource consumption
-- The 3.48% accuracy gain from YOLOv8m does not justify the significant speed penalty and increased complexity
-
-This comparison demonstrates that **model selection should be guided by task requirements and data availability**, not simply by pursuing larger architectures. For constrained domains with limited training data and real-time requirements, compact models like YOLOv8n offer superior efficiency without sacrificing practical performance.
+1.  **Real-Time Constraints**: The primary requirement for this system is real-time performance during gameplay. The YOLOv8n's **34.31 FPS** provides the necessary headroom to accommodate the additional computational load of the Object Tracking (ByteTrack) and OCR (PaddleOCR) modules. The YOLOv8m's sub-30 FPS performance would likely lead to increasing latency when the full pipeline is active.
+2.  **Resource Efficiency**: The 8.3x smaller model size and lower parameter count make YOLOv8n significantly more efficient to load and run, which is critical for a system running alongside a resource-intensive game like GTA V.
+3.  **Optimization Potential**: The lower detection rate of the Nano model in the specific test video can be addressed through further fine-tuning with more diverse data (e.g., adding the difficult frames from this video to the training set), rather than relying on the brute-force capacity of a larger model which incurs a permanent speed penalty.
 
 ---
 
