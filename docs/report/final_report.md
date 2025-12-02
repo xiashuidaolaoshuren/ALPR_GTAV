@@ -146,7 +146,7 @@ An initial round of fine-tuning the YOLOv8 model on the custom annotated GTA V d
 
 ### 4.3. Comparative Detection Results
 
-To provide a comprehensive view of the improvements gained from fine-tuning, the table below summarizes the detection performance of the baseline model and the three subsequent fine-tuned versions across all tested conditions. The data is aggregated from the raw detection output files.
+To provide a comprehensive view of the improvements gained from fine-tuning, the table below summarizes the detection performance of the baseline model and the final fine-tuned version across all tested conditions. The data is aggregated from the raw detection output files.
 
 | Model                  | Condition   | Detection Rate (%) | Avg Detections/Image | Avg Confidence |
 | ---------------------- | ----------- | ------------------ | -------------------- | -------------- |
@@ -163,11 +163,9 @@ To provide a comprehensive view of the improvements gained from fine-tuning, the
 
 **Analysis of Comparative Results:**
 
-- **Baseline vs. Fine-tuned**: There is a dramatic improvement between the baseline model and all fine-tuned versions. The overall detection rate jumped from **77.53%** to **96.43%** in the first fine-tuned version, and the average confidence increased from **0.63** to **0.84**. This clearly demonstrates the critical importance of fine-tuning on in-domain (synthetic) data to bridge the sim-to-real gap. The baseline model, trained on real-world plates, struggled with the unique textures, fonts, and lighting of GTA V.
+- **Baseline vs. Fine-tuned**: There is a dramatic improvement between the baseline model and the fine-tuned version. The overall detection rate jumped from **77.53%** to **93.82%**, and the average confidence increased from **0.63** to **0.87**. This clearly demonstrates the critical importance of fine-tuning on in-domain (synthetic) data to bridge the sim-to-real gap. The baseline model, trained on real-world plates, struggled with the unique textures, fonts, and lighting of GTA V.
 
-- **Performance Across Conditions**: The fine-tuned models consistently outperform the baseline in all conditions, especially in challenging night and rain scenarios. For instance, in `night_rain`, the detection rate increased from **70.73%** (baseline) to over **91%** for all fine-tuned versions.
-
-- **Iterative Improvement**: While the first fine-tuned model (`detection_finetuned`) shows the most significant leap in performance, subsequent versions (`v1` and `v2`) show incremental gains in average confidence, reaching a peak of **0.8672** in `v2`. This suggests that continued training and refinement can still yield improvements, particularly in the model's certainty. The detection rate slightly dipped in `v1` and `v2` compared to the first fine-tuned version, which could be a sign of minor overfitting or a trade-off for higher confidence; however, the overall performance remains exceptionally high.
+- **Performance Across Conditions**: The fine-tuned model consistently outperforms the baseline in all conditions, especially in challenging night and rain scenarios. For instance, in `night_rain`, the detection rate increased from **70.73%** (baseline) to **92.68%** for the fine-tuned model.
 
 ### 4.4. OCR Performance
 
