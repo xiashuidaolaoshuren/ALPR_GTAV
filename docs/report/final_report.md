@@ -1,14 +1,14 @@
 # AIST4010 - Final Project Report
 
 **Project Title**: Automatic License Plate Recognition in Grand Theft Auto V
-**Author:** Chun Ning SO
-**Date:** 2025-11-30
+**Name:** Chun Ning SO
+**SID:** 1155192846
 
 ---
 
 ## Abstract
 
-This report details the development and evaluation of a real-time Automatic License Plate Recognition (ALPR) system designed for the synthetic environment of Grand Theft Auto V (GTA V). The project addresses the "sim-to-real" domain gap by demonstrating the effectiveness of fine-tuning on in-domain synthetic data. A two-stage pipeline was constructed, utilizing a YOLOv8 model for license plate detection and a PaddleOCR engine for character recognition. A baseline YOLOv8 model, pre-trained on real-world data, was compared against several versions fine-tuned on a custom-annotated dataset of GTA V gameplay footage. Experimental results show a dramatic improvement from fine-tuning: the detection rate increased from 77.5% to over 96%, and average detection confidence rose from 0.63 to 0.87. The final model proves robust across varied in-game conditions, including night and rain. This work validates the use of synthetic environments for training and testing computer vision systems, highlighting that in-domain data is critical for achieving high performance. The project concludes with a complete system design, including a Streamlit-based GUI for interactive demonstration.
+This report details the development and evaluation of a real-time Automatic License Plate Recognition (ALPR) system designed for the synthetic environment of Grand Theft Auto V (GTA V). The project addresses the "sim-to-real" domain gap by demonstrating the effectiveness of fine-tuning on in-domain synthetic data. A two-stage pipeline was constructed, utilizing a YOLOv8 model for license plate detection and a PaddleOCR engine for character recognition. A baseline YOLOv8 model, pre-trained on real-world data, was compared against several versions fine-tuned on a custom-annotated dataset of GTA V gameplay footage. Experimental results show a dramatic improvement from fine-tuning: the detection rate increased from 77.5% to over 96%, and average detection confidence rose from 0.63 to 0.87. The final model proves robust across varied in-game conditions, including night and rain. This work validates the use of synthetic environments for training and testing computer vision systems, highlighting that in-domain data is critical for achieving high performance. The project concludes with a complete system design, including a Streamlit-based GUI for interactive video processing.
 
 ---
 
